@@ -66,7 +66,7 @@ export default function Home() {
     if (ingredients.length === 0) return;
     setIsLoadingRecipes(true);
     try {
-      const result = await suggestRecipes({ ingredients });
+      const result = await suggestRecipes({ ingredients, language });
       setRecipes(result.recipes);
     } catch (error) {
       console.error('Error suggesting recipes:', error);

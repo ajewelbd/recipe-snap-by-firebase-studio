@@ -13,6 +13,7 @@ import {z} from 'genkit';
 
 const SuggestRecipesInputSchema = z.object({
   ingredients: z.array(z.string()).describe('A list of ingredients to base the recipe suggestions on.'),
+  language: z.string().describe("The language to generate the recipes in. Can be 'en' for English or 'bn' for Bengali."),
 });
 export type SuggestRecipesInput = z.infer<typeof SuggestRecipesInputSchema>;
 
@@ -21,7 +22,7 @@ const SuggestRecipesOutputSchema = z.object({
     z.object({
       name: z.string().describe('The name of the recipe.'),
       instructions: z.string().describe('The cooking instructions for the recipe.'),
-      youtubeSearchQuery: z.string().describe('A simple, effective search query to find a YouTube video for this recipe.'),
+      youtubeSearchQuery: z.string().describe('A simple, effective search query to find a YouTube video for this recipe in English.'),
     })
   ).describe('A list of suggested recipes based on the provided ingredients.'),
 });
@@ -40,6 +41,10 @@ const prompt = ai.definePrompt({
 {{#each ingredients}}
 - {{this}}
 {{/each}}
+
+The user's preferred language is {{language}}. 'en' is English, and 'bn' is Bengali.
+Generate the recipe name and instructions in the user's preferred language.
+The youtubeSearchQuery should always be in English.
 
 Each recipe should include a name, cooking instructions, and a simple YouTube search query.`,
 });
