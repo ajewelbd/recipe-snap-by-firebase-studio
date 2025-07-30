@@ -1,6 +1,6 @@
 'use client';
 
-import { type ChangeEvent, useState, useRef, useEffect } from 'react';
+import { type ChangeEvent, useState, useRef, useEffect, useContext } from 'react';
 import Image from 'next/image';
 import { Upload, FileImage, Loader2, Camera, X } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
+import { LanguageContext, content } from '@/context/language-context';
 
 interface ImageUploaderProps {
   onImageUpload: (file: File) => void;
@@ -23,6 +24,9 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const { toast } = useToast();
+  const { language } = useContext(LanguageContext);
+  const t = content[language];
+
 
   useEffect(() => {
     let stream: MediaStream | null = null;
@@ -39,8 +43,8 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
         setHasCameraPermission(false);
         toast({
           variant: 'destructive',
-          title: 'Camera Access Denied',
-          description: 'Please enable camera permissions in your browser settings.',
+          title: t.toast.error.camera,
+          description: t.toast.error.cameraPermission,
         });
         setIsCameraOpen(false);
       }
@@ -53,7 +57,7 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
         stream.getTracks().forEach(track => track.stop());
       }
     };
-  }, [isCameraOpen, toast]);
+  }, [isCameraOpen, toast, t]);
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -104,20 +108,20 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
       </div>
       {hasCameraPermission === false && (
          <Alert variant="destructive">
-            <AlertTitle>Camera Access Required</AlertTitle>
+            <AlertTitle>{t.camera.accessRequired}</AlertTitle>
             <AlertDescription>
-                Please allow camera access to use this feature. You may need to change permissions in your browser settings.
+              {t.camera.allowAccess}
             </AlertDescription>
         </Alert>
       )}
       <div className="flex justify-center gap-4">
         <Button onClick={() => setIsCameraOpen(false)} variant="outline">
             <X className="mr-2" />
-            Cancel
+            {t.camera.cancel}
         </Button>
         <Button onClick={handleCapture} disabled={hasCameraPermission !== true}>
             <Camera className="mr-2" />
-            Snap Photo
+            {t.camera.snap}
         </Button>
       </div>
     </div>
@@ -136,20 +140,20 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
           >
             <div className="flex flex-col items-center justify-center pt-5 pb-6">
               <Upload className="w-10 h-10 mb-3 text-muted-foreground" />
-              <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">Click to upload</span> or drag and drop</p>
-              <p className="text-xs text-muted-foreground">PNG, JPG or WEBP</p>
+              <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">{t.uploader.click}</span> {t.uploader.drag}</p>
+              <p className="text-xs text-muted-foreground">{t.uploader.types}</p>
             </div>
             <Input id="dropzone-file" type="file" className="hidden" onChange={handleFileChange} accept="image/png, image/jpeg, image/webp" />
           </label>
            <Button onClick={() => setIsCameraOpen(true)} variant="outline" className="w-full">
             <Camera className="mr-2" />
-            Use Camera
+            {t.uploader.useCamera}
           </Button>
         </div>
       )}
       {imagePreview && (
         <div className="relative w-full h-64 rounded-lg overflow-hidden border shadow-sm">
-          <Image src={imagePreview} alt="Ingredients preview" layout="fill" objectFit="cover" data-ai-hint="food ingredients" />
+          <Image src={imagePreview} alt={t.uploader.previewAlt} layout="fill" objectFit="cover" data-ai-hint="food ingredients" />
           <div className="absolute top-2 right-2 flex gap-2">
             <Button
                 variant="outline"
@@ -158,7 +162,7 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
                 onClick={() => document.getElementById('dropzone-file')?.click()}
             >
               <FileImage className="mr-2 h-4 w-4" />
-              Change
+              {t.uploader.change}
             </Button>
             <Button
                 variant="outline"
@@ -167,7 +171,7 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
                 onClick={() => setIsCameraOpen(true)}
             >
               <Camera className="mr-2 h-4 w-4" />
-              Retake
+              {t.uploader.retake}
             </Button>
           </div>
         </div>
@@ -176,10 +180,10 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
         {isLoading ? (
           <>
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Analyzing...
+            {t.uploader.analyzing}
           </>
         ) : (
-          'Analyze Ingredients'
+          t.uploader.analyzeButton
         )}
       </Button>
     </div>
@@ -189,9 +193,9 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
   return (
     <Card>
       <CardHeader>
-        <CardTitle>1. Upload Your Ingredients</CardTitle>
+        <CardTitle>{t.uploader.title}</CardTitle>
         <CardDescription>
-          {isCameraOpen ? "Capture a photo of your ingredients." : "Upload a photo of your ingredients to get started."}
+          {isCameraOpen ? t.uploader.cameraDescription : t.uploader.description}
         </CardDescription>
       </CardHeader>
       <CardContent>

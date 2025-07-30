@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import { Trash2, Plus, Loader2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { LanguageContext, content } from '@/context/language-context';
 
 interface IngredientEditorProps {
   ingredients: string[];
@@ -21,6 +22,8 @@ export default function IngredientEditor({
   isLoading,
 }: IngredientEditorProps) {
   const [newIngredient, setNewIngredient] = useState('');
+  const { language } = useContext(LanguageContext);
+  const t = content[language];
 
   const handleAddIngredient = () => {
     if (newIngredient.trim() !== '') {
@@ -36,8 +39,8 @@ export default function IngredientEditor({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>2. Refine Your Ingredients</CardTitle>
-        <CardDescription>Add or remove ingredients to customize your recipes.</CardDescription>
+        <CardTitle>{t.ingredients.title}</CardTitle>
+        <CardDescription>{t.ingredients.description}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex flex-wrap gap-2">
@@ -61,9 +64,9 @@ export default function IngredientEditor({
             value={newIngredient}
             onChange={(e) => setNewIngredient(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleAddIngredient()}
-            placeholder="Add another ingredient..."
+            placeholder={t.ingredients.addPlaceholder}
           />
-          <Button onClick={handleAddIngredient} variant="outline" size="icon" aria-label="Add ingredient">
+          <Button onClick={handleAddIngredient} variant="outline" size="icon" aria-label={t.ingredients.addAriaLabel}>
             <Plus className="h-4 w-4" />
           </Button>
         </div>
@@ -72,10 +75,10 @@ export default function IngredientEditor({
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Finding Recipes...
+              {t.ingredients.loading}
             </>
           ) : (
-            'Get Recipes'
+            t.ingredients.getButton
           )}
         </Button>
       </CardContent>

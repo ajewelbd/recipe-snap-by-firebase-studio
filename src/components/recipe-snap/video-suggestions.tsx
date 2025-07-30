@@ -1,12 +1,15 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import { findRelatedVideos, type FindRelatedVideosOutput } from '@/ai/flows/find-related-videos';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Separator } from '../ui/separator';
+import { LanguageContext, content } from '@/context/language-context';
+
 
 interface VideoSuggestionsProps {
   recipeName: string;
+  searchQuery: string;
 }
 
 function convertToEmbedUrl(url: string): string | null {
@@ -31,24 +34,26 @@ function convertToEmbedUrl(url: string): string | null {
   return null;
 }
 
-export default function VideoSuggestions({ recipeName }: VideoSuggestionsProps) {
+export default function VideoSuggestions({ recipeName, searchQuery }: VideoSuggestionsProps) {
   const [videos, setVideos] = useState<FindRelatedVideosOutput['videoUrls']>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { language } = useContext(LanguageContext);
+  const t = content[language];
 
   useEffect(() => {
-    if (recipeName) {
+    if (searchQuery) {
       setIsLoading(true);
-      findRelatedVideos({ recipeName })
+      findRelatedVideos({ recipeName: searchQuery })
         .then((result) => setVideos(result.videoUrls))
         .catch((error) => console.error('Error finding videos:', error))
         .finally(() => setIsLoading(false));
     }
-  }, [recipeName]);
+  }, [searchQuery]);
 
   return (
     <div className="space-y-4 pt-4">
       <Separator />
-      <h4 className="font-semibold font-headline">Related Videos</h4>
+      <h4 className="font-semibold font-headline">{t.videos.title}</h4>
       {isLoading && (
         <div className="space-y-2">
           <Skeleton className="h-24 w-full" />
@@ -75,7 +80,7 @@ export default function VideoSuggestions({ recipeName }: VideoSuggestionsProps) 
         </div>
       )}
       {!isLoading && videos.length === 0 && (
-        <p className="text-sm text-muted-foreground">No related videos found.</p>
+        <p className="text-sm text-muted-foreground">{t.videos.empty}</p>
       )}
     </div>
   );

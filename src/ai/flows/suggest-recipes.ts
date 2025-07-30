@@ -21,6 +21,7 @@ const SuggestRecipesOutputSchema = z.object({
     z.object({
       name: z.string().describe('The name of the recipe.'),
       instructions: z.string().describe('The cooking instructions for the recipe.'),
+      youtubeSearchQuery: z.string().describe('A simple, effective search query to find a YouTube video for this recipe.'),
     })
   ).describe('A list of suggested recipes based on the provided ingredients.'),
 });
@@ -34,7 +35,7 @@ const prompt = ai.definePrompt({
   name: 'suggestRecipesPrompt',
   input: {schema: SuggestRecipesInputSchema},
   output: {schema: SuggestRecipesOutputSchema},
-  prompt: `Suggest 3 recipes based on the following ingredients:\n\n{% for ingredient in ingredients %}\n- {{ingredient}}\n{% endfor %}\n\nEach recipe should include a name and cooking instructions.`,
+  prompt: `Suggest 3 recipes based on the following ingredients:\n\n{% for ingredient in ingredients %}\n- {{ingredient}}\n{% endfor %}\n\nEach recipe should include a name, cooking instructions, and a simple YouTube search query.`,
 });
 
 const suggestRecipesFlow = ai.defineFlow(

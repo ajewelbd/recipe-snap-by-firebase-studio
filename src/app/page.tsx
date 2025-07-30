@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useContext } from 'react';
 import type { AnalyzeImageIngredientsOutput } from '@/ai/flows/analyze-image-ingredients';
 import type { SuggestRecipesOutput } from '@/ai/flows/suggest-recipes';
 import { analyzeImageIngredients } from '@/ai/flows/analyze-image-ingredients';
@@ -14,6 +14,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
+import { LanguageContext, content } from '@/context/language-context';
 
 export default function Home() {
   const [image, setImage] = useState<string | null>(null);
@@ -22,6 +23,8 @@ export default function Home() {
   const [isLoadingIngredients, setIsLoadingIngredients] = useState(false);
   const [isLoadingRecipes, setIsLoadingRecipes] = useState(false);
   const { toast } = useToast();
+  const { language } = useContext(LanguageContext);
+  const t = content[language];
 
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
@@ -50,8 +53,8 @@ export default function Home() {
       console.error('Error analyzing image:', error);
       toast({
         variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
-        description: 'Failed to analyze ingredients from the image.',
+        title: t.toast.error.title,
+        description: t.toast.error.analyze,
       });
     } finally {
       setIsLoadingIngredients(false);
@@ -68,8 +71,8 @@ export default function Home() {
       console.error('Error suggesting recipes:', error);
       toast({
         variant: 'destructive',
-        title: 'Uh oh! Something went wrong.',
-        description: 'Failed to generate new recipes.',
+        title: t.toast.error.title,
+        description: t.toast.error.recipes,
       });
     } finally {
       setIsLoadingRecipes(false);
@@ -92,7 +95,7 @@ export default function Home() {
             {isLoadingIngredients ? (
               <Card>
                 <CardHeader>
-                  <CardTitle>Ingredients</CardTitle>
+                  <CardTitle>{t.ingredients.title}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2">
                   <Skeleton className="h-8 w-full" />
@@ -115,7 +118,7 @@ export default function Home() {
             {isLoadingRecipes ? (
                <Card>
                 <CardHeader>
-                  <CardTitle>Suggested Recipes</CardTitle>
+                  <CardTitle>{t.recipes.title}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
@@ -139,10 +142,10 @@ export default function Home() {
             {!isLoadingRecipes && recipes.length === 0 && ingredients.length > 0 && (
                  <Card className="flex flex-col items-center justify-center p-12 text-center border-dashed">
                     <CardHeader>
-                        <CardTitle>Ready to Cook?</CardTitle>
+                        <CardTitle>{t.recipes.ready}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <p className="text-muted-foreground">Your delicious recipe suggestions will appear here once you click &quot;Get Recipes&quot;.</p>
+                        <p className="text-muted-foreground">{t.recipes.prompt}</p>
                     </CardContent>
                 </Card>
             )}
