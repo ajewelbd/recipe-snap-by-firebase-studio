@@ -13,26 +13,32 @@ interface VideoSuggestionsProps {
 }
 
 function convertToEmbedUrl(url: string): string | null {
+  if (!url) return null;
   try {
     const urlObj = new URL(url);
+    let videoId = null;
+
     if (urlObj.hostname === 'www.youtube.com' || urlObj.hostname === 'youtube.com') {
-      const videoId = urlObj.searchParams.get('v');
-      if (videoId) {
-        return `https://www.youtube.com/embed/${videoId}`;
+      if (urlObj.pathname === '/watch') {
+        videoId = urlObj.searchParams.get('v');
+      } else if (urlObj.pathname.startsWith('/embed/')) {
+        videoId = urlObj.pathname.substring('/embed/'.length);
       }
+    } else if (urlObj.hostname === 'youtu.be') {
+      videoId = urlObj.pathname.slice(1);
     }
-    if (urlObj.hostname === 'youtu.be') {
-      const videoId = urlObj.pathname.slice(1);
-      if (videoId) {
-        return `https://www.youtube.com/embed/${videoId}`;
-      }
+
+    if (videoId) {
+      const cleanVideoId = videoId.split('&')[0];
+      return `https://www.youtube.com/embed/${cleanVideoId}`;
     }
   } catch (error) {
-    console.error("Invalid URL:", error);
+    console.error("Invalid URL:", url, error);
     return null;
   }
   return null;
 }
+
 
 export default function VideoSuggestions({ recipeName, searchQuery }: VideoSuggestionsProps) {
   const [videos, setVideos] = useState<FindRelatedVideosOutput['videoUrls']>([]);
@@ -50,6 +56,8 @@ export default function VideoSuggestions({ recipeName, searchQuery }: VideoSugge
     }
   }, [searchQuery]);
 
+  const embeddableVideos = videos.map(convertToEmbedUrl).filter(Boolean) as string[];
+
   return (
     <div className="space-y-4 pt-4">
       <Separator />
@@ -60,12 +68,9 @@ export default function VideoSuggestions({ recipeName, searchQuery }: VideoSugge
           <Skeleton className="h-24 w-full" />
         </div>
       )}
-      {!isLoading && videos.length > 0 && (
+      {!isLoading && embeddableVideos.length > 0 && (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {videos.map((videoUrl, index) => {
-            const embedUrl = convertToEmbedUrl(videoUrl);
-            if (!embedUrl) return null;
-            return(
+          {embeddableVideos.map((embedUrl, index) => (
             <div key={index} className="aspect-video">
               <iframe
                 className="w-full h-full rounded-lg"
@@ -76,10 +81,10 @@ export default function VideoSuggestions({ recipeName, searchQuery }: VideoSugge
                 allowFullScreen
               ></iframe>
             </div>
-          )})}
+          ))}
         </div>
       )}
-      {!isLoading && videos.length === 0 && (
+      {!isLoading && embeddableVideos.length === 0 && (
         <p className="text-sm text-muted-foreground">{t.videos.empty}</p>
       )}
     </div>
