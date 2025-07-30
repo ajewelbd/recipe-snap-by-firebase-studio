@@ -53,9 +53,10 @@ export const content = {
             listen: 'Listen to recipe',
         },
         videos: {
-            title: 'Find a Video Tutorial',
+            title: 'Video Tutorials',
             search: 'Search on YouTube',
             prompt: (query: string) => `Click the button to search for "${query}" on YouTube.`,
+            unavailable: 'Could not find any relevant video tutorials for this recipe.',
         },
         camera: {
             accessRequired: 'Camera Access Required',
@@ -108,9 +109,10 @@ export const content = {
             listen: 'রেসিপি শুনুন',
         },
         videos: {
-            title: 'একটি ভিডিও টিউটোরিয়াল খুঁজুন',
+            title: 'ভিডিও টিউটোরিয়াল',
             search: 'YouTube-এ অনুসন্ধান করুন',
             prompt: (query: string) => `"${query}" ইউটিউবে অনুসন্ধান করতে বোতামে ক্লিক করুন।`,
+            unavailable: 'এই রেসিপির জন্য কোনো প্রাসঙ্গিক ভিডিও টিউটোরিয়াল খুঁজে পাওয়া যায়নি।',
         },
         camera: {
             accessRequired: 'ক্যামেরা অ্যাক্সেস প্রয়োজন',

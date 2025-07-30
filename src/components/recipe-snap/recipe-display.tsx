@@ -21,6 +21,8 @@ export default function RecipeDisplay({ recipes, onGetSpeech }: RecipeDisplayPro
   const t = content[language];
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [loadingAudio, setLoadingAudio] = useState<string | null>(null);
+  const [activeRecipe, setActiveRecipe] = useState<string | null>(null);
+
 
   const handleListen = async (recipeName: string, text: string) => {
     setLoadingAudio(recipeName);
@@ -39,13 +41,13 @@ export default function RecipeDisplay({ recipes, onGetSpeech }: RecipeDisplayPro
       </CardHeader>
       <CardContent>
         {recipes.length > 0 ? (
-          <Accordion type="single" collapsible className="w-full">
+          <Accordion type="single" collapsible className="w-full" onValueChange={(value) => setActiveRecipe(value)}>
             {recipes.map((recipe, index) => (
               <AccordionItem key={index} value={`item-${index}`}>
                 <AccordionTrigger className="font-headline text-lg hover:no-underline">{recipe.name}</AccordionTrigger>
                 <AccordionContent className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <p className="whitespace-pre-wrap text-foreground/80 flex-grow">{recipe.instructions}</p>
+                  <div className="flex items-start gap-4">
+                    <p className="whitespace-pre-wrap text-foreground/80 flex-grow pt-2">{recipe.instructions}</p>
                     <Button 
                       variant="outline" 
                       size="icon" 
@@ -61,7 +63,7 @@ export default function RecipeDisplay({ recipes, onGetSpeech }: RecipeDisplayPro
                     <Skeleton className="h-12 w-full" />
                   )}
 
-                  {audioUrl && loadingAudio !== recipe.name && (
+                  {audioUrl && loadingAudio !== recipe.name && activeRecipe === `item-${index}` && (
                     <div className="w-full">
                         <audio controls src={audioUrl} className="w-full">
                             Your browser does not support the audio element.
@@ -69,7 +71,7 @@ export default function RecipeDisplay({ recipes, onGetSpeech }: RecipeDisplayPro
                     </div>
                   )}
 
-                  <VideoSuggestions recipeName={recipe.name} searchQuery={recipe.youtubeSearchQuery} />
+                  <VideoSuggestions searchQuery={recipe.youtubeSearchQuery} />
                 </AccordionContent>
               </AccordionItem>
             ))}
