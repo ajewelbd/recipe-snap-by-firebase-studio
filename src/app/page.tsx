@@ -109,27 +109,14 @@ export default function Home() {
               isLoading={isLoadingIngredients}
               imagePreview={image}
             />
-            {isLoadingIngredients ? (
-              <Card>
-                <CardHeader>
-                  <CardTitle>{t.ingredients.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <Skeleton className="h-8 w-full" />
-                  <Skeleton className="h-8 w-full" />
-                  <Skeleton className="h-8 w-4/5" />
-                </CardContent>
-              </Card>
-            ) : (
-              (image || ingredients.length > 0) && (
-                <IngredientEditor
-                  ingredients={ingredients}
-                  setIngredients={setIngredients}
-                  onGetRecipes={handleGetRecipes}
-                  isLoading={isLoadingRecipes}
-                />
-              )
-            )}
+
+            <IngredientEditor
+              ingredients={ingredients}
+              setIngredients={setIngredients}
+              onGetRecipes={handleGetRecipes}
+              isLoading={isLoadingRecipes}
+              isImageLoading={isLoadingIngredients}
+            />
           </div>
           <div className="lg:mt-0">
             {isLoadingRecipes ? (
