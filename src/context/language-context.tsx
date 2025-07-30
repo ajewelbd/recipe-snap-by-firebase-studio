@@ -51,6 +51,11 @@ export const content = {
             ready: 'Ready to Cook?',
             prompt: 'Your delicious recipe suggestions will appear here once you click "Get Recipes".',
             listen: 'Listen to recipe',
+            nutrition: 'Nutritional Information',
+            calories: 'Calories',
+            protein: 'Protein',
+            carbs: 'Carbs',
+            fat: 'Fat',
         },
         videos: {
             title: 'Video Tutorials',
@@ -107,6 +112,11 @@ export const content = {
             ready: 'রান্না করতে প্রস্তুত?',
             prompt: 'আপনি "রেসিপি পান" ক্লিক করলে আপনার সুস্বাদু রেসিপির পরামর্শ এখানে প্রদর্শিত হবে।',
             listen: 'রেসিপি শুনুন',
+            nutrition: 'পুষ্টি সম্পর্কিত তথ্য',
+            calories: 'ক্যালোরি',
+            protein: 'প্রোটিন',
+            carbs: 'কার্বোহাইড্রেট',
+            fat: 'চর্বি',
         },
         videos: {
             title: 'ভিডিও টিউটোরিয়াল',

@@ -23,6 +23,12 @@ const SuggestRecipesOutputSchema = z.object({
       name: z.string().describe('The name of the recipe.'),
       instructions: z.string().describe('The cooking instructions for the recipe.'),
       youtubeSearchQuery: z.string().describe('A simple, effective search query to find a YouTube video for this recipe in English.'),
+      nutrition: z.object({
+        calories: z.string().describe('Estimated calories per serving.'),
+        protein: z.string().describe('Estimated protein in grams per serving.'),
+        carbs: z.string().describe('Estimated carbohydrates in grams per serving.'),
+        fat: z.string().describe('Estimated fat in grams per serving.'),
+      }).describe('Estimated nutritional information per serving.'),
     })
   ).describe('A list of suggested recipes based on the provided ingredients.'),
 });
@@ -44,9 +50,10 @@ const prompt = ai.definePrompt({
 
 The user's preferred language is {{language}}. 'en' is English, and 'bn' is Bengali.
 Generate the recipe name and instructions in the user's preferred language.
+For each recipe, also provide estimated nutritional information (calories, protein, carbs, and fat) per serving.
 The youtubeSearchQuery should always be in English.
 
-Each recipe should include a name, cooking instructions, and a simple YouTube search query.`,
+Each recipe should include a name, cooking instructions, a simple YouTube search query, and nutritional information.`,
 });
 
 const suggestRecipesFlow = ai.defineFlow(

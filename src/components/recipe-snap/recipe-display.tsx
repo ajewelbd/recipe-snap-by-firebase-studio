@@ -7,8 +7,9 @@ import type { SuggestRecipesOutput } from '@/ai/flows/suggest-recipes';
 import VideoSuggestions from './video-suggestions';
 import { LanguageContext, content } from '@/context/language-context';
 import { Button } from '../ui/button';
-import { Loader2, Volume2 } from 'lucide-react';
+import { Loader2, Volume2, Soup } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
+import { Separator } from '../ui/separator';
 
 
 interface RecipeDisplayProps {
@@ -70,6 +71,33 @@ export default function RecipeDisplay({ recipes, onGetSpeech }: RecipeDisplayPro
                         </audio>
                     </div>
                   )}
+
+                  <div className="space-y-4 pt-4">
+                    <Separator />
+                     <h4 className="font-semibold font-headline flex items-center gap-2">
+                        <Soup />
+                        {t.recipes.nutrition}
+                      </h4>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+                        <div className="bg-muted p-3 rounded-lg text-center">
+                            <p className="font-semibold">{recipe.nutrition.calories}</p>
+                            <p className="text-muted-foreground">{t.recipes.calories}</p>
+                        </div>
+                        <div className="bg-muted p-3 rounded-lg text-center">
+                            <p className="font-semibold">{recipe.nutrition.protein}</p>
+                            <p className="text-muted-foreground">{t.recipes.protein}</p>
+                        </div>
+                        <div className="bg-muted p-3 rounded-lg text-center">
+                            <p className="font-semibold">{recipe.nutrition.carbs}</p>
+                            <p className="text-muted-foreground">{t.recipes.carbs}</p>
+                        </div>
+                        <div className="bg-muted p-3 rounded-lg text-center">
+                            <p className="font-semibold">{recipe.nutrition.fat}</p>
+                            <p className="text-muted-foreground">{t.recipes.fat}</p>
+                        </div>
+                      </div>
+                  </div>
+
 
                   <VideoSuggestions searchQuery={recipe.youtubeSearchQuery} />
                 </AccordionContent>
