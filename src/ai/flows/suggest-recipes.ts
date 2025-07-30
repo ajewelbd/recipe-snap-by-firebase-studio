@@ -35,7 +35,13 @@ const prompt = ai.definePrompt({
   name: 'suggestRecipesPrompt',
   input: {schema: SuggestRecipesInputSchema},
   output: {schema: SuggestRecipesOutputSchema},
-  prompt: `Suggest 3 recipes based on the following ingredients:\n\n{% for ingredient in ingredients %}\n- {{ingredient}}\n{% endfor %}\n\nEach recipe should include a name, cooking instructions, and a simple YouTube search query.`,
+  prompt: `Suggest 3 recipes based on the following ingredients:
+
+{{#each ingredients}}
+- {{this}}
+{{/each}}
+
+Each recipe should include a name, cooking instructions, and a simple YouTube search query.`,
 });
 
 const suggestRecipesFlow = ai.defineFlow(
