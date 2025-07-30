@@ -40,9 +40,7 @@ const prompt = ai.definePrompt({
   prompt: `You are an AI that identifies ingredients in a photo.
 
   Analyze the image and extract the ingredients.
-  Return a list of strings of the identified ingredients.
   Do not include any ingredients that you are not confident about.
-  Respond using only the JSON format.
 
   Photo: {{media url=photoDataUri}}
   `,
