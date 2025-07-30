@@ -19,6 +19,7 @@ import { LanguageContext, content } from '@/context/language-context';
 import { firestore, storage } from '@/lib/firebase';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
+import { useAuth } from '@/context/auth-context';
 
 export default function Home() {
   const [image, setImage] = useState<string | null>(null);
@@ -29,6 +30,7 @@ export default function Home() {
   const { toast } = useToast();
   const { language } = useContext(LanguageContext);
   const t = content[language];
+  const { user } = useAuth();
 
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
@@ -73,12 +75,12 @@ export default function Home() {
       setRecipes(result.recipes);
       
       // Save to Firebase
-      if (image) {
-        const storageRef = ref(storage, `history/${new Date().toISOString()}`);
+      if (user && image) {
+        const storageRef = ref(storage, `history/${user.uid}/${new Date().toISOString()}`);
         await uploadString(storageRef, image, 'data_url');
         const imageUrl = await getDownloadURL(storageRef);
 
-        await addDoc(collection(firestore, 'history'), {
+        await addDoc(collection(firestore, 'users', user.uid, 'history'), {
           imageUrl,
           ingredients,
           recipes: result.recipes,

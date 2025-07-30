@@ -1,5 +1,4 @@
 'use client';
-import { useState } from 'react';
 import Header from '@/components/recipe-snap/header';
 import HistoryList from '@/components/recipe-snap/history-list';
 

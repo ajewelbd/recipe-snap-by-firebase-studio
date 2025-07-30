@@ -10,6 +10,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import Image from 'next/image';
 import { format } from 'date-fns';
 import { LanguageContext, content } from '@/context/language-context';
+import { useAuth } from '@/context/auth-context';
 
 interface HistoryItem {
   id: string;
@@ -27,12 +28,17 @@ export default function HistoryList() {
   const [isLoading, setIsLoading] = useState(true);
   const { language } = useContext(LanguageContext);
   const t = content[language];
+  const { user, loading: authLoading } = useAuth();
 
   useEffect(() => {
     const fetchHistory = async () => {
+      if (!user) {
+        setIsLoading(false);
+        return;
+      };
       setIsLoading(true);
       try {
-        const historyCollection = collection(firestore, 'history');
+        const historyCollection = collection(firestore, 'users', user.uid, 'history');
         const q = query(historyCollection, orderBy('createdAt', 'desc'));
         const querySnapshot = await getDocs(q);
         const historyData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as HistoryItem));
@@ -55,10 +61,13 @@ export default function HistoryList() {
         setIsLoading(false);
       }
     };
-    fetchHistory();
-  }, []);
 
-  if (isLoading) {
+    if (!authLoading) {
+      fetchHistory();
+    }
+  }, [user, authLoading]);
+
+  if (isLoading || authLoading) {
     return (
       <div className="space-y-8">
         {[...Array(2)].map((_, i) => (
@@ -82,6 +91,15 @@ export default function HistoryList() {
         ))}
       </div>
     );
+  }
+
+  if (!user) {
+    return (
+      <div className="text-center py-16">
+        <h1 className="text-2xl font-bold mb-4">{language === 'en' ? 'Please Log In' : 'অনুগ্রহ করে লগইন করুন'}</h1>
+        <p className="text-muted-foreground">{language === 'en' ? 'Log in to see your recipe history.' : 'আপনার রেসিপির ইতিহাস দেখতে লগইন করুন।'}</p>
+      </div>
+    )
   }
 
   return (

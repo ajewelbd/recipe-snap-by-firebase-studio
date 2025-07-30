@@ -1,19 +1,64 @@
 import { useContext } from 'react';
 import Link from 'next/link';
-import { ChefHat, Globe, History } from 'lucide-react';
+import { ChefHat, Globe, History, LogOut } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
+  DropdownMenuLabel,
+  DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { LanguageContext, content } from '@/context/language-context';
+import { useAuth } from '@/context/auth-context';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Skeleton } from '../ui/skeleton';
 
 export default function Header() {
   const { language, setLanguage } = useContext(LanguageContext);
   const t = content[language];
+  const { user, loading, signInWithGoogle, signOut } = useAuth();
+
+  const UserMenu = () => {
+    if (loading) {
+      return <Skeleton className="h-9 w-24" />;
+    }
+    if (user) {
+      return (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+              <Avatar className="h-9 w-9">
+                <AvatarImage src={user.photoURL || ''} alt={user.displayName || 'User'} />
+                <AvatarFallback>{user.displayName?.charAt(0) || 'U'}</AvatarFallback>
+              </Avatar>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56" align="end" forceMount>
+            <DropdownMenuLabel className="font-normal">
+              <div className="flex flex-col space-y-1">
+                <p className="text-sm font-medium leading-none">{user.displayName}</p>
+                <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={signOut}>
+              <LogOut className="mr-2 h-4 w-4" />
+              <span>{language === 'en' ? 'Log out' : 'লগ আউট'}</span>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      );
+    }
+    return (
+      <Button onClick={signInWithGoogle} variant="outline" size="sm">
+        {language === 'en' ? 'Login' : 'লগইন'}
+      </Button>
+    )
+  }
 
   return (
     <header className="bg-card border-b p-4">
@@ -27,12 +72,14 @@ export default function Header() {
           </Link>
         </div>
         <div className="flex items-center gap-2">
-          <Link href="/history" prefetch={true}>
-            <Button variant="outline" size="sm">
-              <History className="mr-2 h-4 w-4" />
-              {language === 'en' ? 'History' : 'ইতিহাস'}
-            </Button>
-          </Link>
+          {user && (
+            <Link href="/history" prefetch={true}>
+              <Button variant="outline" size="sm">
+                <History className="mr-2 h-4 w-4" />
+                {language === 'en' ? 'History' : 'ইতিহাস'}
+              </Button>
+            </Link>
+          )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="sm">
@@ -47,6 +94,7 @@ export default function Header() {
               </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
+          <UserMenu />
         </div>
       </div>
     </header>
