@@ -31,10 +31,10 @@ const findVideosPrompt = ai.definePrompt({
   output: {schema: FindRelatedVideosOutputSchema},
   prompt: `You are a helpful assistant that finds YouTube videos related to recipes.
 
-  Find 3 YouTube videos related to the following recipe:
+  Find 3 public, embeddable YouTube videos related to the following recipe:
   {{recipeName}}
 
-  Return the video URLs in a JSON array.
+  Return the video URLs in a JSON array. Only return URLs that are publicly accessible and can be embedded. Do not return private or unavailable videos.
   `,
 });
 
