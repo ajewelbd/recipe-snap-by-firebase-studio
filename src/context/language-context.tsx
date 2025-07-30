@@ -50,6 +50,7 @@ export const content = {
             empty: 'No recipes to show yet. Try generating some!',
             ready: 'Ready to Cook?',
             prompt: 'Your delicious recipe suggestions will appear here once you click "Get Recipes".',
+            listen: 'Listen to recipe',
         },
         videos: {
             title: 'Related Videos',
@@ -66,6 +67,7 @@ export const content = {
                 title: 'Uh oh! Something went wrong.',
                 analyze: 'Failed to analyze ingredients from the image.',
                 recipes: 'Failed to generate new recipes.',
+                speech: 'Failed to generate audio for the recipe.',
                 camera: 'Camera Access Denied',
                 cameraPermission: 'Please enable camera permissions in your browser settings.',
             }
@@ -102,6 +104,7 @@ export const content = {
             empty: 'এখনও দেখানোর মতো কোনো রেসিপি নেই। কিছু তৈরি করার চেষ্টা করুন!',
             ready: 'রান্না করতে প্রস্তুত?',
             prompt: 'আপনি "রেসিপি পান" ক্লিক করলে আপনার সুস্বাদু রেসিপির পরামর্শ এখানে প্রদর্শিত হবে।',
+            listen: 'রেসিপি শুনুন',
         },
         videos: {
             title: 'সম্পর্কিত ভিডিও',
@@ -118,6 +121,7 @@ export const content = {
                 title: 'ওহ হো! কিছু ভুল হয়েছে।',
                 analyze: 'ছবি থেকে উপাদান বিশ্লেষণ করতে ব্যর্থ হয়েছে।',
                 recipes: 'নতুন রেসিপি তৈরি করতে ব্যর্থ হয়েছে।',
+                speech: 'রেসিপির জন্য অডিও তৈরি করতে ব্যর্থ হয়েছে।',
                 camera: 'ক্যামেরা অ্যাক্সেস প্রত্যাখ্যাত হয়েছে',
                 cameraPermission: 'অনুগ্রহ করে আপনার ব্রাউজার সেটিংসে ক্যামেরার অনুমতি সক্ষম করুন।',
             }

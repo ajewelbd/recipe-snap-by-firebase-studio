@@ -5,6 +5,7 @@ import type { AnalyzeImageIngredientsOutput } from '@/ai/flows/analyze-image-ing
 import type { SuggestRecipesOutput } from '@/ai/flows/suggest-recipes';
 import { analyzeImageIngredients } from '@/ai/flows/analyze-image-ingredients';
 import { suggestRecipes } from '@/ai/flows/suggest-recipes';
+import { generateRecipeSpeech } from '@/ai/flows/generate-recipe-speech';
 
 import Header from '@/components/recipe-snap/header';
 import ImageUploader from '@/components/recipe-snap/image-uploader';
@@ -79,6 +80,22 @@ export default function Home() {
     }
   };
 
+  const handleGetSpeech = async (text: string) => {
+    try {
+      const result = await generateRecipeSpeech({ text });
+      return result.audioDataUri;
+    } catch (error) {
+      console.error('Error generating speech:', error);
+      toast({
+        variant: 'destructive',
+        title: t.toast.error.title,
+        description: t.toast.error.speech,
+      });
+      return null;
+    }
+  };
+
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -136,7 +153,7 @@ export default function Home() {
                 </CardContent>
               </Card>
             ) : (
-              (recipes.length > 0 || isLoadingRecipes) && <RecipeDisplay recipes={recipes} />
+              (recipes.length > 0 || isLoadingRecipes) && <RecipeDisplay recipes={recipes} onGetSpeech={handleGetSpeech} />
             )}
             
             {!isLoadingRecipes && recipes.length === 0 && ingredients.length > 0 && (
