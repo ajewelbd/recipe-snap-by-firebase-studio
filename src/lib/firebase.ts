@@ -10,7 +10,7 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth";
 const firebaseConfig = {
   projectId: "recipe-snap-zavua",
   appId: "1:187840532515:web:f70fdc459f89529448e196",
-  storageBucket: "recipe-snap-zavua.appspot.com",
+  storageBucket: "recipe-snap-zavua.firebasestorage.app",
   apiKey: "AIzaSyDXg3B03aFLASL_CbhA8E9bl9f9EB_emOc",
   authDomain: "recipe-snap-zavua.firebaseapp.com",
   messagingSenderId: "187840532515",
