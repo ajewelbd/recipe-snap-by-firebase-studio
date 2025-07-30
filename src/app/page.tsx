@@ -16,6 +16,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { LanguageContext, content } from '@/context/language-context';
+import { firestore, storage } from '@/lib/firebase';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 
 export default function Home() {
   const [image, setImage] = useState<string | null>(null);
@@ -68,6 +71,21 @@ export default function Home() {
     try {
       const result = await suggestRecipes({ ingredients, language });
       setRecipes(result.recipes);
+      
+      // Save to Firebase
+      if (image) {
+        const storageRef = ref(storage, `history/${new Date().toISOString()}`);
+        await uploadString(storageRef, image, 'data_url');
+        const imageUrl = await getDownloadURL(storageRef);
+
+        await addDoc(collection(firestore, 'history'), {
+          imageUrl,
+          ingredients,
+          recipes: result.recipes,
+          createdAt: serverTimestamp(),
+        });
+      }
+
     } catch (error) {
       console.error('Error suggesting recipes:', error);
       toast({
