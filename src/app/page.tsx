@@ -33,6 +33,12 @@ export default function Home() {
     reader.readAsDataURL(file);
   };
 
+  const handleImageCapture = (dataUri: string) => {
+    setImage(dataUri);
+    setIngredients([]);
+    setRecipes([]);
+  };
+
   const handleAnalyzeImage = async () => {
     if (!image) return;
     setIsLoadingIngredients(true);
@@ -78,6 +84,7 @@ export default function Home() {
           <div className="space-y-8">
             <ImageUploader
               onImageUpload={handleImageUpload}
+              onImageCapture={handleImageCapture}
               onAnalyze={handleAnalyzeImage}
               isLoading={isLoadingIngredients}
               imagePreview={image}
