@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useContext } from 'react';
-import Image from 'next/image';
 import { Separator } from '../ui/separator';
 import { LanguageContext, content } from '@/context/language-context';
 import { findYoutubeVideos, type FindYoutubeVideosOutput } from '@/ai/flows/find-youtube-videos';
@@ -70,7 +69,7 @@ export default function VideoSuggestions({ searchQuery }: VideoSuggestionsProps)
               <DialogTrigger asChild key={video.videoId} onClick={() => setSelectedVideo(video)}>
                 <Card className="overflow-hidden flex flex-col cursor-pointer group">
                   <div className="relative w-full aspect-video bg-muted">
-                    <Image
+                    <img
                       src={getThumbnailUrl(video.videoId)}
                       alt={video.title}
                       width={320}
