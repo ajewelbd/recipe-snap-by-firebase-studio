@@ -27,7 +27,7 @@ export default function Header() {
           </Link>
         </div>
         <div className="flex items-center gap-2">
-          <Link href="/history">
+          <Link href="/history" prefetch={true}>
             <Button variant="outline" size="sm">
               <History className="mr-2 h-4 w-4" />
               {language === 'en' ? 'History' : 'ইতিহাস'}

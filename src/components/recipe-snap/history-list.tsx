@@ -19,7 +19,7 @@ interface HistoryItem {
   createdAt: {
     seconds: number;
     nanoseconds: number;
-  };
+  } | null;
 }
 
 export default function HistoryList() {
@@ -38,11 +38,13 @@ export default function HistoryList() {
         const historyData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as HistoryItem));
         
         const groupedByDate = historyData.reduce((acc, item) => {
-          const date = format(new Date(item.createdAt.seconds * 1000), 'MMMM dd, yyyy');
-          if (!acc[date]) {
-            acc[date] = [];
+          if (item.createdAt) {
+            const date = format(new Date(item.createdAt.seconds * 1000), 'MMMM dd, yyyy');
+            if (!acc[date]) {
+              acc[date] = [];
+            }
+            acc[date].push(item);
           }
-          acc[date].push(item);
           return acc;
         }, {} as Record<string, HistoryItem[]>);
 
@@ -96,7 +98,7 @@ export default function HistoryList() {
               <Card key={item.id}>
                 <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
                   <div className="relative w-full aspect-square rounded-lg overflow-hidden shadow-md">
-                    <Image src={item.imageUrl} alt="Ingredients" layout="fill" objectFit="cover" data-ai-hint="food ingredients" />
+                    <Image src={item.imageUrl} alt="Ingredients" fill style={{objectFit: 'cover'}} data-ai-hint="food ingredients" />
                   </div>
                   <div className="md:col-span-2">
                     <div>
