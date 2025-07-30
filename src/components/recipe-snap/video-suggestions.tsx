@@ -68,20 +68,20 @@ export default function VideoSuggestions({ searchQuery }: VideoSuggestionsProps)
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {videos.map((video) => (
               <DialogTrigger asChild key={video.videoId} onClick={() => setSelectedVideo(video)}>
-                <Card className="overflow-hidden h-full flex flex-col cursor-pointer group">
-                  <div className="relative w-full aspect-video">
+                <Card className="overflow-hidden flex flex-col cursor-pointer group">
+                  <div className="relative w-full aspect-video bg-muted">
                     <Image
                       src={getThumbnailUrl(video.videoId)}
                       alt={video.title}
-                      layout="fill"
-                      objectFit="cover"
-                      className="group-hover:scale-105 transition-transform duration-200"
+                      width={320}
+                      height={180}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                     />
                     <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                       <PlayCircle className="w-12 h-12 text-white" />
                     </div>
                   </div>
-                  <div className="p-3">
+                  <div className="p-3 flex-grow">
                     <p className="text-xs font-medium line-clamp-2">{video.title}</p>
                   </div>
                 </Card>
