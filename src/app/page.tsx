@@ -39,6 +39,7 @@ export default function Home() {
   const [recipes, setRecipes] = useState<SuggestRecipesOutput['recipes']>([]);
   const [isLoadingIngredients, setIsLoadingIngredients] = useState(false);
   const [isLoadingRecipes, setIsLoadingRecipes] = useState(false);
+  const [analysisPerformed, setAnalysisPerformed] = useState(false);
   const { toast } = useToast();
   const { language } = useContext(LanguageContext);
   const t = content[language];
@@ -50,6 +51,7 @@ export default function Home() {
       setImage(reader.result as string);
       setIngredients([]);
       setRecipes([]);
+      setAnalysisPerformed(false);
     };
     reader.readAsDataURL(file);
   };
@@ -58,17 +60,20 @@ export default function Home() {
     setImage(dataUri);
     setIngredients([]);
     setRecipes([]);
+    setAnalysisPerformed(false);
   };
 
   const handleRemoveImage = () => {
     setImage(null);
     setIngredients([]);
     setRecipes([]);
+    setAnalysisPerformed(false);
   }
 
   const handleAnalyzeImage = async () => {
     if (!image) return;
     setIsLoadingIngredients(true);
+    setAnalysisPerformed(false);
     setRecipes([]);
     try {
       const result = await analyzeImageIngredients({ photoDataUri: image });
@@ -82,6 +87,7 @@ export default function Home() {
       });
     } finally {
       setIsLoadingIngredients(false);
+      setAnalysisPerformed(true);
     }
   };
 
@@ -198,6 +204,7 @@ export default function Home() {
               onGetRecipes={handleGetRecipes}
               isLoading={isLoadingRecipes}
               isImageLoading={isLoadingIngredients}
+              analysisPerformed={analysisPerformed}
             />
           </div>
           <div className="lg:mt-0">

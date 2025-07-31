@@ -78,6 +78,7 @@ export const content = {
             addAriaLabel: 'Add ingredient',
             loading: 'Finding Recipes...',
             getButton: 'Get Recipes',
+            notFound: 'No ingredients found. Please try another image or add some manually.',
             list: {
                 "orange": "Orange",
                 "guava": "Guava",
@@ -179,6 +180,7 @@ export const content = {
             addAriaLabel: 'উপাদান যোগ করুন',
             loading: 'রেসিপি খোঁজা হচ্ছে...',
             getButton: 'রেসিপি পান',
+            notFound: 'কোন উপাদান পাওয়া যায়নি। অনুগ্রহ করে অন্য একটি ছবি চেষ্টা করুন বা ম্যানুয়ালি কিছু যোগ করুন।',
             list: {
                 "orange": "কমলা",
                 "guava": "পেয়ারা",

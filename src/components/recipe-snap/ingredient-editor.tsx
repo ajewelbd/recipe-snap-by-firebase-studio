@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useContext } from 'react';
@@ -15,6 +16,7 @@ interface IngredientEditorProps {
   onGetRecipes: () => void;
   isLoading: boolean;
   isImageLoading: boolean;
+  analysisPerformed: boolean;
 }
 
 export default function IngredientEditor({
@@ -23,6 +25,7 @@ export default function IngredientEditor({
   onGetRecipes,
   isLoading,
   isImageLoading,
+  analysisPerformed,
 }: IngredientEditorProps) {
   const [newIngredient, setNewIngredient] = useState('');
   const { language } = useContext(LanguageContext);
@@ -49,6 +52,15 @@ export default function IngredientEditor({
             </div>
           );
     }
+
+    if (analysisPerformed && ingredients.length === 0) {
+        return (
+            <div className="text-center text-muted-foreground p-4 bg-muted rounded-md">
+                {t.ingredients.notFound}
+            </div>
+        )
+    }
+
     return (
         <>
             <div className="flex flex-wrap gap-2 min-h-[2.5rem]">
