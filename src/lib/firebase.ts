@@ -1,8 +1,8 @@
 // Import the functions you need from the SDKs you need
-import { initializeApp, getApp, getApps } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { getStorage } from "firebase/storage";
-import { getAuth, GoogleAuthProvider } from "firebase/auth";
+import { initializeApp, getApp, getApps, type FirebaseApp } from "firebase/app";
+import { getFirestore, type Firestore } from "firebase/firestore";
+import { getStorage, type FirebaseStorage } from "firebase/storage";
+import { getAuth, GoogleAuthProvider, type Auth } from "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -14,11 +14,11 @@ const firebaseConfig = {
   messagingSenderId: "187840532515",
 };
 
-// Initialize Firebase for SSR
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-const firestore = getFirestore(app);
-const storage = getStorage(app);
-const auth = getAuth(app);
+// Initialize Firebase
+const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
+const firestore: Firestore = getFirestore(app);
+const storage: FirebaseStorage = getStorage(app);
+const auth: Auth = getAuth(app);
 const googleProvider = new GoogleAuthProvider();
 
 export { app, firestore, storage, auth, googleProvider };
