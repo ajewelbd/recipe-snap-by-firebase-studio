@@ -22,6 +22,7 @@ export function AuthForm() {
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
@@ -40,7 +41,7 @@ export function AuthForm() {
       const { error } = await signInWithPassword({ email, password });
       authError = error;
     } else {
-      const { error } = await signUp({ email, password });
+      const { error } = await signUp({ email, password, fullName });
       if (!error) {
         setShowSuccessMessage(true);
       }
@@ -70,6 +71,7 @@ export function AuthForm() {
     if (!isOpen) {
         setEmail('');
         setPassword('');
+        setFullName('');
         setError(null);
         setShowSuccessMessage(false);
     }
@@ -78,6 +80,19 @@ export function AuthForm() {
 
   const renderForm = (type: 'login' | 'signup') => (
     <div className="space-y-4">
+       {type === 'signup' && (
+        <div className="space-y-2">
+          <Label htmlFor="signup-name">{t.fullNameLabel}</Label>
+          <Input
+            id="signup-name"
+            type="text"
+            placeholder={t.fullNamePlaceholder}
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            disabled={isSubmitting}
+          />
+        </div>
+      )}
       <div className="space-y-2">
         <Label htmlFor={`${type}-email`}>Email</Label>
         <Input
@@ -103,7 +118,7 @@ export function AuthForm() {
       {error && <p className="text-sm text-destructive">{error}</p>}
       <Button
         onClick={() => handleAuthAction(type)}
-        disabled={isSubmitting || !email || !password}
+        disabled={isSubmitting || !email || !password || (type === 'signup' && !fullName)}
         className="w-full"
       >
         {isSubmitting

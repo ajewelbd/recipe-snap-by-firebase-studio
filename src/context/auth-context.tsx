@@ -3,13 +3,18 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { supabase } from '@/lib/supabase';
 import type { User, AuthError } from '@supabase/supabase-js';
-import type { SignInWithPasswordCredentials, SignUpWithPasswordCredentials } from '@supabase/supabase-js';
+import type { SignInWithPasswordCredentials } from '@supabase/supabase-js';
+
+// Extend the signup credentials to include the full name
+interface SignUpCredentials extends SignInWithPasswordCredentials {
+  fullName: string;
+}
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   signInWithPassword: (credentials: SignInWithPasswordCredentials) => Promise<{ error: AuthError | null }>;
-  signUp: (credentials: SignUpWithPasswordCredentials) => Promise<{ error: AuthError | null }>;
+  signUp: (credentials: SignUpCredentials) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<{ error: AuthError | null }>;
 }
 
@@ -49,8 +54,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     return { error };
   };
 
-  const signUp = async (credentials: SignUpWithPasswordCredentials) => {
-    const { error } = await supabase.auth.signUp(credentials);
+  const signUp = async ({ email, password, fullName }: SignUpCredentials) => {
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: fullName,
+        },
+      },
+    });
     return { error };
   };
 
