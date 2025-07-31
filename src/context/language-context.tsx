@@ -22,6 +22,36 @@ export const content = {
     en: {
         appName: 'Recipe Snap',
         languageName: 'English',
+        auth: {
+            login: 'Login',
+            logout: 'Log out',
+            signup: 'Sign Up',
+            emailPlaceholder: 'your@email.com',
+            passwordPlaceholder: '••••••••',
+            loginButton: 'Login',
+            signupButton: 'Sign Up',
+            loginDescription: 'Enter your credentials to access your account.',
+            signupDescription: 'Create an account to save your recipe history.',
+            signupSuccess: 'Check your email!',
+            signupSuccessDescription: 'We have sent you a confirmation link. Please check your inbox to complete the registration.',
+            or: 'OR',
+            errors: {
+                invalid: 'Invalid login credentials.',
+                emailInUse: 'Email is already in use.',
+                weakPassword: 'Password should be at least 6 characters.',
+                unknown: 'An unknown error occurred. Please try again.',
+            }
+        },
+        history: {
+            title: 'Recipe History',
+            loginPrompt: {
+                title: 'Please Log In',
+                description: 'Log in to see your recipe history.',
+            },
+            empty: 'No history found.',
+            ingredientsUsed: 'Ingredients Used',
+            suggestedRecipes: 'Suggested Recipes',
+        },
         uploader: {
             title: '1. Your Ingredients',
             description: 'Upload a photo or manually add ingredients to get started.',
@@ -84,6 +114,36 @@ export const content = {
     bn: {
         appName: 'রেসিপি স্ন্যাপ',
         languageName: 'বাংলা',
+        auth: {
+            login: 'লগইন',
+            logout: 'লগ আউট',
+            signup: 'নিবন্ধন করুন',
+            emailPlaceholder: 'your@email.com',
+            passwordPlaceholder: '••••••••',
+            loginButton: 'লগইন',
+            signupButton: 'নিবন্ধন করুন',
+            loginDescription: 'আপনার অ্যাকাউন্টে প্রবেশ করতে আপনার পরিচয়পত্র লিখুন।',
+            signupDescription: 'আপনার রেসিপির ইতিহাস সংরক্ষণ করতে একটি অ্যাকাউন্ট তৈরি করুন।',
+            signupSuccess: 'আপনার ইমেইল চেক করুন!',
+            signupSuccessDescription: 'আমরা আপনাকে একটি নিশ্চিতকরণ লিঙ্ক পাঠিয়েছি। নিবন্ধন সম্পন্ন করতে আপনার ইনবক্স চেক করুন।',
+            or: 'অথবা',
+            errors: {
+                invalid: 'অকার্যকর লগইন পরিচয়পত্র।',
+                emailInUse: 'ইমেল ইতিমধ্যে ব্যবহৃত হচ্ছে।',
+                weakPassword: 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।',
+                unknown: 'একটি অজানা ত্রুটি ঘটেছে। অনুগ্রহ করে আবার চেষ্টা করুন।',
+            }
+        },
+        history: {
+            title: 'রেসিপির ইতিহাস',
+            loginPrompt: {
+                title: 'অনুগ্রহ করে লগইন করুন',
+                description: 'আপনার রেসিপির ইতিহাস দেখতে লগইন করুন।',
+            },
+            empty: 'কোনো ইতিহাস পাওয়া যায়নি।',
+            ingredientsUsed: 'ব্যবহৃত উপাদান',
+            suggestedRecipes: 'প্রস্তাবিত রেসিপি',
+        },
         uploader: {
             title: '১. আপনার উপাদান',
             description: 'শুরু করতে একটি ফটো আপলোড করুন বা ম্যানুয়ালি উপাদান যোগ করুন।',

@@ -16,11 +16,12 @@ import { LanguageContext, content } from '@/context/language-context';
 import { useAuth } from '@/context/auth-context';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Skeleton } from '../ui/skeleton';
+import { AuthForm } from './auth-form';
 
 export default function Header() {
   const { language, setLanguage } = useContext(LanguageContext);
   const t = content[language];
-  const { user, loading, signInWithGoogle, signOut } = useAuth();
+  const { user, loading, signOut } = useAuth();
 
   const UserMenu = () => {
     if (loading) {
@@ -51,17 +52,13 @@ export default function Header() {
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={signOut}>
               <LogOut className="mr-2 h-4 w-4" />
-              <span>{language === 'en' ? 'Log out' : 'লগ আউট'}</span>
+              <span>{t.auth.logout}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       );
     }
-    return (
-      <Button onClick={signInWithGoogle} variant="outline" size="sm">
-        {language === 'en' ? 'Login' : 'লগইন'}
-      </Button>
-    )
+    return <AuthForm />;
   }
 
   return (
@@ -80,7 +77,7 @@ export default function Header() {
             <Link href="/history" prefetch={true}>
               <Button variant="outline" size="sm">
                 <History className="mr-2 h-4 w-4" />
-                {language === 'en' ? 'History' : 'ইতিহাস'}
+                {t.history.title}
               </Button>
             </Link>
           )}

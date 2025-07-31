@@ -87,7 +87,8 @@ export default function Home() {
   const saveHistoryInBackground = async (
     currentUser: User, 
     imageData: string, 
-    recipeData: SuggestRecipesOutput
+    recipeData: SuggestRecipesOutput,
+    currentIngredients: string[],
   ) => {
     try {
       // 1. Upload image to Supabase Storage
@@ -95,7 +96,11 @@ export default function Home() {
       const filePath = `history/${currentUser.id}/${new Date().toISOString()}`;
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('history-images')
-        .upload(filePath, file);
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false,
+          contentType: file.type,
+        });
 
       if (uploadError) throw uploadError;
 
@@ -110,7 +115,7 @@ export default function Home() {
       const { error: dbError } = await supabase.from('history').insert({
         user_id: currentUser.id,
         image_url: imageUrl,
-        ingredients,
+        ingredients: currentIngredients,
         recipes: recipeData.recipes,
       });
 
@@ -118,6 +123,8 @@ export default function Home() {
 
     } catch (supabaseError) {
       console.error("Error saving to Supabase in background:", supabaseError);
+      // Non-blocking error - we don't want to hang the UI
+      // But we can inform the user if something went wrong
       toast({
         variant: 'destructive',
         title: 'Database Error',
@@ -135,7 +142,7 @@ export default function Home() {
       
       if (user && image) {
         // Don't wait for this to complete. Let it run in the background.
-        saveHistoryInBackground(user, image, result);
+        saveHistoryInBackground(user, image, result, ingredients);
       }
 
     } catch (error) {

@@ -95,17 +95,17 @@ export default function HistoryList() {
   if (!user) {
     return (
       <div className="text-center py-16">
-        <h1 className="text-2xl font-bold mb-4">{language === 'en' ? 'Please Log In' : 'অনুগ্রহ করে লগইন করুন'}</h1>
-        <p className="text-muted-foreground">{language === 'en' ? 'Log in to see your recipe history.' : 'আপনার রেসিপির ইতিহাস দেখতে লগইন করুন।'}</p>
+        <h1 className="text-2xl font-bold mb-4">{t.history.loginPrompt.title}</h1>
+        <p className="text-muted-foreground">{t.history.loginPrompt.description}</p>
       </div>
     )
   }
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold font-headline text-primary">{language === 'en' ? 'Recipe History' : 'রেসিপির ইতিহাস'}</h1>
+      <h1 className="text-3xl font-bold font-headline text-primary">{t.history.title}</h1>
       {Object.keys(history).length === 0 && !isLoading ? (
-        <p className="text-muted-foreground text-center py-8">{language === 'en' ? 'No history found.' : 'কোনো ইতিহাস পাওয়া যায়নি।'}</p>
+        <p className="text-muted-foreground text-center py-8">{t.history.empty}</p>
       ) : (
         Object.entries(history).map(([date, items]) => (
           <div key={date}>
@@ -119,7 +119,7 @@ export default function HistoryList() {
                   </div>
                   <div className="md:col-span-2">
                     <div>
-                      <h3 className="text-lg font-semibold font-headline">{language === 'en' ? 'Ingredients Used' : 'ব্যবহৃত উপাদান'}</h3>
+                      <h3 className="text-lg font-semibold font-headline">{t.history.ingredientsUsed}</h3>
                       <div className="flex flex-wrap gap-2 mt-2">
                         {item.ingredients.map((ing, i) => (
                           <span key={i} className="text-sm bg-muted text-muted-foreground px-2 py-1 rounded-md">{ing}</span>
@@ -127,7 +127,7 @@ export default function HistoryList() {
                       </div>
                     </div>
                     <div className="mt-4">
-                       <h3 className="text-lg font-semibold font-headline mb-2">{language === 'en' ? 'Suggested Recipes' : 'প্রস্তাবিত রেসিপি'}</h3>
+                       <h3 className="text-lg font-semibold font-headline mb-2">{t.history.suggestedRecipes}</h3>
                        <Accordion type="single" collapsible className="w-full">
                           {item.recipes.map((recipe, index) => (
                             <AccordionItem key={index} value={`item-${index}`}>

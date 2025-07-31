@@ -2,20 +2,23 @@
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { supabase } from '@/lib/supabase';
-import type { User, Session } from '@supabase/supabase-js';
+import type { User, AuthError } from '@supabase/supabase-js';
+import type { SignInWithPasswordCredentials, SignUpWithPasswordCredentials } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signInWithGoogle: () => Promise<void>;
-  signOut: () => Promise<void>;
+  signInWithPassword: (credentials: SignInWithPasswordCredentials) => Promise<{ error: AuthError | null }>;
+  signUp: (credentials: SignUpWithPasswordCredentials) => Promise<{ error: AuthError | null }>;
+  signOut: () => Promise<{ error: AuthError | null }>;
 }
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  signInWithGoogle: async () => {},
-  signOut: async () => {},
+  signInWithPassword: async () => ({ error: null }),
+  signUp: async () => ({ error: null }),
+  signOut: async () => ({ error: null }),
 });
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -41,32 +44,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     };
   }, []);
 
-  const signInWithGoogle = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin,
-        },
-      });
-      if (error) throw error;
-    } catch (error) {
-      console.error("Error signing in with Google: ", error);
-    }
+  const signInWithPassword = async (credentials: SignInWithPasswordCredentials) => {
+    const { error } = await supabase.auth.signInWithPassword(credentials);
+    return { error };
+  };
+
+  const signUp = async (credentials: SignUpWithPasswordCredentials) => {
+    const { error } = await supabase.auth.signUp(credentials);
+    return { error };
   };
 
   const signOut = async () => {
-    try {
-      await supabase.auth.signOut();
-    } catch (error) {
-      console.error("Error signing out: ", error);
-    }
+    const { error } = await supabase.auth.signOut();
+    return { error };
   };
 
   const value = {
     user,
     loading,
-    signInWithGoogle,
+    signInWithPassword,
+    signUp,
     signOut,
   };
 
