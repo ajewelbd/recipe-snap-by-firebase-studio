@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useContext } from 'react';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
-import { getFirestore } from 'firebase/firestore';
-import { app } from '@/lib/firebase';
+import { getFirestoreInstance } from '@/lib/firebase';
 import type { SuggestRecipesOutput } from '@/ai/flows/suggest-recipes';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -39,7 +38,7 @@ export default function HistoryList() {
       };
       setIsLoading(true);
       try {
-        const firestore = getFirestore(app);
+        const firestore = getFirestoreInstance();
         const historyCollection = collection(firestore, 'users', user.uid, 'history');
         const q = query(historyCollection, orderBy('createdAt', 'desc'));
         const querySnapshot = await getDocs(q);

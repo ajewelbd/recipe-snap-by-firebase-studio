@@ -16,7 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { LanguageContext, content } from '@/context/language-context';
-import { firestore, storage } from '@/lib/firebase';
+import { getFirestoreInstance, getStorageInstance } from '@/lib/firebase';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { useAuth } from '@/context/auth-context';
@@ -82,6 +82,8 @@ export default function Home() {
       
       // Save to Firebase
       if (user && image) {
+        const firestore = getFirestoreInstance();
+        const storage = getStorageInstance();
         const storageRef = ref(storage, `history/${user.uid}/${new Date().toISOString()}`);
         await uploadString(storageRef, image, 'data_url');
         const imageUrl = await getDownloadURL(storageRef);

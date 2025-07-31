@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { onAuthStateChanged, signInWithPopup, signOut as firebaseSignOut, User, GoogleAuthProvider, Auth } from 'firebase/auth';
-import { auth as firebaseAuth } from '@/lib/firebase';
+import { getAuthInstance } from '@/lib/firebase';
 
 interface AuthContextType {
   user: User | null;
@@ -26,7 +26,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
 
   useEffect(() => {
-    setAuth(firebaseAuth);
+    setAuth(getAuthInstance());
     setGoogleProvider(new GoogleAuthProvider());
   }, []);
 
