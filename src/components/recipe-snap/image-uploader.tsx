@@ -18,9 +18,10 @@ interface ImageUploaderProps {
   onRemove: () => void;
   isLoading: boolean;
   imagePreview: string | null;
+  imageSource: 'file' | 'camera' | null;
 }
 
-export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze, onRemove, isLoading, imagePreview }: ImageUploaderProps) {
+export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze, onRemove, isLoading, imagePreview, imageSource }: ImageUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
@@ -145,6 +146,14 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
     }
   };
 
+  const handleEditClick = () => {
+    if (imageSource === 'camera') {
+        setIsCameraOpen(true);
+    } else {
+        fileInputRef.current?.click();
+    }
+  }
+
   const renderCameraView = () => (
     <div className="space-y-4">
       <div className="relative w-full aspect-video rounded-lg overflow-hidden border bg-muted">
@@ -207,7 +216,7 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
             <Button
                 variant="outline"
                 size="sm"
-                className="bg-card/80 backdrop-blur-sm hover:bg-destructive/10 hover:text-destructive text-destructive border-destructive/30 hover:border-destructive/30 p-0 h-9 w-9"
+                className="text-destructive hover:bg-destructive/10 hover:text-destructive border-destructive/30 hover:border-destructive/30 p-0 h-9 w-9"
                 onClick={onRemove}
             >
               <Trash2 className="h-4 w-4" />
@@ -217,7 +226,7 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
                 variant="outline"
                 size="sm"
                 className="bg-card/80 backdrop-blur-sm p-0 h-9 w-9"
-                onClick={() => fileInputRef.current?.click()}
+                onClick={handleEditClick}
             >
               <Edit className="h-4 w-4" />
               <span className="sr-only">{t.uploader.change}</span>

@@ -35,6 +35,7 @@ const dataURIToBlob = (dataURI: string) => {
 
 export default function Home() {
   const [image, setImage] = useState<string | null>(null);
+  const [imageSource, setImageSource] = useState<'file' | 'camera' | null>(null);
   const [ingredients, setIngredients] = useState<AnalyzeImageIngredientsOutput['ingredients']>([]);
   const [recipes, setRecipes] = useState<SuggestRecipesOutput['recipes']>([]);
   const [isLoadingIngredients, setIsLoadingIngredients] = useState(false);
@@ -49,6 +50,7 @@ export default function Home() {
     const reader = new FileReader();
     reader.onloadend = () => {
       setImage(reader.result as string);
+      setImageSource('file');
       setIngredients([]);
       setRecipes([]);
       setAnalysisPerformed(false);
@@ -58,6 +60,7 @@ export default function Home() {
 
   const handleImageCapture = (dataUri: string) => {
     setImage(dataUri);
+    setImageSource('camera');
     setIngredients([]);
     setRecipes([]);
     setAnalysisPerformed(false);
@@ -65,6 +68,7 @@ export default function Home() {
 
   const handleRemoveImage = () => {
     setImage(null);
+    setImageSource(null);
     setIngredients([]);
     setRecipes([]);
     setAnalysisPerformed(false);
@@ -195,6 +199,7 @@ export default function Home() {
               onRemove={handleRemoveImage}
               isLoading={isLoadingIngredients}
               imagePreview={image}
+              imageSource={imageSource}
             />
 
             <IngredientEditor
