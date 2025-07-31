@@ -48,6 +48,12 @@ export default function Home() {
     setRecipes([]);
   };
 
+  const handleRemoveImage = () => {
+    setImage(null);
+    setIngredients([]);
+    setRecipes([]);
+  }
+
   const handleAnalyzeImage = async () => {
     if (!image) return;
     setIsLoadingIngredients(true);
@@ -126,6 +132,7 @@ export default function Home() {
               onImageUpload={handleImageUpload}
               onImageCapture={handleImageCapture}
               onAnalyze={handleAnalyzeImage}
+              onRemove={handleRemoveImage}
               isLoading={isLoadingIngredients}
               imagePreview={image}
             />

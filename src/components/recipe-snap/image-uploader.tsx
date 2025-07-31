@@ -2,7 +2,7 @@
 
 import { type ChangeEvent, useState, useRef, useEffect, useContext } from 'react';
 import Image from 'next/image';
-import { Upload, FileImage, Loader2, Camera, X, RefreshCw } from 'lucide-react';
+import { Upload, FileImage, Loader2, Camera, X, RefreshCw, Trash2 } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,11 +14,12 @@ interface ImageUploaderProps {
   onImageUpload: (file: File) => void;
   onImageCapture: (dataUri: string) => void;
   onAnalyze: () => void;
+  onRemove: () => void;
   isLoading: boolean;
   imagePreview: string | null;
 }
 
-export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze, isLoading, imagePreview }: ImageUploaderProps) {
+export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze, onRemove, isLoading, imagePreview }: ImageUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
@@ -28,6 +29,7 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
   const { toast } = useToast();
   const { language } = useContext(LanguageContext);
   const t = content[language];
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
 
   useEffect(() => {
@@ -178,6 +180,7 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
       {!imagePreview && (
         <div className="space-y-2">
           <label 
+            htmlFor="dropzone-file"
             className={`flex flex-col items-center justify-center w-full h-40 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${isDragging ? 'border-primary bg-accent' : 'border-border hover:bg-muted'}`}
             onDragEnter={handleDragEnter}
             onDragLeave={handleDragLeave}
@@ -189,7 +192,6 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
               <p className="mb-2 text-sm text-muted-foreground"><span className="font-semibold">{t.uploader.click}</span> {t.uploader.drag}</p>
               <p className="text-xs text-muted-foreground">{t.uploader.types}</p>
             </div>
-            <Input id="dropzone-file" type="file" className="hidden" onChange={handleFileChange} accept="image/png, image/jpeg, image/webp" />
           </label>
            <Button onClick={() => setIsCameraOpen(true)} variant="outline" className="w-full">
             <Camera className="mr-2" />
@@ -199,13 +201,22 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
       )}
       {imagePreview && (
         <div className="relative w-full h-64 rounded-lg overflow-hidden border shadow-sm">
-          <Image src={imagePreview} alt={t.uploader.previewAlt} layout="fill" objectFit="cover" data-ai-hint="food ingredients" />
+          <Image src={imagePreview} alt={t.uploader.previewAlt} fill objectFit="cover" data-ai-hint="food ingredients" />
           <div className="absolute top-2 right-2 flex gap-2">
+            <Button
+                variant="destructive"
+                size="icon"
+                className="bg-card/80 backdrop-blur-sm hover:bg-destructive/80"
+                onClick={onRemove}
+            >
+              <Trash2 className="h-4 w-4" />
+              <span className="sr-only">{t.uploader.remove}</span>
+            </Button>
             <Button
                 variant="outline"
                 size="sm"
                 className="bg-card/80 backdrop-blur-sm"
-                onClick={() => document.getElementById('dropzone-file')?.click()}
+                onClick={() => fileInputRef.current?.click()}
             >
               <FileImage className="mr-2 h-4 w-4" />
               {t.uploader.change}
@@ -232,6 +243,7 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
           t.uploader.analyzeButton
         )}
       </Button>
+      <Input id="dropzone-file" type="file" className="hidden" onChange={handleFileChange} accept="image/png, image/jpeg, image/webp" ref={fileInputRef}/>
     </div>
   );
 
