@@ -223,17 +223,6 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
               {t.uploader.change}
             </Button>
           </div>
-           <div className="absolute bottom-2 right-2">
-             <Button
-                variant="outline"
-                size="icon"
-                className="bg-card/80 backdrop-blur-sm"
-                onClick={() => setIsCameraOpen(true)}
-            >
-              <SwitchCamera className="h-4 w-4" />
-              <span className="sr-only">{t.uploader.retake}</span>
-            </Button>
-           </div>
         </div>
       )}
       <Button onClick={onAnalyze} disabled={!imagePreview || isLoading} className="w-full">
