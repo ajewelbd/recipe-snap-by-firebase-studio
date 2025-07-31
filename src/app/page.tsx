@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useContext } from 'react';
@@ -86,30 +87,33 @@ export default function Home() {
 
   const saveHistoryInBackground = async (
     currentUser: User, 
-    imageData: string, 
+    imageData: string | null, 
     recipeData: SuggestRecipesOutput,
     currentIngredients: string[],
   ) => {
     try {
-      // 1. Upload image to Supabase Storage
-      const file = dataURIToBlob(imageData);
-      const filePath = `public/${currentUser.id}/${new Date().toISOString()}`;
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('history-images')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: false,
-          contentType: file.type,
-        });
+      let imageUrl: string | null = null;
+      if (imageData) {
+        // 1. Upload image to Supabase Storage if it exists
+        const file = dataURIToBlob(imageData);
+        const filePath = `public/${currentUser.id}/${new Date().toISOString()}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('history-images')
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false,
+            contentType: file.type,
+          });
 
-      if (uploadError) throw uploadError;
+        if (uploadError) throw uploadError;
 
-      // 2. Get public URL for the uploaded image
-      const { data: urlData } = supabase.storage
-        .from('history-images')
-        .getPublicUrl(uploadData.path);
-      
-      const imageUrl = urlData.publicUrl;
+        // 2. Get public URL for the uploaded image
+        const { data: urlData } = supabase.storage
+          .from('history-images')
+          .getPublicUrl(uploadData.path);
+        
+        imageUrl = urlData.publicUrl;
+      }
 
       // 3. Save history to Supabase database
       const { error: dbError } = await supabase.from('history').insert({
@@ -140,7 +144,7 @@ export default function Home() {
       const result = await suggestRecipes({ ingredients, language });
       setRecipes(result.recipes);
       
-      if (user && image) {
+      if (user) {
         // Don't wait for this to complete. Let it run in the background.
         saveHistoryInBackground(user, image, result, ingredients);
       }

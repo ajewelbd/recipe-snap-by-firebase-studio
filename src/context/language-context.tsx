@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { createContext, useState, ReactNode } from 'react';
@@ -53,6 +54,7 @@ export const content = {
             empty: 'No history found.',
             ingredientsUsed: 'Ingredients Used',
             suggestedRecipes: 'Suggested Recipes',
+            manualEntry: 'Manual Entry',
         },
         uploader: {
             title: '1. Your Ingredients',
@@ -153,6 +155,7 @@ export const content = {
             empty: 'কোনো ইতিহাস পাওয়া যায়নি।',
             ingredientsUsed: 'ব্যবহৃত উপাদান',
             suggestedRecipes: 'প্রস্তাবিত রেসিপি',
+            manualEntry: 'ম্যানুয়াল এন্ট্রি',
         },
         uploader: {
             title: '১. আপনার উপাদান',

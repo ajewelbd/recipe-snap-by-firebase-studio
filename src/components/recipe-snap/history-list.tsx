@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useContext } from 'react';
@@ -11,10 +12,11 @@ import { format } from 'date-fns';
 import { bn, enUS } from 'date-fns/locale';
 import { LanguageContext, content } from '@/context/language-context';
 import { useAuth } from '@/context/auth-context';
+import { ListPlus } from 'lucide-react';
 
 interface HistoryItem {
   id: string;
-  image_url: string;
+  image_url: string | null;
   ingredients: string[];
   recipes: SuggestRecipesOutput['recipes'];
   created_at: string | null;
@@ -116,9 +118,16 @@ export default function HistoryList() {
             {items.map((item) => (
               <Card key={item.id}>
                 <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
-                  <div className="relative w-full aspect-square rounded-lg overflow-hidden shadow-md">
-                    <Image src={item.image_url} alt="Ingredients" fill style={{objectFit: 'cover'}} data-ai-hint="food ingredients" />
-                  </div>
+                  {item.image_url ? (
+                    <div className="relative w-full aspect-square rounded-lg overflow-hidden shadow-md">
+                      <Image src={item.image_url} alt="Ingredients" fill style={{objectFit: 'cover'}} data-ai-hint="food ingredients" />
+                    </div>
+                  ) : (
+                    <div className="relative w-full aspect-square rounded-lg bg-muted flex flex-col items-center justify-center text-muted-foreground">
+                      <ListPlus className="w-16 h-16" />
+                      <p className="mt-2 text-sm font-medium">{t.history.manualEntry}</p>
+                    </div>
+                  )}
                   <div className="md:col-span-2">
                     <div>
                       <h3 className="text-lg font-semibold font-headline">{t.history.ingredientsUsed}</h3>
