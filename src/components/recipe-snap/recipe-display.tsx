@@ -47,7 +47,7 @@ export default function RecipeDisplay({ recipes, onGetSpeech }: RecipeDisplayPro
               <AccordionItem key={index} value={`item-${index}`}>
                 <AccordionTrigger className="font-headline text-lg hover:no-underline">{recipe.name}</AccordionTrigger>
                 <AccordionContent className="space-y-4">
-                  <div className="flex items-start gap-4">
+                  <div className="flex flex-wrap items-start gap-4">
                     <p className="whitespace-pre-wrap text-foreground/80 flex-grow pt-2">{recipe.instructions}</p>
                     <Button 
                       variant="outline" 
@@ -55,6 +55,7 @@ export default function RecipeDisplay({ recipes, onGetSpeech }: RecipeDisplayPro
                       onClick={() => handleListen(recipe.name, recipe.instructions)}
                       disabled={loadingAudio === recipe.name}
                       aria-label={t.recipes.listen}
+                      className="shrink-0"
                     >
                       {loadingAudio === recipe.name ? <Loader2 className="animate-spin" /> : <Volume2 />}
                     </Button>
