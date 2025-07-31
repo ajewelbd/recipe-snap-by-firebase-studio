@@ -212,9 +212,9 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
         </div>
       )}
       {imagePreview && (
-        <div className="relative w-full h-64 rounded-lg overflow-hidden border shadow-sm">
+        <div className="relative w-full h-64 rounded-lg overflow-hidden border shadow-sm bg-muted">
           <div className="absolute inset-0">
-             <Image src={imagePreview} alt={t.uploader.previewAlt} fill className="object-cover" data-ai-hint="food ingredients" />
+             <Image src={imagePreview} alt={t.uploader.previewAlt} fill className="object-contain" data-ai-hint="food ingredients" />
           </div>
           
           {ingredients.map((ingredient, index) => {
