@@ -2,7 +2,7 @@
 
 import { type ChangeEvent, useState, useRef, useEffect, useContext } from 'react';
 import Image from 'next/image';
-import { Upload, FileImage, Loader2, Camera, X } from 'lucide-react';
+import { Upload, FileImage, Loader2, Camera, X, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +23,8 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>([]);
+  const [activeDeviceId, setActiveDeviceId] = useState<string | undefined>(undefined);
   const { toast } = useToast();
   const { language } = useContext(LanguageContext);
   const t = content[language];
@@ -30,14 +32,24 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
 
   useEffect(() => {
     let stream: MediaStream | null = null;
+    
     const getCameraPermission = async () => {
       if (!isCameraOpen) return;
       try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        // Get initial stream to request permission
+        await navigator.mediaDevices.getUserMedia({ video: true });
         setHasCameraPermission(true);
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream;
-        }
+
+        // Enumerate devices
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoInputs = devices.filter(device => device.kind === 'videoinput');
+        setVideoDevices(videoInputs);
+
+        // Set initial device (prefer back camera)
+        const rearCamera = videoInputs.find(device => device.label.toLowerCase().includes('back'));
+        const initialDeviceId = rearCamera?.deviceId || videoInputs[0]?.deviceId;
+        setActiveDeviceId(initialDeviceId);
+
       } catch (error) {
         console.error('Error accessing camera:', error);
         setHasCameraPermission(false);
@@ -58,6 +70,35 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
       }
     };
   }, [isCameraOpen, toast, t]);
+
+  useEffect(() => {
+    let stream: MediaStream | null = null;
+    const startStream = async () => {
+      if (videoRef.current && activeDeviceId) {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { deviceId: { exact: activeDeviceId } },
+        });
+        videoRef.current.srcObject = stream;
+      }
+    };
+
+    if (isCameraOpen && hasCameraPermission) {
+      startStream();
+    }
+    
+    return () => {
+        stream?.getTracks().forEach(track => track.stop());
+    }
+  }, [activeDeviceId, isCameraOpen, hasCameraPermission]);
+
+  const handleSwitchCamera = () => {
+    if (videoDevices.length > 1) {
+      const currentIndex = videoDevices.findIndex(device => device.deviceId === activeDeviceId);
+      const nextIndex = (currentIndex + 1) % videoDevices.length;
+      setActiveDeviceId(videoDevices[nextIndex].deviceId);
+    }
+  };
+
 
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -123,6 +164,11 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
             <Camera className="mr-2" />
             {t.camera.snap}
         </Button>
+        {videoDevices.length > 1 && (
+            <Button onClick={handleSwitchCamera} variant="outline" size="icon" aria-label={language === 'en' ? 'Switch Camera' : 'ক্যামেরা পরিবর্তন করুন'}>
+                <RefreshCw className="h-4 w-4" />
+            </Button>
+        )}
       </div>
     </div>
   );
