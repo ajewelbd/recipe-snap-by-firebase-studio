@@ -26,7 +26,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
 
   useEffect(() => {
-    setAuth(getAuthInstance());
+    const authInstance = getAuthInstance();
+    setAuth(authInstance);
     setGoogleProvider(new GoogleAuthProvider());
   }, []);
 

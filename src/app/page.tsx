@@ -82,18 +82,27 @@ export default function Home() {
       
       // Save to Firebase
       if (user && image) {
-        const firestore = getFirestoreInstance();
-        const storage = getStorageInstance();
-        const storageRef = ref(storage, `history/${user.uid}/${new Date().toISOString()}`);
-        await uploadString(storageRef, image, 'data_url');
-        const imageUrl = await getDownloadURL(storageRef);
+        try {
+            const firestore = getFirestoreInstance();
+            const storage = getStorageInstance();
+            const storageRef = ref(storage, `history/${user.uid}/${new Date().toISOString()}`);
+            await uploadString(storageRef, image, 'data_url');
+            const imageUrl = await getDownloadURL(storageRef);
 
-        await addDoc(collection(firestore, 'users', user.uid, 'history'), {
-          imageUrl,
-          ingredients,
-          recipes: result.recipes,
-          createdAt: serverTimestamp(),
-        });
+            await addDoc(collection(firestore, 'users', user.uid, 'history'), {
+              imageUrl,
+              ingredients,
+              recipes: result.recipes,
+              createdAt: serverTimestamp(),
+            });
+        } catch (error) {
+            console.error("Error saving to Firebase:", error);
+            toast({
+                variant: 'destructive',
+                title: 'Database Error',
+                description: 'Failed to save recipe to your history.',
+            });
+        }
       }
 
     } catch (error) {
