@@ -45,7 +45,7 @@ export const content = {
             }
         },
         history: {
-            title: 'Recipe History',
+            title: 'History',
             loginPrompt: {
                 title: 'Please Log In',
                 description: 'Log in to see your recipe history.',
@@ -145,7 +145,7 @@ export const content = {
             }
         },
         history: {
-            title: 'রেসিপির ইতিহাস',
+            title: 'ইতিহাস',
             loginPrompt: {
                 title: 'অনুগ্রহ করে লগইন করুন',
                 description: 'আপনার রেসিপির ইতিহাস দেখতে লগইন করুন।',
