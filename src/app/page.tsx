@@ -80,7 +80,6 @@ export default function Home() {
       const result = await suggestRecipes({ ingredients, language });
       setRecipes(result.recipes);
       
-      // Save to Firebase in a separate try/catch to not block UI
       if (user && image) {
         try {
             const firestore = getFirestoreInstance();
