@@ -213,7 +213,9 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
       )}
       {imagePreview && (
         <div className="relative w-full h-64 rounded-lg overflow-hidden border shadow-sm">
-          <Image src={imagePreview} alt={t.uploader.previewAlt} fill objectFit="cover" data-ai-hint="food ingredients" />
+          <div className="absolute inset-0">
+             <Image src={imagePreview} alt={t.uploader.previewAlt} fill className="object-cover" data-ai-hint="food ingredients" />
+          </div>
           
           {ingredients.map((ingredient, index) => {
             if (!ingredient.box || ingredient.box.length !== 4) return null;
