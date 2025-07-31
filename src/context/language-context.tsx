@@ -76,6 +76,12 @@ export const content = {
             addAriaLabel: 'Add ingredient',
             loading: 'Finding Recipes...',
             getButton: 'Get Recipes',
+            list: {
+                "orange": "Orange",
+                "guava": "Guava",
+                "mango": "Mango",
+                "lime": "Lime",
+            }
         },
         recipes: {
             title: '3. Your Personalized Recipes',
@@ -170,6 +176,12 @@ export const content = {
             addAriaLabel: 'উপাদান যোগ করুন',
             loading: 'রেসিপি খোঁজা হচ্ছে...',
             getButton: 'রেসিপি পান',
+            list: {
+                "orange": "কমলা",
+                "guava": "পেয়ারা",
+                "mango": "আম",
+                "lime": "লেবু",
+            }
         },
         recipes: {
             title: '৩. আপনার ব্যক্তিগতকৃত রেসিপি',

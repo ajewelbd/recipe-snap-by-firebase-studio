@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import Image from 'next/image';
 import { format } from 'date-fns';
+import { bn, enUS } from 'date-fns/locale';
 import { LanguageContext, content } from '@/context/language-context';
 import { useAuth } from '@/context/auth-context';
 
@@ -25,6 +26,7 @@ export default function HistoryList() {
   const { language } = useContext(LanguageContext);
   const t = content[language];
   const { user, loading: authLoading } = useAuth();
+  const dateLocale = language === 'bn' ? bn : enUS;
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -44,7 +46,7 @@ export default function HistoryList() {
         
         const groupedByDate = (historyData || []).reduce((acc, item) => {
           if (item.created_at) {
-            const date = format(new Date(item.created_at), 'MMMM dd, yyyy');
+            const date = format(new Date(item.created_at), 'MMMM dd, yyyy', { locale: dateLocale });
             if (!acc[date]) {
               acc[date] = [];
             }
@@ -64,7 +66,7 @@ export default function HistoryList() {
     if (!authLoading) {
       fetchHistory();
     }
-  }, [user, authLoading]);
+  }, [user, authLoading, dateLocale]);
 
   if (isLoading || authLoading) {
     return (
@@ -122,7 +124,7 @@ export default function HistoryList() {
                       <h3 className="text-lg font-semibold font-headline">{t.history.ingredientsUsed}</h3>
                       <div className="flex flex-wrap gap-2 mt-2">
                         {item.ingredients.map((ing, i) => (
-                          <span key={i} className="text-sm bg-muted text-muted-foreground px-2 py-1 rounded-md">{ing}</span>
+                          <span key={i} className="text-sm bg-muted text-muted-foreground px-2 py-1 rounded-md">{language === 'bn' ? t.ingredients.list[ing.toLowerCase() as keyof typeof t.ingredients.list] || ing : ing}</span>
                         ))}
                       </div>
                     </div>
@@ -131,9 +133,13 @@ export default function HistoryList() {
                        <Accordion type="single" collapsible className="w-full">
                           {item.recipes.map((recipe, index) => (
                             <AccordionItem key={index} value={`item-${index}`}>
-                              <AccordionTrigger className="font-headline text-md hover:no-underline">{recipe.name}</AccordionTrigger>
+                              <AccordionTrigger className="font-headline text-md hover:no-underline">
+                                {language === 'bn' ? recipe.name_bn : recipe.name_en}
+                              </AccordionTrigger>
                               <AccordionContent className="space-y-2">
-                                <p className="whitespace-pre-wrap text-foreground/80">{recipe.instructions}</p>
+                                <p className="whitespace-pre-wrap text-foreground/80">
+                                  {language === 'bn' ? recipe.instructions_bn : recipe.instructions_en}
+                                </p>
                               </AccordionContent>
                             </AccordionItem>
                           ))}
