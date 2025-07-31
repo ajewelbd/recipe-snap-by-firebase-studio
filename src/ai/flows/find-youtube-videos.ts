@@ -31,43 +31,41 @@ export async function findYoutubeVideos(input: FindYoutubeVideosInput): Promise<
   return findYoutubeVideosFlow(input);
 }
 
-const youtubeSearchTool = ai.defineTool(
-  {
-    name: 'youtubeSearchTool',
-    description: 'Searches YouTube for videos based on a query.',
-    inputSchema: z.object({ query: z.string() }),
-    outputSchema: FindYoutubeVideosOutputSchema,
-  },
-  async (input) => {
-    const youtube = google.youtube('v3');
-    const response = await youtube.search.list({
-      key: process.env.YOUTUBE_API_KEY,
-      part: ['snippet'],
-      q: input.query,
-      type: ['video'],
-      maxResults: 3,
-      videoEmbeddable: 'true',
-    });
-
-    const videos = response.data.items?.map(item => ({
-      videoId: item.id?.videoId || '',
-      title: item.snippet?.title || '',
-    })).filter(v => v.videoId && v.title) || [];
-
-    return { videos };
-  }
-);
-
-
 const findYoutubeVideosFlow = ai.defineFlow(
   {
     name: 'findYoutubeVideosFlow',
     inputSchema: FindYoutubeVideosInputSchema,
     outputSchema: FindYoutubeVideosOutputSchema,
-    tools: [youtubeSearchTool],
   },
   async (input) => {
-    const {output} = await youtubeSearchTool(input);
-    return output!;
+    if (!process.env.YOUTUBE_API_KEY) {
+      console.warn("YouTube API key not found. Returning empty video list.");
+      return { videos: [] };
+    }
+
+    const youtube = google.youtube('v3');
+    try {
+      const response = await youtube.search.list({
+        key: process.env.YOUTUBE_API_KEY,
+        part: ['snippet'],
+        q: input.query,
+        type: ['video'],
+        maxResults: 3,
+        videoEmbeddable: 'true',
+      });
+
+      const videos = response.data.items
+        ?.map(item => ({
+          videoId: item.id?.videoId || '',
+          title: item.snippet?.title || '',
+        }))
+        .filter(v => v.videoId && v.title) || [];
+
+      return { videos };
+    } catch (error) {
+        console.error("Error fetching from YouTube API: ", error);
+        // Return empty list on error to prevent app crash
+        return { videos: [] };
+    }
   }
 );
