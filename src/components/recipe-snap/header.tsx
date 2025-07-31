@@ -27,21 +27,25 @@ export default function Header() {
       return <Skeleton className="h-9 w-24" />;
     }
     if (user) {
+      const displayName = user.user_metadata?.full_name || user.email;
+      const avatarUrl = user.user_metadata?.avatar_url;
+      const email = user.email;
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-9 w-9 rounded-full">
               <Avatar className="h-9 w-9">
-                <AvatarImage src={user.photoURL || ''} alt={user.displayName || 'User'} />
-                <AvatarFallback>{user.displayName?.charAt(0) || 'U'}</AvatarFallback>
+                <AvatarImage src={avatarUrl || ''} alt={displayName || 'User'} />
+                <AvatarFallback>{displayName?.charAt(0)?.toUpperCase() || 'U'}</AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56" align="end" forceMount>
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{user.displayName}</p>
-                <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                <p className="text-sm font-medium leading-none">{displayName}</p>
+                <p className="text-xs leading-none text-muted-foreground">{email}</p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />

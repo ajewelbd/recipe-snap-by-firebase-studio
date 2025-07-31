@@ -1,8 +1,7 @@
 'use client';
 
 import { useState, useEffect, useContext } from 'react';
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
-import { getFirestoreInstance } from '@/lib/firebase';
+import { supabase } from '@/lib/supabase';
 import type { SuggestRecipesOutput } from '@/ai/flows/suggest-recipes';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -14,13 +13,10 @@ import { useAuth } from '@/context/auth-context';
 
 interface HistoryItem {
   id: string;
-  imageUrl: string;
+  image_url: string;
   ingredients: string[];
   recipes: SuggestRecipesOutput['recipes'];
-  createdAt: {
-    seconds: number;
-    nanoseconds: number;
-  } | null;
+  created_at: string | null;
 }
 
 export default function HistoryList() {
@@ -38,15 +34,17 @@ export default function HistoryList() {
       };
       setIsLoading(true);
       try {
-        const firestore = getFirestoreInstance();
-        const historyCollection = collection(firestore, 'users', user.uid, 'history');
-        const q = query(historyCollection, orderBy('createdAt', 'desc'));
-        const querySnapshot = await getDocs(q);
-        const historyData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as HistoryItem));
+        const { data: historyData, error } = await supabase
+          .from('history')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
         
-        const groupedByDate = historyData.reduce((acc, item) => {
-          if (item.createdAt) {
-            const date = format(new Date(item.createdAt.seconds * 1000), 'MMMM dd, yyyy');
+        const groupedByDate = (historyData || []).reduce((acc, item) => {
+          if (item.created_at) {
+            const date = format(new Date(item.created_at), 'MMMM dd, yyyy');
             if (!acc[date]) {
               acc[date] = [];
             }
@@ -117,7 +115,7 @@ export default function HistoryList() {
               <Card key={item.id}>
                 <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
                   <div className="relative w-full aspect-square rounded-lg overflow-hidden shadow-md">
-                    <Image src={item.imageUrl} alt="Ingredients" fill style={{objectFit: 'cover'}} data-ai-hint="food ingredients" />
+                    <Image src={item.image_url} alt="Ingredients" fill style={{objectFit: 'cover'}} data-ai-hint="food ingredients" />
                   </div>
                   <div className="md:col-span-2">
                     <div>

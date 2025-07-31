@@ -16,11 +16,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { LanguageContext, content } from '@/context/language-context';
-import { getFirestoreInstance, getStorageInstance } from '@/lib/firebase';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
-import { ref, uploadString, getDownloadURL } from 'firebase/storage';
+import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/auth-context';
-import type { User } from 'firebase/auth';
+import type { User } from '@supabase/supabase-js';
+
+// Helper to convert data URI to a Blob
+const dataURIToBlob = (dataURI: string) => {
+  const splitDataURI = dataURI.split(',');
+  const byteString = splitDataURI[0].indexOf('base64') >= 0 ? atob(splitDataURI[1]) : decodeURI(splitDataURI[1]);
+  const mimeString = splitDataURI[0].split(':')[1].split(';')[0];
+  const ia = new Uint8Array(byteString.length);
+  for (let i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
+  }
+  return new Blob([ia], { type: mimeString });
+}
 
 export default function Home() {
   const [image, setImage] = useState<string | null>(null);
@@ -80,20 +90,34 @@ export default function Home() {
     recipeData: SuggestRecipesOutput
   ) => {
     try {
-      const firestore = getFirestoreInstance();
-      const storage = getStorageInstance();
-      const storageRef = ref(storage, `history/${currentUser.uid}/${new Date().toISOString()}`);
-      await uploadString(storageRef, imageData, 'data_url');
-      const imageUrl = await getDownloadURL(storageRef);
+      // 1. Upload image to Supabase Storage
+      const file = dataURIToBlob(imageData);
+      const filePath = `history/${currentUser.id}/${new Date().toISOString()}`;
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('history-images')
+        .upload(filePath, file);
 
-      await addDoc(collection(firestore, 'users', currentUser.uid, 'history'), {
-        imageUrl,
+      if (uploadError) throw uploadError;
+
+      // 2. Get public URL for the uploaded image
+      const { data: urlData } = supabase.storage
+        .from('history-images')
+        .getPublicUrl(uploadData.path);
+      
+      const imageUrl = urlData.publicUrl;
+
+      // 3. Save history to Supabase database
+      const { error: dbError } = await supabase.from('history').insert({
+        user_id: currentUser.id,
+        image_url: imageUrl,
         ingredients,
         recipes: recipeData.recipes,
-        createdAt: serverTimestamp(),
       });
-    } catch (firebaseError) {
-      console.error("Error saving to Firebase in background:", firebaseError);
+
+      if (dbError) throw dbError;
+
+    } catch (supabaseError) {
+      console.error("Error saving to Supabase in background:", supabaseError);
       toast({
         variant: 'destructive',
         title: 'Database Error',

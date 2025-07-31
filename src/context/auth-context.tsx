@@ -1,8 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { onAuthStateChanged, signInWithPopup, signOut as firebaseSignOut, User, GoogleAuthProvider, Auth } from 'firebase/auth';
-import { getAuthInstance } from '@/lib/firebase';
+import { supabase } from '@/lib/supabase';
+import type { User, Session } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: User | null;
@@ -21,46 +21,43 @@ const AuthContext = createContext<AuthContextType>({
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [auth, setAuth] = useState<Auth | null>(null);
-  const [googleProvider, setGoogleProvider] = useState<GoogleAuthProvider | null>(null);
-
 
   useEffect(() => {
-    const authInstance = getAuthInstance();
-    setAuth(authInstance);
-    setGoogleProvider(new GoogleAuthProvider());
-  }, []);
-
-  useEffect(() => {
-    if (!auth) return;
+    const getSession = async () => {
+        const { data: { session } } = await supabase.auth.getSession();
+        setUser(session?.user ?? null);
+        setLoading(false);
+    }
     
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+    getSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
       setLoading(false);
     });
 
-    return () => unsubscribe();
-  }, [auth]);
+    return () => {
+      subscription?.unsubscribe();
+    };
+  }, []);
 
   const signInWithGoogle = async () => {
-    if (!auth || !googleProvider) {
-        console.error("Firebase Auth not initialized");
-        return;
-    }
     try {
-      await signInWithPopup(auth, googleProvider);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: window.location.origin,
+        },
+      });
+      if (error) throw error;
     } catch (error) {
       console.error("Error signing in with Google: ", error);
     }
   };
 
   const signOut = async () => {
-    if (!auth) {
-        console.error("Firebase Auth not initialized");
-        return;
-    }
     try {
-      await firebaseSignOut(auth);
+      await supabase.auth.signOut();
     } catch (error) {
       console.error("Error signing out: ", error);
     }
