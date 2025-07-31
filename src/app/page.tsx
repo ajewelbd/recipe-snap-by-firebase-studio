@@ -73,7 +73,6 @@ export default function Home() {
   const handleAnalyzeImage = async () => {
     if (!image) return;
     setIsLoadingIngredients(true);
-    setAnalysisPerformed(false);
     setRecipes([]);
     try {
       const result = await analyzeImageIngredients({ photoDataUri: image });
