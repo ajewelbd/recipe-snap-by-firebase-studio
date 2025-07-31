@@ -2,7 +2,7 @@
 
 import { type ChangeEvent, useState, useRef, useEffect, useContext } from 'react';
 import Image from 'next/image';
-import { Upload, FileImage, Loader2, Camera, X, RefreshCw, Trash2 } from 'lucide-react';
+import { Upload, FileImage, Loader2, Camera, X, RefreshCw, Trash2, SwitchCamera } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -168,7 +168,7 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
         </Button>
         {videoDevices.length > 1 && (
             <Button onClick={handleSwitchCamera} variant="outline" size="icon" aria-label={language === 'en' ? 'Switch Camera' : 'ক্যামেরা পরিবর্তন করুন'}>
-                <RefreshCw className="h-4 w-4" />
+                <SwitchCamera className="h-4 w-4" />
             </Button>
         )}
       </div>
@@ -221,16 +221,18 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
               <FileImage className="mr-2 h-4 w-4" />
               {t.uploader.change}
             </Button>
-            <Button
+          </div>
+           <div className="absolute bottom-2 right-2">
+             <Button
                 variant="outline"
-                size="sm"
+                size="icon"
                 className="bg-card/80 backdrop-blur-sm"
                 onClick={() => setIsCameraOpen(true)}
             >
-              <Camera className="mr-2 h-4 w-4" />
-              {t.uploader.retake}
+              <SwitchCamera className="h-4 w-4" />
+              <span className="sr-only">{t.uploader.retake}</span>
             </Button>
-          </div>
+           </div>
         </div>
       )}
       <Button onClick={onAnalyze} disabled={!imagePreview || isLoading} className="w-full">
