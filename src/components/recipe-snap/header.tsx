@@ -73,18 +73,20 @@ export default function Header() {
         <div className="flex items-center gap-2">
           {user && (
             <Link href="/history" prefetch={true}>
-              <Button variant="outline" size="sm">
-                <History className="mr-2 h-4 w-4" />
-                {t.history.title}
-              </Button>
+               <Button variant="outline" size="sm" className="relative md:w-auto w-9 p-0 md:px-3">
+                  <History className="h-4 w-4" />
+                  <span className="hidden md:inline ml-2">{t.history.title}</span>
+                  <span className="sr-only">{t.history.title}</span>
+               </Button>
             </Link>
           )}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Globe className="mr-2 h-4 w-4" />
-                {t.languageName}
-              </Button>
+               <Button variant="outline" size="sm" className="relative md:w-auto w-9 p-0 md:px-3">
+                  <Globe className="h-4 w-4" />
+                  <span className="hidden md:inline ml-2">{t.languageName}</span>
+                  <span className="sr-only">{t.languageName}</span>
+                </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               <DropdownMenuRadioGroup value={language} onValueChange={(value) => setLanguage(value as 'en' | 'bn')}>
