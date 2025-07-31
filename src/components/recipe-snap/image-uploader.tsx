@@ -148,6 +148,11 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
     <div className="space-y-4">
       <div className="relative w-full aspect-video rounded-lg overflow-hidden border bg-muted">
         <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
+        {videoDevices.length > 1 && (
+            <Button onClick={handleSwitchCamera} variant="outline" size="icon" aria-label={language === 'en' ? 'Switch Camera' : 'ক্যামেরা পরিবর্তন করুন'} className="absolute bottom-2 right-2 bg-card/80 backdrop-blur-sm">
+                <SwitchCamera className="h-4 w-4" />
+            </Button>
+        )}
       </div>
       {hasCameraPermission === false && (
          <Alert variant="destructive">
@@ -166,11 +171,6 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
             <Camera className="mr-2" />
             {t.camera.snap}
         </Button>
-        {videoDevices.length > 1 && (
-            <Button onClick={handleSwitchCamera} variant="outline" size="icon" aria-label={language === 'en' ? 'Switch Camera' : 'ক্যামেরা পরিবর্তন করুন'}>
-                <SwitchCamera className="h-4 w-4" />
-            </Button>
-        )}
       </div>
     </div>
   );
