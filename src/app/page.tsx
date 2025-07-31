@@ -147,15 +147,16 @@ export default function Home() {
   };
 
   const handleGetRecipes = async () => {
-    if (ingredients.length === 0) return;
+    const ingredientNames = ingredients.map(i => i.name);
+    if (ingredientNames.length === 0) return;
     setIsLoadingRecipes(true);
     try {
-      const result = await suggestRecipes({ ingredients, language });
+      const result = await suggestRecipes({ ingredients: ingredientNames, language });
       setRecipes(result.recipes);
       
       if (user) {
         // Don't wait for this to complete. Let it run in the background.
-        saveHistoryInBackground(user, image, result, ingredients);
+        saveHistoryInBackground(user, image, result, ingredientNames);
       }
 
     } catch (error) {
@@ -200,11 +201,18 @@ export default function Home() {
               isLoading={isLoadingIngredients}
               imagePreview={image}
               imageSource={imageSource}
+              ingredients={ingredients}
             />
 
             <IngredientEditor
-              ingredients={ingredients}
-              setIngredients={setIngredients}
+              ingredients={ingredients.map(i => i.name)}
+              setIngredients={(newIngredients) => {
+                const newFullIngredients = newIngredients.map(name => {
+                  const existing = ingredients.find(i => i.name === name);
+                  return existing || { name, box: [] };
+                });
+                setIngredients(newFullIngredients);
+              }}
               onGetRecipes={handleGetRecipes}
               isLoading={isLoadingRecipes}
               isImageLoading={isLoadingIngredients}

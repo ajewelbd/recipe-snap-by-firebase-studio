@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { LanguageContext, content } from '@/context/language-context';
+import type { AnalyzeImageIngredientsOutput } from '@/ai/flows/analyze-image-ingredients';
 
 interface ImageUploaderProps {
   onImageUpload: (file: File) => void;
@@ -19,9 +20,10 @@ interface ImageUploaderProps {
   isLoading: boolean;
   imagePreview: string | null;
   imageSource: 'file' | 'camera' | null;
+  ingredients: AnalyzeImageIngredientsOutput['ingredients'];
 }
 
-export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze, onRemove, isLoading, imagePreview, imageSource }: ImageUploaderProps) {
+export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze, onRemove, isLoading, imagePreview, imageSource, ingredients }: ImageUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
@@ -212,6 +214,29 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
       {imagePreview && (
         <div className="relative w-full h-64 rounded-lg overflow-hidden border shadow-sm">
           <Image src={imagePreview} alt={t.uploader.previewAlt} fill objectFit="cover" data-ai-hint="food ingredients" />
+          
+          {ingredients.map((ingredient, index) => {
+            if (!ingredient.box || ingredient.box.length !== 4) return null;
+            const [xMin, yMin, xMax, yMax] = ingredient.box;
+            const left = `${xMin * 100}%`;
+            const top = `${yMin * 100}%`;
+            const width = `${(xMax - xMin) * 100}%`;
+            const height = `${(yMax - yMin) * 100}%`;
+
+            return (
+              <div
+                key={index}
+                className="absolute"
+                style={{ left, top, width, height }}
+              >
+                <div className="absolute inset-0 border-2 border-primary rounded-md opacity-80 animate-pulse"></div>
+                <div className="absolute -top-6 left-0 bg-primary text-primary-foreground text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">
+                  {ingredient.name}
+                </div>
+              </div>
+            );
+          })}
+
           <div className="absolute top-2 right-2 flex gap-2">
             <Button
                 variant="outline"

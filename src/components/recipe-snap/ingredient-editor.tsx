@@ -12,7 +12,7 @@ import { Skeleton } from '../ui/skeleton';
 
 interface IngredientEditorProps {
   ingredients: string[];
-  setIngredients: React.Dispatch<React.SetStateAction<string[]>>;
+  setIngredients: (ingredients: string[]) => void;
   onGetRecipes: () => void;
   isLoading: boolean;
   isImageLoading: boolean;
