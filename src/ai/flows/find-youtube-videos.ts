@@ -1,7 +1,7 @@
 'use server';
 
 /**
- * @fileOverview Finds relevant YouTube videos for a given recipe search query.
+ * @fileOverview Finds relevant YouTube videos for a given recipe search query using the YouTube Data API.
  *
  * - findYoutubeVideos - A function that finds YouTube videos.
  * - FindYoutubeVideosInput - The input type for the findYoutubeVideos function.
@@ -10,6 +10,7 @@
 
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
+import {google} from 'googleapis';
 
 const FindYoutubeVideosInputSchema = z.object({
   query: z.string().describe('The search query for YouTube, e.g., a recipe name.'),
@@ -30,25 +31,43 @@ export async function findYoutubeVideos(input: FindYoutubeVideosInput): Promise<
   return findYoutubeVideosFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'findYoutubeVideosPrompt',
-  input: {schema: FindYoutubeVideosInputSchema},
-  output: {schema: FindYoutubeVideosOutputSchema},
-  prompt: `You are an expert at finding relevant YouTube videos.
-  
-  Find 3 public, popular, and relevant YouTube videos for the following search query: {{{query}}}.
-  
-  IMPORTANT: Only return the video ID and title for each video. You must not return private, deleted, or otherwise unavailable videos. Ensure the videos are in English and are embeddable. Double-check that each video is publicly accessible before including it in the output.`,
-});
+const youtubeSearchTool = ai.defineTool(
+  {
+    name: 'youtubeSearchTool',
+    description: 'Searches YouTube for videos based on a query.',
+    inputSchema: z.object({ query: z.string() }),
+    outputSchema: FindYoutubeVideosOutputSchema,
+  },
+  async (input) => {
+    const youtube = google.youtube('v3');
+    const response = await youtube.search.list({
+      key: process.env.YOUTUBE_API_KEY,
+      part: ['snippet'],
+      q: input.query,
+      type: ['video'],
+      maxResults: 3,
+      videoEmbeddable: 'true',
+    });
+
+    const videos = response.data.items?.map(item => ({
+      videoId: item.id?.videoId || '',
+      title: item.snippet?.title || '',
+    })).filter(v => v.videoId && v.title) || [];
+
+    return { videos };
+  }
+);
+
 
 const findYoutubeVideosFlow = ai.defineFlow(
   {
     name: 'findYoutubeVideosFlow',
     inputSchema: FindYoutubeVideosInputSchema,
     outputSchema: FindYoutubeVideosOutputSchema,
+    tools: [youtubeSearchTool],
   },
-  async input => {
-    const {output} = await prompt(input);
+  async (input) => {
+    const {output} = await youtubeSearchTool(input);
     return output!;
   }
 );
