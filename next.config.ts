@@ -18,11 +18,13 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'firebasestorage.googleapis.com',
+        hostname: 'img.youtube.com',
       },
       {
         protocol: 'https',
-        hostname: 'img.youtube.com',
+        hostname: 'qjhnhazqrdcxahxoigwm.supabase.co',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
