@@ -73,7 +73,7 @@ export default function VideoSuggestions({ searchQuery }: VideoSuggestionsProps)
                     <Image
                       src={getThumbnailUrl(video.videoId)}
                       alt={video.title}
-                      layout="fill"
+                      fill
                       className="object-cover group-hover:scale-105 transition-transform duration-200"
                       unoptimized
                     />
@@ -99,7 +99,7 @@ export default function VideoSuggestions({ searchQuery }: VideoSuggestionsProps)
                   height="100%"
                   src={getEmbedUrl(selectedVideo.videoId)}
                   title={selectedVideo.title}
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                   allowFullScreen
                   className="rounded-lg"
                 ></iframe>
