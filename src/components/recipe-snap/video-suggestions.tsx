@@ -7,6 +7,7 @@ import { findYoutubeVideos, type FindYoutubeVideosOutput } from '@/ai/flows/find
 import { Skeleton } from '../ui/skeleton';
 import { Card } from '../ui/card';
 import { Youtube, PlayCircle } from 'lucide-react';
+import Image from 'next/image';
 import {
   Dialog,
   DialogContent,
@@ -69,12 +70,12 @@ export default function VideoSuggestions({ searchQuery }: VideoSuggestionsProps)
               <DialogTrigger asChild key={video.videoId} onClick={() => setSelectedVideo(video)}>
                 <Card className="overflow-hidden flex flex-col cursor-pointer group">
                   <div className="relative w-full aspect-video bg-muted">
-                    <img
+                    <Image
                       src={getThumbnailUrl(video.videoId)}
                       alt={video.title}
-                      width={320}
-                      height={180}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                      layout="fill"
+                      className="object-cover group-hover:scale-105 transition-transform duration-200"
+                      unoptimized
                     />
                     <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                       <PlayCircle className="w-12 h-12 text-white" />
