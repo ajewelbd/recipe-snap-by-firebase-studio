@@ -15,8 +15,15 @@ export const firebaseConfig = {
 };
 
 // Initialize Firebase
+let app: FirebaseApp;
+if (!getApps().length) {
+    app = initializeApp(firebaseConfig);
+} else {
+    app = getApp();
+}
+
 const getAppInstance = (): FirebaseApp => {
-    return getApps().length ? getApp() : initializeApp(firebaseConfig);
+    return !getApps().length ? initializeApp(firebaseConfig) : getApp();
 }
 
 export const getFirestoreInstance = (): Firestore => {

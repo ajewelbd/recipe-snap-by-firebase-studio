@@ -80,7 +80,7 @@ export default function Home() {
       const result = await suggestRecipes({ ingredients, language });
       setRecipes(result.recipes);
       
-      // Save to Firebase
+      // Save to Firebase in a separate try/catch to not block UI
       if (user && image) {
         try {
             const firestore = getFirestoreInstance();
@@ -95,12 +95,12 @@ export default function Home() {
               recipes: result.recipes,
               createdAt: serverTimestamp(),
             });
-        } catch (error) {
-            console.error("Error saving to Firebase:", error);
+        } catch (firebaseError) {
+            console.error("Error saving to Firebase:", firebaseError);
             toast({
                 variant: 'destructive',
                 title: 'Database Error',
-                description: 'Failed to save recipe to your history.',
+                description: 'Failed to save recipe to your history. Your recipes are still available to view.',
             });
         }
       }
