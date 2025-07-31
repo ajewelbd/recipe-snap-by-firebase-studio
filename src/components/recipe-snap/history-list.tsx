@@ -124,7 +124,9 @@ export default function HistoryList() {
                       <h3 className="text-lg font-semibold font-headline">{t.history.ingredientsUsed}</h3>
                       <div className="flex flex-wrap gap-2 mt-2">
                         {item.ingredients.map((ing, i) => (
-                          <span key={i} className="text-sm bg-muted text-muted-foreground px-2 py-1 rounded-md">{language === 'bn' ? t.ingredients.list[ing.toLowerCase() as keyof typeof t.ingredients.list] || ing : ing}</span>
+                          <span key={i} className="text-sm bg-muted text-muted-foreground px-2 py-1 rounded-md">
+                            {language === 'bn' ? (t.ingredients.list[ing.toLowerCase() as keyof typeof t.ingredients.list] || ing) : ing}
+                          </span>
                         ))}
                       </div>
                     </div>
@@ -134,11 +136,11 @@ export default function HistoryList() {
                           {item.recipes.map((recipe, index) => (
                             <AccordionItem key={index} value={`item-${index}`}>
                               <AccordionTrigger className="font-headline text-md hover:no-underline">
-                                {language === 'bn' ? recipe.name_bn : recipe.name_en}
+                                {language === 'bn' ? recipe.name_bn || recipe.name : recipe.name_en || recipe.name}
                               </AccordionTrigger>
                               <AccordionContent className="space-y-2">
                                 <p className="whitespace-pre-wrap text-foreground/80">
-                                  {language === 'bn' ? recipe.instructions_bn : recipe.instructions_en}
+                                  {language === 'bn' ? recipe.instructions_bn || recipe.instructions : recipe.instructions_en || recipe.instructions}
                                 </p>
                               </AccordionContent>
                             </AccordionItem>
