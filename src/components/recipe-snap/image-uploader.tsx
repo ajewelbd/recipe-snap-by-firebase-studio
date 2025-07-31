@@ -205,8 +205,8 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
           <div className="absolute top-2 right-2 flex gap-2">
             <Button
                 variant="destructive"
-                size="icon"
-                className="bg-card/80 backdrop-blur-sm hover:bg-destructive/80"
+                size="sm"
+                className="bg-card/80 backdrop-blur-sm hover:bg-destructive/80 p-2 h-9 w-9"
                 onClick={onRemove}
             >
               <Trash2 className="h-4 w-4" />
