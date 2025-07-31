@@ -20,6 +20,7 @@ import { getFirestoreInstance, getStorageInstance } from '@/lib/firebase';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { ref, uploadString, getDownloadURL } from 'firebase/storage';
 import { useAuth } from '@/context/auth-context';
+import type { User } from 'firebase/auth';
 
 export default function Home() {
   const [image, setImage] = useState<string | null>(null);
@@ -73,6 +74,34 @@ export default function Home() {
     }
   };
 
+  const saveHistoryInBackground = async (
+    currentUser: User, 
+    imageData: string, 
+    recipeData: SuggestRecipesOutput
+  ) => {
+    try {
+      const firestore = getFirestoreInstance();
+      const storage = getStorageInstance();
+      const storageRef = ref(storage, `history/${currentUser.uid}/${new Date().toISOString()}`);
+      await uploadString(storageRef, imageData, 'data_url');
+      const imageUrl = await getDownloadURL(storageRef);
+
+      await addDoc(collection(firestore, 'users', currentUser.uid, 'history'), {
+        imageUrl,
+        ingredients,
+        recipes: recipeData.recipes,
+        createdAt: serverTimestamp(),
+      });
+    } catch (firebaseError) {
+      console.error("Error saving to Firebase in background:", firebaseError);
+      toast({
+        variant: 'destructive',
+        title: 'Database Error',
+        description: 'Failed to save recipe to your history. Your recipes are still available to view.',
+      });
+    }
+  };
+
   const handleGetRecipes = async () => {
     if (ingredients.length === 0) return;
     setIsLoadingRecipes(true);
@@ -81,27 +110,8 @@ export default function Home() {
       setRecipes(result.recipes);
       
       if (user && image) {
-        try {
-            const firestore = getFirestoreInstance();
-            const storage = getStorageInstance();
-            const storageRef = ref(storage, `history/${user.uid}/${new Date().toISOString()}`);
-            await uploadString(storageRef, image, 'data_url');
-            const imageUrl = await getDownloadURL(storageRef);
-
-            await addDoc(collection(firestore, 'users', user.uid, 'history'), {
-              imageUrl,
-              ingredients,
-              recipes: result.recipes,
-              createdAt: serverTimestamp(),
-            });
-        } catch (firebaseError) {
-            console.error("Error saving to Firebase:", firebaseError);
-            toast({
-                variant: 'destructive',
-                title: 'Database Error',
-                description: 'Failed to save recipe to your history. Your recipes are still available to view.',
-            });
-        }
+        // Don't wait for this to complete. Let it run in the background.
+        saveHistoryInBackground(user, image, result);
       }
 
     } catch (error) {
