@@ -61,8 +61,8 @@ export default function IngredientEditor({
         )
     }
 
-    return (
-        <>
+    if (ingredients.length > 0) {
+        return (
             <div className="flex flex-wrap gap-2 min-h-[2.5rem]">
             {ingredients.map((ingredient, index) => (
                 <Badge key={index} variant="secondary" className="text-base py-1 pl-3 pr-2 flex items-center gap-2">
@@ -77,21 +77,10 @@ export default function IngredientEditor({
                 </Badge>
             ))}
             </div>
-
-            <div className="flex gap-2">
-            <Input
-                type="text"
-                value={newIngredient}
-                onChange={(e) => setNewIngredient(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleAddIngredient()}
-                placeholder={t.ingredients.addPlaceholder}
-            />
-            <Button onClick={handleAddIngredient} variant="outline" size="icon" aria-label={t.ingredients.addAriaLabel}>
-                <Plus className="h-4 w-4" />
-            </Button>
-            </div>
-        </>
-    )
+        )
+    }
+    
+    return null;
   }
 
   return (
@@ -102,6 +91,20 @@ export default function IngredientEditor({
       </CardHeader>
       <CardContent className="space-y-4">
         {renderContent()}
+        
+        <div className="flex gap-2">
+        <Input
+            type="text"
+            value={newIngredient}
+            onChange={(e) => setNewIngredient(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleAddIngredient()}
+            placeholder={t.ingredients.addPlaceholder}
+        />
+        <Button onClick={handleAddIngredient} variant="outline" size="icon" aria-label={t.ingredients.addAriaLabel}>
+            <Plus className="h-4 w-4" />
+        </Button>
+        </div>
+
         <Button onClick={onGetRecipes} disabled={ingredients.length === 0 || isLoading || isImageLoading} className="w-full bg-primary hover:bg-primary/90">
           {isLoading ? (
             <>
