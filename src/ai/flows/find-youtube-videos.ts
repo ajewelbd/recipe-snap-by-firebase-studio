@@ -38,7 +38,7 @@ const prompt = ai.definePrompt({
   
   Find 3 public, popular, and relevant YouTube videos for the following search query: {{{query}}}.
   
-  Only return the video ID and title for each video. Do not return private or unavailable videos. Ensure the videos are in English and are embeddable.`,
+  IMPORTANT: Only return the video ID and title for each video. You must not return private, deleted, or otherwise unavailable videos. Ensure the videos are in English and are embeddable. Double-check that each video is publicly accessible before including it in the output.`,
 });
 
 const findYoutubeVideosFlow = ai.defineFlow(
