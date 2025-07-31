@@ -45,7 +45,7 @@ export default function VideoSuggestions({ searchQuery }: VideoSuggestionsProps)
   }, [searchQuery]);
 
   const getThumbnailUrl = (videoId: string) => `https://img.youtube.com/vi/${videoId}/sddefault.jpg`;
-  const getEmbedUrl = (videoId: string) => `https://www.youtube.com/embed/${videoId}`;
+  const getEmbedUrl = (videoId: string) => `https://www.youtube.com/embed/${videoId}?autoplay=1`;
 
   return (
     <div className="space-y-4 pt-4">
