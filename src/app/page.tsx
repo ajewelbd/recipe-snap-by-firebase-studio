@@ -36,7 +36,7 @@ const dataURIToBlob = (dataURI: string) => {
 export default function Home() {
   const [image, setImage] = useState<string | null>(null);
   const [imageSource, setImageSource] = useState<'file' | 'camera' | null>(null);
-  const [ingredients, setIngredients] = useState<AnalyzeImageIngredientsOutput['ingredients']>([]);
+  const [ingredients, setIngredients] = useState<string[]>([]);
   const [recipes, setRecipes] = useState<SuggestRecipesOutput['recipes']>([]);
   const [isLoadingIngredients, setIsLoadingIngredients] = useState(false);
   const [isLoadingRecipes, setIsLoadingRecipes] = useState(false);
@@ -147,16 +147,15 @@ export default function Home() {
   };
 
   const handleGetRecipes = async () => {
-    const ingredientNames = ingredients.map(i => i.name);
-    if (ingredientNames.length === 0) return;
+    if (ingredients.length === 0) return;
     setIsLoadingRecipes(true);
     try {
-      const result = await suggestRecipes({ ingredients: ingredientNames, language });
+      const result = await suggestRecipes({ ingredients: ingredients, language });
       setRecipes(result.recipes);
       
       if (user) {
         // Don't wait for this to complete. Let it run in the background.
-        saveHistoryInBackground(user, image, result, ingredientNames);
+        saveHistoryInBackground(user, image, result, ingredients);
       }
 
     } catch (error) {
@@ -201,18 +200,11 @@ export default function Home() {
               isLoading={isLoadingIngredients}
               imagePreview={image}
               imageSource={imageSource}
-              ingredients={ingredients}
             />
 
             <IngredientEditor
-              ingredients={ingredients.map(i => i.name)}
-              setIngredients={(newIngredients) => {
-                const newFullIngredients = newIngredients.map(name => {
-                  const existing = ingredients.find(i => i.name === name);
-                  return existing || { name, box: [] };
-                });
-                setIngredients(newFullIngredients);
-              }}
+              ingredients={ingredients}
+              setIngredients={setIngredients}
               onGetRecipes={handleGetRecipes}
               isLoading={isLoadingRecipes}
               isImageLoading={isLoadingIngredients}

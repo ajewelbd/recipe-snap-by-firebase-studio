@@ -21,11 +21,7 @@ const AnalyzeImageIngredientsInputSchema = z.object({
 export type AnalyzeImageIngredientsInput = z.infer<typeof AnalyzeImageIngredientsInputSchema>;
 
 const AnalyzeImageIngredientsOutputSchema = z.object({
-  ingredients: z.array(z.object({
-    name: z.string().describe('The name of the ingredient.'),
-    box: z.array(z.number()).length(4).describe('The bounding box of the ingredient, in the format [x_min, y_min, x_max, y_max] with normalized coordinates (0-1).'),
-  }))
-  .describe('A list of ingredients identified in the image, with their bounding boxes.'),
+  ingredients: z.array(z.string()).describe('A list of ingredients identified in the image.'),
 });
 export type AnalyzeImageIngredientsOutput = z.infer<typeof AnalyzeImageIngredientsOutputSchema>;
 
@@ -39,11 +35,9 @@ const prompt = ai.definePrompt({
   name: 'analyzeImageIngredientsPrompt',
   input: {schema: AnalyzeImageIngredientsInputSchema},
   output: {schema: AnalyzeImageIngredientsOutputSchema},
-  prompt: `You are an AI that identifies ingredients in a photo and provides their location.
+  prompt: `You are an AI that identifies ingredients in a photo.
 
   Analyze the image and extract the ingredients.
-  For each ingredient, provide its name and its bounding box.
-  The bounding box should be in the format [x_min, y_min, x_max, y_max] with normalized coordinates (from 0 to 1).
   Do not include any ingredients that you are not confident about.
 
   Photo: {{media url=photoDataUri}}
