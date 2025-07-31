@@ -93,7 +93,7 @@ export default function Home() {
     try {
       // 1. Upload image to Supabase Storage
       const file = dataURIToBlob(imageData);
-      const filePath = `history/${currentUser.id}/${new Date().toISOString()}`;
+      const filePath = `public/${currentUser.id}/${new Date().toISOString()}`;
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('history-images')
         .upload(filePath, file, {
