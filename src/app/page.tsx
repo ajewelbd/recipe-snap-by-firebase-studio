@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import type { AnalyzeImageIngredientsOutput } from '@/ai/flows/analyze-image-ingredients';
 import type { SuggestRecipesOutput } from '@/ai/flows/suggest-recipes';
 import { analyzeImageIngredients } from '@/ai/flows/analyze-image-ingredients';
@@ -33,6 +33,8 @@ const dataURIToBlob = (dataURI: string) => {
   return new Blob([ia], { type: mimeString });
 }
 
+const GUEST_SEARCH_LIMIT = 3;
+
 export default function Home() {
   const [image, setImage] = useState<string | null>(null);
   const [imageSource, setImageSource] = useState<'file' | 'camera' | null>(null);
@@ -45,6 +47,24 @@ export default function Home() {
   const { language } = useContext(LanguageContext);
   const t = content[language];
   const { user } = useAuth();
+  const [remainingSearches, setRemainingSearches] = useState(GUEST_SEARCH_LIMIT);
+
+  useEffect(() => {
+    if (!user) {
+      try {
+        const storedCount = localStorage.getItem('guestRecipeSearches');
+        if (storedCount !== null) {
+          setRemainingSearches(parseInt(storedCount, 10));
+        } else {
+          localStorage.setItem('guestRecipeSearches', String(GUEST_SEARCH_LIMIT));
+          setRemainingSearches(GUEST_SEARCH_LIMIT);
+        }
+      } catch (error) {
+        console.error("Could not access localStorage. Guest search limit will not work.", error);
+        setRemainingSearches(GUEST_SEARCH_LIMIT); // Fallback
+      }
+    }
+  }, [user]);
 
   const handleImageUpload = (file: File) => {
     const reader = new FileReader();
@@ -78,6 +98,7 @@ export default function Home() {
     if (!image) return;
     setIsLoadingIngredients(true);
     setRecipes([]);
+    setAnalysisPerformed(false); 
     try {
       const result = await analyzeImageIngredients({ photoDataUri: image });
       setIngredients(result.ingredients);
@@ -148,6 +169,18 @@ export default function Home() {
 
   const handleGetRecipes = async () => {
     if (ingredients.length === 0) return;
+    
+    if (!user) {
+      if (remainingSearches <= 0) {
+        toast({
+          variant: 'destructive',
+          title: t.toast.limit.title,
+          description: t.toast.limit.description,
+        });
+        return;
+      }
+    }
+
     setIsLoadingRecipes(true);
     try {
       const result = await suggestRecipes({ ingredients: ingredients, language });
@@ -156,6 +189,15 @@ export default function Home() {
       if (user) {
         // Don't wait for this to complete. Let it run in the background.
         saveHistoryInBackground(user, image, result, ingredients);
+      } else {
+         // Decrement and save for guest users
+         try {
+            const newCount = remainingSearches - 1;
+            setRemainingSearches(newCount);
+            localStorage.setItem('guestRecipeSearches', String(newCount));
+         } catch (error) {
+            console.error("Could not access localStorage to update search count.", error);
+         }
       }
 
     } catch (error) {
@@ -209,6 +251,7 @@ export default function Home() {
               isLoading={isLoadingRecipes}
               isImageLoading={isLoadingIngredients}
               analysisPerformed={analysisPerformed}
+              remainingSearches={user ? undefined : remainingSearches}
             />
           </div>
           <div className="lg:mt-0">

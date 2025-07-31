@@ -79,6 +79,7 @@ export const content = {
             loading: 'Finding Recipes...',
             getButton: 'Get Recipes',
             notFound: 'No ingredients found. Please try another image or add some manually.',
+            searchesLeft: (count: number) => `You have ${count} free ${count === 1 ? 'search' : 'searches'} left.`,
             list: {
                 "orange": "Orange",
                 "guava": "Guava",
@@ -119,6 +120,10 @@ export const content = {
                 speech: 'Failed to generate audio for the recipe.',
                 camera: 'Camera Access Denied',
                 cameraPermission: 'Please enable camera permissions in your browser settings.',
+            },
+            limit: {
+                title: 'Search Limit Reached',
+                description: 'Please log in to get unlimited recipe searches.',
             }
         }
     },
@@ -181,6 +186,7 @@ export const content = {
             loading: 'রেসিপি খোঁজা হচ্ছে...',
             getButton: 'রেসিপি পান',
             notFound: 'কোন উপাদান পাওয়া যায়নি। অনুগ্রহ করে অন্য একটি ছবি চেষ্টা করুন বা ম্যানুয়ালি কিছু যোগ করুন।',
+            searchesLeft: (count: number) => `আপনার ${count}টি বিনামূল্যে অনুসন্ধান বাকি আছে।`,
             list: {
                 "orange": "কমলা",
                 "guava": "পেয়ারা",
@@ -221,6 +227,10 @@ export const content = {
                 speech: 'রেসিপির জন্য অডিও তৈরি করতে ব্যর্থ হয়েছে।',
                 camera: 'ক্যামেরা অ্যাক্সেস প্রত্যাখ্যাত হয়েছে',
                 cameraPermission: 'অনুগ্রহ করে আপনার ব্রাউজার সেটিংসে ক্যামেরার অনুমতি সক্ষম করুন।',
+            },
+            limit: {
+                title: 'অনুসন্ধানের সীমা শেষ',
+                description: 'সীমাহীন রেসিপি অনুসন্ধানের জন্য অনুগ্রহ করে লগইন করুন।',
             }
         }
     },

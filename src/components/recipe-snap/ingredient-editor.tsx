@@ -17,6 +17,7 @@ interface IngredientEditorProps {
   isLoading: boolean;
   isImageLoading: boolean;
   analysisPerformed: boolean;
+  remainingSearches?: number;
 }
 
 export default function IngredientEditor({
@@ -26,6 +27,7 @@ export default function IngredientEditor({
   isLoading,
   isImageLoading,
   analysisPerformed,
+  remainingSearches
 }: IngredientEditorProps) {
   const [newIngredient, setNewIngredient] = useState('');
   const { language } = useContext(LanguageContext);
@@ -83,6 +85,8 @@ export default function IngredientEditor({
     return null;
   }
 
+  const getRecipesDisabled = ingredients.length === 0 || isLoading || isImageLoading || (remainingSearches !== undefined && remainingSearches <= 0);
+
   return (
     <Card>
       <CardHeader>
@@ -105,7 +109,7 @@ export default function IngredientEditor({
         </Button>
         </div>
 
-        <Button onClick={onGetRecipes} disabled={ingredients.length === 0 || isLoading || isImageLoading} className="w-full bg-primary hover:bg-primary/90">
+        <Button onClick={onGetRecipes} disabled={getRecipesDisabled} className="w-full bg-primary hover:bg-primary/90">
           {isLoading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -115,6 +119,12 @@ export default function IngredientEditor({
             t.ingredients.getButton
           )}
         </Button>
+
+        {remainingSearches !== undefined && (
+          <p className="text-center text-sm text-muted-foreground">
+            {t.ingredients.searchesLeft(remainingSearches)}
+          </p>
+        )}
       </CardContent>
     </Card>
   );
