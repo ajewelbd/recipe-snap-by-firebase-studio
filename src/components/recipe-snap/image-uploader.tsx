@@ -3,7 +3,7 @@
 
 import { type ChangeEvent, useState, useRef, useEffect, useContext } from 'react';
 import Image from 'next/image';
-import { Upload, FileImage, Loader2, Camera, X, RefreshCw, Trash2, SwitchCamera } from 'lucide-react';
+import { Upload, FileImage, Loader2, Camera, X, RefreshCw, Trash2, SwitchCamera, Edit } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -216,11 +216,11 @@ export default function ImageUploader({ onImageUpload, onImageCapture, onAnalyze
             <Button
                 variant="outline"
                 size="sm"
-                className="bg-card/80 backdrop-blur-sm"
+                className="bg-card/80 backdrop-blur-sm p-0 h-9 w-9"
                 onClick={() => fileInputRef.current?.click()}
             >
-              <FileImage className="mr-2 h-4 w-4" />
-              {t.uploader.change}
+              <Edit className="h-4 w-4" />
+              <span className="sr-only">{t.uploader.change}</span>
             </Button>
           </div>
         </div>
