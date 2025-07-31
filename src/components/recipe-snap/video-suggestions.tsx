@@ -43,7 +43,7 @@ export default function VideoSuggestions({ searchQuery }: VideoSuggestionsProps)
     fetchVideos();
   }, [searchQuery]);
 
-  const getThumbnailUrl = (videoId: string) => `https://img.youtube.com/vi/${videoId}/mqdefault.jpg`;
+  const getThumbnailUrl = (videoId: string) => `https://img.youtube.com/vi/${videoId}/sddefault.jpg`;
   const getEmbedUrl = (videoId: string) => `https://www.youtube.com/embed/${videoId}`;
 
   return (
