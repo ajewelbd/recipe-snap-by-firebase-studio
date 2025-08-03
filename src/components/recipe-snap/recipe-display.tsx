@@ -94,7 +94,7 @@ export default function RecipeDisplay({ recipes, onGetSpeech }: RecipeDisplayPro
 
                   <div className="space-y-4 pt-4">
                     <Separator />
-                     <div className="flex items-center justify-between">
+                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <h4 className="font-semibold font-headline flex items-center gap-2">
                           <Soup />
                           {t.recipes.nutrition}
