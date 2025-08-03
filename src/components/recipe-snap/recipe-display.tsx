@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useContext } from 'react';
@@ -33,6 +34,19 @@ export default function RecipeDisplay({ recipes, onGetSpeech }: RecipeDisplayPro
     setLoadingAudio(null);
   };
 
+  const getRecipeName = (recipe: SuggestRecipesOutput['recipes'][0]) => {
+    if (language === 'bn') {
+      return recipe.name_bn || recipe.name;
+    }
+    return recipe.name_en || recipe.name;
+  };
+
+  const getRecipeInstructions = (recipe: SuggestRecipesOutput['recipes'][0]) => {
+    if (language === 'bn') {
+      return recipe.instructions_bn || recipe.instructions;
+    }
+    return recipe.instructions_en || recipe.instructions;
+  };
 
   return (
     <Card>
@@ -43,29 +57,33 @@ export default function RecipeDisplay({ recipes, onGetSpeech }: RecipeDisplayPro
       <CardContent>
         {recipes.length > 0 ? (
           <Accordion type="single" collapsible className="w-full" onValueChange={(value) => setActiveRecipe(value)}>
-            {recipes.map((recipe, index) => (
+            {recipes.map((recipe, index) => {
+                const recipeName = getRecipeName(recipe);
+                const recipeInstructions = getRecipeInstructions(recipe);
+
+                return (
               <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger className="font-headline text-lg hover:no-underline">{recipe.name}</AccordionTrigger>
+                <AccordionTrigger className="font-headline text-lg hover:no-underline">{recipeName}</AccordionTrigger>
                 <AccordionContent className="space-y-4">
                   <div className="flex flex-wrap items-start gap-4">
-                    <p className="whitespace-pre-wrap text-foreground/80 flex-grow pt-2">{recipe.instructions}</p>
+                    <p className="whitespace-pre-wrap text-foreground/80 flex-grow pt-2">{recipeInstructions}</p>
                     <Button 
                       variant="outline" 
                       size="icon" 
-                      onClick={() => handleListen(recipe.name, recipe.instructions)}
-                      disabled={loadingAudio === recipe.name}
+                      onClick={() => handleListen(recipeName, recipeInstructions)}
+                      disabled={loadingAudio === recipeName}
                       aria-label={t.recipes.listen}
                       className="shrink-0"
                     >
-                      {loadingAudio === recipe.name ? <Loader2 className="animate-spin" /> : <Volume2 />}
+                      {loadingAudio === recipeName ? <Loader2 className="animate-spin" /> : <Volume2 />}
                     </Button>
                   </div>
                   
-                  {loadingAudio === recipe.name && !audioUrl && (
+                  {loadingAudio === recipeName && !audioUrl && (
                     <Skeleton className="h-12 w-full" />
                   )}
 
-                  {audioUrl && loadingAudio !== recipe.name && activeRecipe === `item-${index}` && (
+                  {audioUrl && loadingAudio !== recipeName && activeRecipe === `item-${index}` && (
                     <div className="w-full">
                         <audio controls src={audioUrl} className="w-full">
                             Your browser does not support the audio element.
@@ -103,7 +121,7 @@ export default function RecipeDisplay({ recipes, onGetSpeech }: RecipeDisplayPro
                   <VideoSuggestions searchQuery={recipe.youtubeSearchQuery} />
                 </AccordionContent>
               </AccordionItem>
-            ))}
+            )})}
           </Accordion>
         ) : (
           <p className="text-muted-foreground text-center py-8">{t.recipes.empty}</p>
