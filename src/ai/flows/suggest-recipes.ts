@@ -11,6 +11,11 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
+const NutrientSchema = z.object({
+    value: z.number().describe('The numerical value of the nutrient.'),
+    unit: z.string().describe('The unit of measurement (e.g., "g", "mg", "kcal").'),
+});
+
 const SuggestRecipesInputSchema = z.object({
   ingredients: z.array(z.string()).describe('A list of ingredients to base the recipe suggestions on.'),
   language: z.string().describe("The user's preferred language for the output. Can be 'en' for English or 'bn' for Bengali."),
@@ -28,11 +33,11 @@ const SuggestRecipesOutputSchema = z.object({
       instructions_bn: z.string().describe('The cooking instructions for the recipe, in Bengali.'),
       youtubeSearchQuery: z.string().describe('A simple, effective search query to find a YouTube video for this recipe in English.'),
       nutrition: z.object({
-        calories: z.string().describe('Estimated calories per serving.'),
-        protein: z.string().describe('Estimated protein in grams per serving.'),
-        carbs: z.string().describe('Estimated carbohydrates in grams per serving.'),
-        fat: z.string().describe('Estimated fat in grams per serving.'),
-      }).describe('Estimated nutritional information per serving.'),
+        calories: NutrientSchema.describe('Estimated calories per serving.'),
+        protein: NutrientSchema.describe('Estimated protein per serving.'),
+        carbs: NutrientSchema.describe('Estimated carbohydrates per serving.'),
+        fat: NutrientSchema.describe('Estimated fat per serving.'),
+      }).describe('Estimated nutritional information per serving. This is an AI-generated estimate and should not be used for medical purposes.'),
     })
   ).describe('A list of suggested recipes based on the provided ingredients.'),
 });
@@ -57,7 +62,7 @@ VERY IMPORTANT: You must generate the recipe name and instructions in BOTH Engli
 - The 'name_en' and 'instructions_en' fields must be in English.
 - The 'name_bn' and 'instructions_bn' fields must be in Bengali (Bangla).
 
-For each recipe, also provide estimated nutritional information (calories, protein, carbs, and fat) per serving.
+For each recipe, also provide estimated nutritional information (calories, protein, carbs, and fat) per serving. This is an AI-generated estimate and should not be used for medical purposes.
 The youtubeSearchQuery should always be in English.
 
 Each recipe should include a name, cooking instructions, a simple YouTube search query, and nutritional information.`,

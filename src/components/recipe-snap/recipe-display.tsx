@@ -99,19 +99,19 @@ export default function RecipeDisplay({ recipes, onGetSpeech }: RecipeDisplayPro
                       </h4>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
                         <div className="bg-muted p-3 rounded-lg text-center">
-                            <p className="font-semibold">{recipe.nutrition.calories}</p>
+                            <p className="font-semibold">{recipe.nutrition.calories.value} {recipe.nutrition.calories.unit}</p>
                             <p className="text-muted-foreground">{t.recipes.calories}</p>
                         </div>
                         <div className="bg-muted p-3 rounded-lg text-center">
-                            <p className="font-semibold">{recipe.nutrition.protein}</p>
+                            <p className="font-semibold">{recipe.nutrition.protein.value} {recipe.nutrition.protein.unit}</p>
                             <p className="text-muted-foreground">{t.recipes.protein}</p>
                         </div>
                         <div className="bg-muted p-3 rounded-lg text-center">
-                            <p className="font-semibold">{recipe.nutrition.carbs}</p>
+                            <p className="font-semibold">{recipe.nutrition.carbs.value} {recipe.nutrition.carbs.unit}</p>
                             <p className="text-muted-foreground">{t.recipes.carbs}</p>
                         </div>
                         <div className="bg-muted p-3 rounded-lg text-center">
-                            <p className="font-semibold">{recipe.nutrition.fat}</p>
+                            <p className="font-semibold">{recipe.nutrition.fat.value} {recipe.nutrition.fat.unit}</p>
                             <p className="text-muted-foreground">{t.recipes.fat}</p>
                         </div>
                       </div>
