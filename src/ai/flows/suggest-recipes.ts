@@ -33,11 +33,12 @@ const SuggestRecipesOutputSchema = z.object({
       instructions_bn: z.string().describe('The cooking instructions for the recipe, in Bengali.'),
       youtubeSearchQuery: z.string().describe('A simple, effective search query to find a YouTube video for this recipe in English.'),
       nutrition: z.object({
+        servingSize: z.string().describe('The estimated serving size for which the nutritional information is calculated (e.g., "1 bowl", "2 people").'),
         calories: NutrientSchema.describe('Estimated calories per serving.'),
         protein: NutrientSchema.describe('Estimated protein per serving.'),
         carbs: NutrientSchema.describe('Estimated carbohydrates per serving.'),
         fat: NutrientSchema.describe('Estimated fat per serving.'),
-      }).describe('Estimated nutritional information per serving. This is an AI-generated estimate and should not be used for medical purposes.'),
+      }).describe('Estimated nutritional information. This is an AI-generated estimate and should not be used for medical purposes.'),
     })
   ).describe('A list of suggested recipes based on the provided ingredients.'),
 });
@@ -62,7 +63,8 @@ VERY IMPORTANT: You must generate the recipe name and instructions in BOTH Engli
 - The 'name_en' and 'instructions_en' fields must be in English.
 - The 'name_bn' and 'instructions_bn' fields must be in Bengali (Bangla).
 
-For each recipe, also provide estimated nutritional information (calories, protein, carbs, and fat) per serving. This is an AI-generated estimate and should not be used for medical purposes.
+For each recipe, also provide estimated nutritional information (calories, protein, carbs, and fat). This is an AI-generated estimate and should not be used for medical purposes.
+Crucially, you must also define a 'servingSize' for which the nutritional info is calculated (e.g., "1 bowl", "2 people", "100g").
 The youtubeSearchQuery should always be in English.
 
 Each recipe should include a name, cooking instructions, a simple YouTube search query, and nutritional information.`,

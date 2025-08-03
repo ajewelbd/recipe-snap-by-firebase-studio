@@ -11,6 +11,7 @@ import { Button } from '../ui/button';
 import { Loader2, Volume2, Soup } from 'lucide-react';
 import { Skeleton } from '../ui/skeleton';
 import { Separator } from '../ui/separator';
+import { Badge } from '../ui/badge';
 
 
 interface RecipeDisplayProps {
@@ -93,10 +94,13 @@ export default function RecipeDisplay({ recipes, onGetSpeech }: RecipeDisplayPro
 
                   <div className="space-y-4 pt-4">
                     <Separator />
-                     <h4 className="font-semibold font-headline flex items-center gap-2">
-                        <Soup />
-                        {t.recipes.nutrition}
-                      </h4>
+                     <div className="flex items-center justify-between">
+                        <h4 className="font-semibold font-headline flex items-center gap-2">
+                          <Soup />
+                          {t.recipes.nutrition}
+                        </h4>
+                        <Badge variant="outline">{t.recipes.servingSize}: {recipe.nutrition.servingSize}</Badge>
+                      </div>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
                         <div className="bg-muted p-3 rounded-lg text-center">
                             <p className="font-semibold">{recipe.nutrition.calories.value} {recipe.nutrition.calories.unit}</p>

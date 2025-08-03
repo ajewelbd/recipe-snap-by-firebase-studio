@@ -100,6 +100,7 @@ export const content = {
             protein: 'Protein',
             carbs: 'Carbs',
             fat: 'Fat',
+            servingSize: 'Serving Size',
         },
         videos: {
             title: 'Video Tutorials',
@@ -208,6 +209,7 @@ export const content = {
             protein: 'প্রোটিন',
             carbs: 'কার্বোহাইড্রেট',
             fat: 'চর্বি',
+            servingSize: 'পরিবেশনের আকার',
         },
         videos: {
             title: 'ভিডিও টিউটোরিয়াল',
