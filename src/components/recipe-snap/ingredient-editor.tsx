@@ -122,7 +122,9 @@ export default function IngredientEditor({
 
         {remainingSearches !== undefined && (
           <p className="text-center text-sm text-muted-foreground">
-            {t.ingredients.searchesLeft(remainingSearches)}
+            {remainingSearches > 0
+              ? t.ingredients.searchesLeft(remainingSearches)
+              : t.ingredients.loginForMore}
           </p>
         )}
       </CardContent>

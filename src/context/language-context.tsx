@@ -80,6 +80,7 @@ export const content = {
             getButton: 'Get Recipes',
             notFound: 'No ingredients found. Please try another image or add some manually.',
             searchesLeft: (count: number) => `You have ${count} free ${count === 1 ? 'search' : 'searches'} left.`,
+            loginForMore: 'Please log in for unlimited searches.',
             list: {
                 "orange": "Orange",
                 "guava": "Guava",
@@ -187,6 +188,7 @@ export const content = {
             getButton: 'রেসিপি পান',
             notFound: 'কোন উপাদান পাওয়া যায়নি। অনুগ্রহ করে অন্য একটি ছবি চেষ্টা করুন বা ম্যানুয়ালি কিছু যোগ করুন।',
             searchesLeft: (count: number) => `আপনার ${count}টি বিনামূল্যে অনুসন্ধান বাকি আছে।`,
+            loginForMore: 'সীমাহীন অনুসন্ধানের জন্য অনুগ্রহ করে লগইন করুন।',
             list: {
                 "orange": "কমলা",
                 "guava": "পেয়ারা",
