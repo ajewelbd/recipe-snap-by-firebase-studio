@@ -195,7 +195,7 @@ export default function ImageUploaderDialog({ open, onOpenChange, onComplete, de
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="max-w-lg">
+            <DialogContent className="max-w-lg p-6">
                 <DialogHeader>
                     <DialogTitle>{t.uploader.title}</DialogTitle>
                     <DialogDescription>

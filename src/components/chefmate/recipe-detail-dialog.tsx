@@ -64,10 +64,6 @@ export default function RecipeDetailDialog({ children, recipes, userIngredients 
                 <DialogContent className="max-w-md p-0 gap-0">
                     <DialogHeader className="p-4 border-b">
                         <DialogTitle className="text-xl">{getRecipeName(selectedRecipe)}</DialogTitle>
-                         <DialogClose className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-                            <X className="h-4 w-4" />
-                            <span className="sr-only">Close</span>
-                        </DialogClose>
                     </DialogHeader>
                     <div className="p-4 space-y-4 h-[70vh] overflow-y-auto">
                         {selectedRecipe.imageUrl ? (
