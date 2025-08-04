@@ -3,6 +3,7 @@ import './globals.css';
 import { Toaster } from "@/components/ui/toaster"
 import { LanguageProvider } from '@/context/language-context';
 import { AuthProvider } from '@/context/auth-context';
+import { ThemeProvider } from '@/context/theme-provider';
 
 export const metadata: Metadata = {
   title: 'ChefMate',
@@ -23,14 +24,22 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
         <link rel="apple-touch-icon" href="/icons/logo.svg" />
-        <meta name="theme-color" content="#6ABF45" />
+        <meta name="theme-color" content="#F0FAF0" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#1C1E1C" media="(prefers-color-scheme: dark)" />
       </head>
       <body className="font-body antialiased">
-        <AuthProvider>
-          <LanguageProvider>
-            {children}
-          </LanguageProvider>
-        </AuthProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthProvider>
+            <LanguageProvider>
+              {children}
+            </LanguageProvider>
+          </AuthProvider>
+        </ThemeProvider>
         <Toaster />
       </body>
     </html>
