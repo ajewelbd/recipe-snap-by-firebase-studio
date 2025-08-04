@@ -61,7 +61,15 @@ export default function IngredientEditor({
     recognition.onresult = (event: any) => {
       const spokenText = event.results[0][0].transcript;
       if (spokenText) {
-        setIngredients([...ingredients, spokenText.trim()]);
+        // Split by commas or the word "and" to handle multiple ingredients
+        const newIngredients = spokenText
+          .split(/,|\s+and\s+/)
+          .map((ingredient: string) => ingredient.trim())
+          .filter((ingredient: string) => ingredient.length > 0);
+        
+        if (newIngredients.length > 0) {
+          setIngredients([...ingredients, ...newIngredients]);
+        }
       }
       setIsListening(false);
     };
