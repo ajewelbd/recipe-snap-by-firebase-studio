@@ -188,12 +188,12 @@ export default function IngredientEditor({
       
       <div className="flex flex-wrap gap-2 min-h-[2rem]">
         {ingredients.map((ingredient, index) => (
-            <Badge key={index} variant="secondary" className="text-base py-1.5 px-3 flex items-center gap-2 rounded-full bg-secondary hover:bg-muted">
+            <Badge key={index} variant="default" className="text-base py-1.5 px-3 flex items-center gap-2 rounded-full">
             {ingredient}
             <button
                 onClick={() => handleRemoveIngredient(index)}
                 disabled={isLoading}
-                className="rounded-full hover:bg-gray-300 p-0.5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="rounded-full hover:bg-black/20 p-0.5 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 aria-label={`Remove ${ingredient}`}
             >
                 <X className="h-3.5 w-3.5" />
