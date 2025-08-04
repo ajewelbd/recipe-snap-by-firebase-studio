@@ -1,14 +1,15 @@
 
 'use client';
 
-import { useState, useContext } from 'react';
-import { Trash2, Plus, Loader2 } from 'lucide-react';
+import { useState, useContext, useEffect, useRef } from 'react';
+import { Trash2, Plus, Loader2, Mic } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { LanguageContext, content } from '@/context/language-context';
 import { Skeleton } from '../ui/skeleton';
+import { useToast } from '@/hooks/use-toast';
 
 interface IngredientEditorProps {
   ingredients: string[];
@@ -19,6 +20,11 @@ interface IngredientEditorProps {
   analysisPerformed: boolean;
   remainingSearches?: number;
 }
+
+// Check for SpeechRecognition API
+const SpeechRecognition =
+  (typeof window !== 'undefined' && window.SpeechRecognition) ||
+  (typeof window !== 'undefined' && (window as any).webkitSpeechRecognition);
 
 export default function IngredientEditor({
   ingredients,
@@ -32,6 +38,60 @@ export default function IngredientEditor({
   const [newIngredient, setNewIngredient] = useState('');
   const { language } = useContext(LanguageContext);
   const t = content[language];
+  const { toast } = useToast();
+
+  const [isListening, setIsListening] = useState(false);
+  const recognitionRef = useRef<any>(null);
+
+  useEffect(() => {
+    if (!SpeechRecognition) {
+      return;
+    }
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = language === 'bn' ? 'bn-BD' : 'en-US';
+
+    recognition.onresult = (event: any) => {
+      const spokenText = event.results[0][0].transcript;
+      if (spokenText) {
+        setIngredients([...ingredients, spokenText.trim()]);
+      }
+      setIsListening(false);
+    };
+
+    recognition.onerror = (event: any) => {
+      console.error('Speech recognition error', event.error);
+      if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+        toast({
+            variant: 'destructive',
+            title: 'Microphone Access Denied',
+            description: 'Please enable microphone permissions in your browser settings to use voice input.'
+        });
+      }
+      setIsListening(false);
+    };
+    
+    recognition.onend = () => {
+        setIsListening(false);
+    }
+
+    recognitionRef.current = recognition;
+  }, [language, ingredients, setIngredients, toast]);
+  
+  const handleListen = () => {
+    if (isListening || !recognitionRef.current) {
+      return;
+    }
+    try {
+        recognitionRef.current.start();
+        setIsListening(true);
+    } catch(e) {
+        console.error("Could not start recognition", e);
+        setIsListening(false);
+    }
+  };
+
 
   const handleAddIngredient = () => {
     if (newIngredient.trim() !== '') {
@@ -97,16 +157,21 @@ export default function IngredientEditor({
         {renderContent()}
         
         <div className="flex gap-2">
-        <Input
-            type="text"
-            value={newIngredient}
-            onChange={(e) => setNewIngredient(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleAddIngredient()}
-            placeholder={t.ingredients.addPlaceholder}
-        />
-        <Button onClick={handleAddIngredient} variant="outline" size="icon" aria-label={t.ingredients.addAriaLabel}>
-            <Plus className="h-4 w-4" />
-        </Button>
+          <Input
+              type="text"
+              value={newIngredient}
+              onChange={(e) => setNewIngredient(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleAddIngredient()}
+              placeholder={t.ingredients.addPlaceholder}
+          />
+          <Button onClick={handleAddIngredient} variant="outline" size="icon" aria-label={t.ingredients.addAriaLabel}>
+              <Plus className="h-4 w-4" />
+          </Button>
+          {SpeechRecognition && (
+            <Button onClick={handleListen} variant={isListening ? 'destructive' : 'outline'} size="icon" aria-label={t.ingredients.voiceAriaLabel} disabled={isListening}>
+                <Mic className={`h-4 w-4 ${isListening ? 'animate-pulse' : ''}`} />
+            </Button>
+          )}
         </div>
 
         <Button onClick={onGetRecipes} disabled={getRecipesDisabled} className="w-full bg-primary hover:bg-primary/90">
