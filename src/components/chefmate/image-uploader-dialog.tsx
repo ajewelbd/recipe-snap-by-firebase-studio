@@ -241,7 +241,7 @@ export default function ImageUploaderDialog({ open, onOpenChange, onComplete, de
                                      </div>
                                 )}
                                 {devices.length > 1 && (
-                                    <Button onClick={handleSwitchCamera} variant="ghost" size="icon" aria-label="Switch camera" className="absolute bottom-2 left-2 bg-black/20 hover:bg-black/40 text-white hover:text-white">
+                                    <Button onClick={handleSwitchCamera} variant="ghost" size="icon" aria-label="Switch camera" className="absolute bottom-2 right-2 bg-black/20 hover:bg-black/40 text-white hover:text-white">
                                         <RefreshCw className="w-5 h-5" />
                                     </Button>
                                 )}
