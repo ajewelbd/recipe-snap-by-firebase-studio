@@ -14,7 +14,10 @@ import Image from "next/image";
 import { Skeleton } from "../ui/skeleton";
 import { LanguageContext, content } from "@/context/language-context";
 import { Badge } from "../ui/badge";
-import { X } from "lucide-react";
+import { X, Volume2, Loader2 } from "lucide-react";
+import { Button } from "../ui/button";
+import { generateRecipeSpeech } from "@/ai/flows/generate-recipe-speech";
+import { useToast } from "@/hooks/use-toast";
 
 
 interface RecipeDetailDialogContextType {
@@ -23,24 +26,26 @@ interface RecipeDetailDialogContextType {
 
 const RecipeDetailDialogContext = createContext<RecipeDetailDialogContextType | null>(null);
 
-const useRecipeDetailDialog = () => {
+export const useRecipeDetailDialog = () => {
     const context = useContext(RecipeDetailDialogContext);
     if (!context) {
-        throw new Error('useRecipeDetailDialog must be used within a RecipeDetailDialog');
+        throw new Error('useRecipeDetailDialog must be used within a RecipeDetailDialogProvider');
     }
     return context;
 }
 
-interface RecipeDetailDialogProps {
+interface RecipeDetailDialogProviderProps {
   children: React.ReactNode;
-  recipes: RecipeWithImage[];
   userIngredients: string[];
 }
 
-export default function RecipeDetailDialog({ children, recipes, userIngredients }: RecipeDetailDialogProps) {
+export function RecipeDetailDialogProvider({ children, userIngredients }: RecipeDetailDialogProviderProps) {
   const [selectedRecipe, setSelectedRecipe] = useState<RecipeWithImage | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
   const { language } = useContext(LanguageContext);
   const t = content[language];
+  const { toast } = useToast();
   
   const getRecipeName = (recipe: RecipeWithImage) => {
     return language === 'bn' ? recipe.name_bn : recipe.name_en;
@@ -56,14 +61,43 @@ export default function RecipeDetailDialog({ children, recipes, userIngredients 
     return instructions.replace(regex, (match) => `<strong class="font-bold text-primary">${match}</strong>`);
   };
 
+  const handleListen = async (text: string) => {
+    if (!text) return;
+    setIsLoadingAudio(true);
+    setAudioUrl(null);
+    try {
+        const result = await generateRecipeSpeech({ text });
+        setAudioUrl(result.audioDataUri);
+    } catch (error) {
+        console.error("Error generating speech:", error);
+        toast({
+            variant: 'destructive',
+            title: t.toast.error.title,
+            description: t.toast.error.speech,
+        });
+    } finally {
+        setIsLoadingAudio(false);
+    }
+  }
+
+  const handleDialogClose = () => {
+    setSelectedRecipe(null);
+    setAudioUrl(null);
+    setIsLoadingAudio(false);
+  }
+
   return (
     <RecipeDetailDialogContext.Provider value={{ setSelectedRecipe }}>
-        <Dialog open={!!selectedRecipe} onOpenChange={(isOpen) => !isOpen && setSelectedRecipe(null)}>
+        <Dialog open={!!selectedRecipe} onOpenChange={(isOpen) => !isOpen && handleDialogClose()}>
             {children}
             {selectedRecipe && (
                 <DialogContent className="max-w-md p-0 gap-0">
-                    <DialogHeader className="p-4 border-b">
+                    <DialogHeader className="p-4 border-b flex-row items-center justify-between">
                         <DialogTitle className="text-xl">{getRecipeName(selectedRecipe)}</DialogTitle>
+                         <DialogClose className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+                            <X className="h-4 w-4" />
+                            <span className="sr-only">Close</span>
+                        </DialogClose>
                     </DialogHeader>
                     <div className="p-4 space-y-4 h-[70vh] overflow-y-auto">
                         {selectedRecipe.imageUrl ? (
@@ -80,7 +114,25 @@ export default function RecipeDetailDialog({ children, recipes, userIngredients 
                         </div>
                         
                         <div>
-                            <h3 className="font-bold mb-2">{language === 'bn' ? 'নির্দেশাবলী' : 'Instructions'}</h3>
+                            <div className="flex items-center justify-between mb-2">
+                                <h3 className="font-bold">{language === 'bn' ? 'নির্দেশাবলী' : 'Instructions'}</h3>
+                                <Button 
+                                    size="icon" 
+                                    variant="ghost" 
+                                    onClick={() => handleListen(getRecipeInstructions(selectedRecipe))}
+                                    disabled={isLoadingAudio}
+                                    aria-label={t.recipes.listen}
+                                >
+                                    {isLoadingAudio ? <Loader2 className="animate-spin" /> : <Volume2 />}
+                                </Button>
+                            </div>
+                            {audioUrl && !isLoadingAudio && (
+                                <div className="mb-2">
+                                    <audio controls src={audioUrl} className="w-full h-10">
+                                        Your browser does not support the audio element.
+                                    </audio>
+                                </div>
+                            )}
                             <p 
                                 className="whitespace-pre-wrap text-foreground/80"
                                 dangerouslySetInnerHTML={{ __html: highlightIngredients(getRecipeInstructions(selectedRecipe)) }}
@@ -104,4 +156,7 @@ const RecipeDetailDialogTrigger = ({ children, recipe }: { children: React.React
     )
 }
 
-RecipeDetailDialog.Trigger = RecipeDetailDialogTrigger;
+export default {
+    Provider: RecipeDetailDialogProvider,
+    Trigger: RecipeDetailDialogTrigger,
+};

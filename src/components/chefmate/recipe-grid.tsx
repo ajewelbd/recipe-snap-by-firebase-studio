@@ -47,7 +47,7 @@ export default function RecipeGrid({ recipes, isLoading, userIngredients }: Reci
     }
   
     return (
-        <RecipeDetailDialog recipes={recipes} userIngredients={userIngredients}>
+        <RecipeDetailDialog.Provider userIngredients={userIngredients}>
             <div className="grid grid-cols-2 gap-x-4 gap-y-6">
             {recipes.map((recipe, index) => (
                 <RecipeDetailDialog.Trigger key={index} recipe={recipe}>
@@ -78,6 +78,6 @@ export default function RecipeGrid({ recipes, isLoading, userIngredients }: Reci
                 </RecipeDetailDialog.Trigger>
             ))}
             </div>
-        </RecipeDetailDialog>
+        </RecipeDetailDialog.Provider>
     );
 }
