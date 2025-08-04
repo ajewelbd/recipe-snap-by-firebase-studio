@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { LanguageContext, content } from '@/context/language-context';
 import { Skeleton } from '../ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
+import { extractIngredientsFromText } from '@/ai/flows/extract-ingredients-from-text';
 
 interface IngredientEditorProps {
   ingredients: string[];
@@ -49,6 +50,27 @@ export default function IngredientEditor({
     setIsClient(true);
   }, []);
 
+  const handleVoiceResult = async (spokenText: string) => {
+    if (!spokenText) return;
+    setIsListening(true); // Keep mic icon in listening state while processing
+    try {
+      const { ingredients: extractedIngredients } = await extractIngredientsFromText({ text: spokenText });
+      if (extractedIngredients.length > 0) {
+        setIngredients([...ingredients, ...extractedIngredients]);
+      }
+    } catch (error) {
+      console.error('Error extracting ingredients from text:', error);
+       toast({
+        variant: 'destructive',
+        title: 'Voice Error',
+        description: 'Sorry, I had trouble understanding the ingredients.'
+       });
+    } finally {
+      setIsListening(false);
+    }
+  };
+
+
   useEffect(() => {
     if (!SpeechRecognition) {
       return;
@@ -60,18 +82,7 @@ export default function IngredientEditor({
 
     recognition.onresult = (event: any) => {
       const spokenText = event.results[0][0].transcript;
-      if (spokenText) {
-        // Split by commas or the word "and" to handle multiple ingredients
-        const newIngredients = spokenText
-          .split(/,|\s+and\s+/)
-          .map((ingredient: string) => ingredient.trim())
-          .filter((ingredient: string) => ingredient.length > 0);
-        
-        if (newIngredients.length > 0) {
-          setIngredients([...ingredients, ...newIngredients]);
-        }
-      }
-      setIsListening(false);
+      handleVoiceResult(spokenText);
     };
 
     recognition.onerror = (event: any) => {
