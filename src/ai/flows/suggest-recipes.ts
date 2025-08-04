@@ -32,6 +32,7 @@ const SuggestRecipesOutputSchema = z.object({
       name_bn: z.string().describe('The name of the recipe, in Bengali.'),
       instructions_bn: z.string().describe('The cooking instructions for the recipe, in Bengali.'),
       youtubeSearchQuery: z.string().describe('A simple, effective search query to find a YouTube video for this recipe in English.'),
+      imageGenerationPrompt: z.string().describe('A detailed, photorealistic image generation prompt for the final, plated dish. This prompt will be used to create an image of the food.'),
       nutrition: z.object({
         servingSize: z.string().describe('The estimated serving size, including a precise quantity in parentheses. For example: "1 bowl (400g)" or "1 glass (250ml)".'),
         calories: NutrientSchema.describe('Estimated calories per serving.'),
@@ -67,7 +68,9 @@ For each recipe, also provide estimated nutritional information (calories, prote
 Crucially, you must also define a 'servingSize' for which the nutritional info is calculated. This should include a descriptive name and a precise quantity in parentheses. For example: "1 cup (250g)" or "1 glass (250ml)".
 The youtubeSearchQuery should always be in English.
 
-Each recipe should include a name, cooking instructions, a simple YouTube search query, and nutritional information.`,
+For each recipe, also generate a detailed, photorealistic image generation prompt for the final, plated dish. This prompt should be in English and will be used to create an image of the food.
+
+Each recipe should include a name, cooking instructions, a simple YouTube search query, an image generation prompt, and nutritional information.`,
 });
 
 const suggestRecipesFlow = ai.defineFlow(

@@ -7,6 +7,7 @@ import type { SuggestRecipesOutput } from '@/ai/flows/suggest-recipes';
 import { analyzeImageIngredients } from '@/ai/flows/analyze-image-ingredients';
 import { suggestRecipes } from '@/ai/flows/suggest-recipes';
 import { generateRecipeSpeech } from '@/ai/flows/generate-recipe-speech';
+import { generateRecipeImage } from '@/ai/flows/generate-recipe-image';
 
 import Header from '@/components/recipe-snap/header';
 import ImageUploader from '@/components/recipe-snap/image-uploader';
@@ -20,6 +21,11 @@ import { LanguageContext, content } from '@/context/language-context';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/auth-context';
 import type { User } from '@supabase/supabase-js';
+
+// Define a new type for the recipe that includes the optional imageUrl
+export type RecipeWithImage = SuggestRecipesOutput['recipes'][0] & {
+  imageUrl?: string;
+};
 
 // Helper to convert data URI to a Blob
 const dataURIToBlob = (dataURI: string) => {
@@ -39,7 +45,7 @@ export default function Home() {
   const [image, setImage] = useState<string | null>(null);
   const [imageSource, setImageSource] = useState<'file' | 'camera' | null>(null);
   const [ingredients, setIngredients] = useState<string[]>([]);
-  const [recipes, setRecipes] = useState<SuggestRecipesOutput['recipes']>([]);
+  const [recipes, setRecipes] = useState<RecipeWithImage[]>([]);
   const [isLoadingIngredients, setIsLoadingIngredients] = useState(false);
   const [isLoadingRecipes, setIsLoadingRecipes] = useState(false);
   const [analysisPerformed, setAnalysisPerformed] = useState(false);
@@ -167,6 +173,25 @@ export default function Home() {
     }
   };
 
+  const generateImagesInBackground = (recipes: RecipeWithImage[]) => {
+    recipes.forEach((recipe, index) => {
+      (async () => {
+        try {
+          const imageResult = await generateRecipeImage({ prompt: recipe.imageGenerationPrompt });
+          // Update the specific recipe in the state with the new image URL
+          setRecipes(currentRecipes => {
+            const newRecipes = [...currentRecipes];
+            newRecipes[index] = { ...newRecipes[index], imageUrl: imageResult.imageUrl };
+            return newRecipes;
+          });
+        } catch (error) {
+          console.error(`Error generating image for recipe "${recipe.name}":`, error);
+          // Optionally, you could set an error state or a default fallback image URL here
+        }
+      })();
+    });
+  };
+
   const handleGetRecipes = async () => {
     if (ingredients.length === 0) return;
     
@@ -185,6 +210,7 @@ export default function Home() {
     try {
       const result = await suggestRecipes({ ingredients: ingredients, language });
       setRecipes(result.recipes);
+      generateImagesInBackground(result.recipes); // Start generating images
       
       if (user) {
         // Don't wait for this to complete. Let it run in the background.

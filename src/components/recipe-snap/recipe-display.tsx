@@ -2,9 +2,10 @@
 'use client';
 
 import { useState, useContext } from 'react';
+import Image from 'next/image';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import type { SuggestRecipesOutput } from '@/ai/flows/suggest-recipes';
+import { type RecipeWithImage } from '@/app/page';
 import VideoSuggestions from './video-suggestions';
 import { LanguageContext, content } from '@/context/language-context';
 import { Button } from '../ui/button';
@@ -15,7 +16,7 @@ import { Badge } from '../ui/badge';
 
 
 interface RecipeDisplayProps {
-  recipes: SuggestRecipesOutput['recipes'];
+  recipes: RecipeWithImage[];
   onGetSpeech: (text: string) => Promise<string | null>;
 }
 
@@ -35,14 +36,14 @@ export default function RecipeDisplay({ recipes, onGetSpeech }: RecipeDisplayPro
     setLoadingAudio(null);
   };
 
-  const getRecipeName = (recipe: SuggestRecipesOutput['recipes'][0]) => {
+  const getRecipeName = (recipe: RecipeWithImage) => {
     if (language === 'bn') {
       return recipe.name_bn || recipe.name;
     }
     return recipe.name_en || recipe.name;
   };
 
-  const getRecipeInstructions = (recipe: SuggestRecipesOutput['recipes'][0]) => {
+  const getRecipeInstructions = (recipe: RecipeWithImage) => {
     if (language === 'bn') {
       return recipe.instructions_bn || recipe.instructions;
     }
@@ -64,8 +65,17 @@ export default function RecipeDisplay({ recipes, onGetSpeech }: RecipeDisplayPro
 
                 return (
               <AccordionItem key={index} value={`item-${index}`}>
-                <AccordionTrigger className="font-headline text-lg hover:no-underline">{recipeName}</AccordionTrigger>
+                <AccordionTrigger className="font-headline text-lg hover:no-underline text-left">{recipeName}</AccordionTrigger>
                 <AccordionContent className="space-y-4">
+                  
+                  {recipe.imageUrl ? (
+                    <div className="relative w-full aspect-video rounded-lg overflow-hidden border shadow-sm bg-muted">
+                        <Image src={recipe.imageUrl} alt={recipeName} fill className="object-cover" data-ai-hint="recipe food" />
+                    </div>
+                  ) : (
+                    <Skeleton className="w-full aspect-video rounded-lg" />
+                  )}
+
                   <div className="flex flex-wrap items-start gap-4">
                     <p className="whitespace-pre-wrap text-foreground/80 flex-grow pt-2">{recipeInstructions}</p>
                     <Button 
