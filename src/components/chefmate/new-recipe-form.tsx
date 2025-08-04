@@ -1,5 +1,6 @@
 'use client';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { saveRecipe, type FormState } from '@/app/my-recipes/new/actions';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
@@ -22,7 +23,7 @@ function SubmitButton() {
 
 export default function NewRecipeForm() {
   const initialState: FormState = { message: '', errors: {} };
-  const [state, dispatch] = useFormState(saveRecipe, initialState);
+  const [state, dispatch] = useActionState(saveRecipe, initialState);
 
   return (
     <form action={dispatch} className="space-y-8">
