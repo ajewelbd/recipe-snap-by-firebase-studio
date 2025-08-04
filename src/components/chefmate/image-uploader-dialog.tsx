@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { LanguageContext, content } from '@/context/language-context';
 import { analyzeImageIngredients } from '@/ai/flows/analyze-image-ingredients';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
-import { Loader2, Camera, UploadCloud, X, CameraSwitch } from 'lucide-react';
+import { Loader2, Camera, UploadCloud, X, RefreshCw } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 
@@ -242,7 +242,7 @@ export default function ImageUploaderDialog({ open, onOpenChange, onComplete, de
                                 )}
                                 {devices.length > 1 && (
                                     <Button onClick={handleSwitchCamera} variant="ghost" size="icon" aria-label="Switch camera" className="absolute bottom-2 left-2 bg-black/20 hover:bg-black/40 text-white hover:text-white">
-                                        <CameraSwitch className="w-5 h-5" />
+                                        <RefreshCw className="w-5 h-5" />
                                     </Button>
                                 )}
                             </div>
