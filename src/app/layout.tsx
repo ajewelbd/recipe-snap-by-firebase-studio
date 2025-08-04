@@ -21,8 +21,8 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet" />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
-        <meta name="theme-color" content="#F0FAF0" />
+        <link rel="apple-touch-icon" href="/icons/logo.svg" />
+        <meta name="theme-color" content="#6ABF45" />
       </head>
       <body className="font-body antialiased">
         <AuthProvider>
