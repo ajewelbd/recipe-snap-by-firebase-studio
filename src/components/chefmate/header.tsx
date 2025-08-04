@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import Link from 'next/link';
-import { ChefHat, Globe, History, LogOut } from 'lucide-react';
+import { Globe, History, LogOut } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +17,7 @@ import { useAuth } from '@/context/auth-context';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Skeleton } from '../ui/skeleton';
 import { AuthForm } from './auth-form';
+import Logo from './logo';
 
 export default function Header() {
   const { language, setLanguage } = useContext(LanguageContext);
@@ -65,7 +66,7 @@ export default function Header() {
     <header className="bg-card border-b p-4">
       <div className="container mx-auto flex items-center justify-between gap-2">
         <Link href="/" className="flex items-center gap-3 flex-shrink-0">
-          <ChefHat className="w-8 h-8 text-primary" />
+          <Logo className="w-10 h-10" />
           <h1 className="text-2xl font-bold font-headline text-primary">
             {t.appName}
           </h1>
