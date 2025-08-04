@@ -44,7 +44,7 @@ export default function RecipeFilters({ onFilterChange, filters }: RecipeFilters
 
   return (
     <div className="flex items-center gap-2">
-      <Select value={filters.cuisine} onValueChange={(value) => onFilterChange('cuisine', value === 'any' ? '' : value)}>
+      <Select value={filters.cuisine} onValueChange={(value) => onFilterChange('cuisine', value)}>
         <SelectTrigger className="w-[110px] h-9">
           <SelectValue placeholder={t.recipes.filters.cuisine} />
         </SelectTrigger>
@@ -53,7 +53,7 @@ export default function RecipeFilters({ onFilterChange, filters }: RecipeFilters
           {filterOptions.cuisine.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
         </SelectContent>
       </Select>
-      <Select value={filters.diet} onValueChange={(value) => onFilterChange('diet', value === 'any' ? '' : value)}>
+      <Select value={filters.diet} onValueChange={(value) => onFilterChange('diet', value)}>
         <SelectTrigger className="w-[110px] h-9">
           <SelectValue placeholder={t.recipes.filters.diet} />
         </SelectTrigger>
@@ -62,7 +62,7 @@ export default function RecipeFilters({ onFilterChange, filters }: RecipeFilters
           {filterOptions.diet.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
         </SelectContent>
       </Select>
-      <Select value={filters.time} onValueChange={(value) => onFilterChange('time', value === 'any' ? '' : value)}>
+      <Select value={filters.time} onValueChange={(value) => onFilterChange('time', value)}>
         <SelectTrigger className="w-[110px] h-9">
           <SelectValue placeholder={t.recipes.filters.time} />
         </SelectTrigger>

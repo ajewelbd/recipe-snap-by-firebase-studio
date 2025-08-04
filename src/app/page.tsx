@@ -122,9 +122,9 @@ export default function Home() {
       const result = await suggestRecipes({ 
         ingredients: ingredients, 
         language,
-        cuisine: filters.cuisine || undefined,
-        diet: filters.diet || undefined,
-        time: filters.time || undefined
+        cuisine: filters.cuisine && filters.cuisine !== 'any' ? filters.cuisine : undefined,
+        diet: filters.diet && filters.diet !== 'any' ? filters.diet : undefined,
+        time: filters.time && filters.time !== 'any' ? filters.time : undefined
       });
       
       const recipesWithImagePlaceholder = result.recipes.map(r => ({...r, imageUrl: undefined}));
