@@ -22,9 +22,10 @@ interface ImageUploaderDialogProps {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     onComplete: (ingredients: string[], imageUrl: string) => void;
+    defaultView?: 'upload' | 'camera';
 }
 
-export default function ImageUploaderDialog({ open, onOpenChange, onComplete }: ImageUploaderDialogProps) {
+export default function ImageUploaderDialog({ open, onOpenChange, onComplete, defaultView = 'upload' }: ImageUploaderDialogProps) {
     const [image, setImage] = useState<string | null>(null);
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [view, setView] = useState<'upload' | 'camera' | 'preview'>('upload');
@@ -73,13 +74,13 @@ export default function ImageUploaderDialog({ open, onOpenChange, onComplete }: 
             // Reset state when dialog opens
             setImage(null);
             setIsAnalyzing(false);
-            setView('upload');
+            setView(defaultView);
             setHasCameraPermission(null);
         } else {
             // Cleanup camera stream when dialog closes
             stopCamera();
         }
-    }, [open, stopCamera]);
+    }, [open, stopCamera, defaultView]);
     
     useEffect(() => {
       if(view === 'camera' && open) {
@@ -158,7 +159,7 @@ export default function ImageUploaderDialog({ open, onOpenChange, onComplete }: 
 
     const reset = () => {
         setImage(null);
-        setView('upload');
+        setView(defaultView);
         if(fileInputRef.current) fileInputRef.current.value = '';
     }
 
@@ -243,4 +244,3 @@ export default function ImageUploaderDialog({ open, onOpenChange, onComplete }: 
         </Dialog>
     );
 }
-

@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useContext, useEffect, useRef } from 'react';
-import { Mic, X, Upload } from 'lucide-react';
+import { Mic, X, Upload, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
@@ -39,6 +39,7 @@ export default function IngredientEditor({
 
   const [isClient, setIsClient] = useState(false);
   const [isUploaderOpen, setIsUploaderOpen] = useState(false);
+  const [uploaderDefaultView, setUploaderDefaultView] = useState<'upload' | 'camera'>('upload');
 
   useEffect(() => {
     setIsClient(true);
@@ -135,23 +136,19 @@ export default function IngredientEditor({
     setIsUploaderOpen(false);
   }
 
+  const openUploader = (view: 'upload' | 'camera') => {
+    setUploaderDefaultView(view);
+    setIsUploaderOpen(true);
+  }
+
   return (
     <div className="space-y-4">
        <ImageUploaderDialog 
           open={isUploaderOpen}
           onOpenChange={setIsUploaderOpen}
           onComplete={handleUploaderComplete}
+          defaultView={uploaderDefaultView}
        />
-       <div className="flex gap-2">
-         <Button 
-            variant="outline"
-            onClick={() => setIsUploaderOpen(true)}
-            disabled={isLoading}
-            className="h-12"
-          >
-           <Upload className="mr-2 h-5 w-5" />
-            {t.uploader.uploadButton}
-         </Button>
         <div className="relative flex-grow">
           <Input
               type="text"
@@ -164,16 +161,23 @@ export default function IngredientEditor({
                 }
               }}
               placeholder={t.ingredients.addPlaceholder}
-              className="h-12 pl-4 pr-10 text-base"
+              className="h-12 pl-4 pr-32 text-base"
               disabled={isLoading}
           />
-          {isClient && SpeechRecognition && (
-            <Button onClick={handleListen} variant="ghost" size="icon" aria-label={t.ingredients.voiceAriaLabel} disabled={isListening || isLoading} className="absolute right-1 top-1/2 -translate-y-1/2 h-9 w-9">
-                <Mic className={`h-5 w-5 ${isListening ? 'text-primary animate-pulse' : 'text-muted-foreground'}`} />
-            </Button>
-          )}
+          <div className="absolute right-1 top-1/2 -translate-y-1/2 flex items-center">
+             <Button onClick={() => openUploader('upload')} variant="ghost" size="icon" aria-label={t.uploader.uploadButton} disabled={isLoading} className="h-9 w-9">
+                <Upload className="h-5 w-5 text-muted-foreground" />
+             </Button>
+             <Button onClick={() => openUploader('camera')} variant="ghost" size="icon" aria-label={t.uploader.useCamera} disabled={isLoading} className="h-9 w-9">
+                <Camera className="h-5 w-5 text-muted-foreground" />
+             </Button>
+             {isClient && SpeechRecognition && (
+                <Button onClick={handleListen} variant="ghost" size="icon" aria-label={t.ingredients.voiceAriaLabel} disabled={isListening || isLoading} className="h-9 w-9">
+                    <Mic className={`h-5 w-5 ${isListening ? 'text-primary animate-pulse' : 'text-muted-foreground'}`} />
+                </Button>
+             )}
+          </div>
         </div>
-      </div>
       
       <div className="flex flex-wrap gap-2 min-h-[2rem]">
         {ingredients.map((ingredient, index) => (
