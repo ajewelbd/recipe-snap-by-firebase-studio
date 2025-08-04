@@ -1,6 +1,6 @@
 'use server';
 
-import { createSupabaseServerClient } from '@/lib/supabase';
+import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { categorizeRecipe } from '@/ai/flows/categorize-recipe';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';

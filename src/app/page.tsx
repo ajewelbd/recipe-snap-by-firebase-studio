@@ -5,7 +5,7 @@ import { useState, useContext, useEffect } from 'react';
 import type { SuggestRecipesOutput } from '@/ai/flows/suggest-recipes';
 import { suggestRecipes } from '@/ai/flows/suggest-recipes';
 import { generateRecipeImage } from '@/ai/flows/generate-recipe-image';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/lib/supabase/client';
 
 import Header from '@/components/chefmate/header';
 import IngredientEditor from '@/components/chefmate/ingredient-editor';
