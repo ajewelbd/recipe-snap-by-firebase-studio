@@ -43,6 +43,12 @@ export default function IngredientEditor({
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
 
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   useEffect(() => {
     if (!SpeechRecognition) {
       return;
@@ -167,7 +173,7 @@ export default function IngredientEditor({
           <Button onClick={handleAddIngredient} variant="outline" size="icon" aria-label={t.ingredients.addAriaLabel}>
               <Plus className="h-4 w-4" />
           </Button>
-          {SpeechRecognition && (
+          {isClient && SpeechRecognition && (
             <Button onClick={handleListen} variant={isListening ? 'destructive' : 'outline'} size="icon" aria-label={t.ingredients.voiceAriaLabel} disabled={isListening}>
                 <Mic className={`h-4 w-4 ${isListening ? 'animate-pulse' : ''}`} />
             </Button>
