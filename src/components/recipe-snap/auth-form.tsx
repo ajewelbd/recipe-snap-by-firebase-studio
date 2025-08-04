@@ -149,7 +149,7 @@ export function AuthForm() {
              </Alert>
            </div>
         ) : (
-        <Tabs defaultValue="login" className="w-full">
+        <Tabs defaultValue="login" className="w-full pt-4">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login">{t.login}</TabsTrigger>
             <TabsTrigger value="signup">{t.signup}</TabsTrigger>
