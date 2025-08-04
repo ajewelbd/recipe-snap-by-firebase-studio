@@ -61,8 +61,19 @@ export default function ImageUploaderDialog({ open, onOpenChange, onComplete, de
             const videoDevices = allDevices.filter(device => device.kind === 'videoinput');
             setDevices(videoDevices);
             
+            // Prefer the rear camera if available
+            const rearCameraIndex = videoDevices.findIndex(device => 
+              device.label.toLowerCase().includes('back') || 
+              device.label.toLowerCase().includes('rear')
+            );
+
+            const initialDeviceIndex = rearCameraIndex !== -1 ? rearCameraIndex : currentDeviceIndex;
+            if (currentDeviceIndex !== initialDeviceIndex) {
+              setCurrentDeviceIndex(initialDeviceIndex);
+            }
+            
             // Now start the stream with the selected device
-            const deviceId = videoDevices[currentDeviceIndex]?.deviceId;
+            const deviceId = videoDevices[initialDeviceIndex]?.deviceId;
             const newStream = await navigator.mediaDevices.getUserMedia({ 
                 video: { deviceId: deviceId ? { exact: deviceId } : undefined }
             });
