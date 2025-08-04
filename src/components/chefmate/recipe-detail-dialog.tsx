@@ -6,7 +6,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogClose,
 } from "@/components/ui/dialog";
 import { type RecipeWithImage } from '@/app/page';
 import { useState, useContext, createContext } from 'react';
@@ -14,7 +13,7 @@ import Image from "next/image";
 import { Skeleton } from "../ui/skeleton";
 import { LanguageContext, content } from "@/context/language-context";
 import { Badge } from "../ui/badge";
-import { X, Volume2, Loader2 } from "lucide-react";
+import { Volume2, Loader2 } from "lucide-react";
 import { Button } from "../ui/button";
 import { generateRecipeSpeech } from "@/ai/flows/generate-recipe-speech";
 import { useToast } from "@/hooks/use-toast";
@@ -91,15 +90,11 @@ export function RecipeDetailDialogProvider({ children, userIngredients }: Recipe
         <Dialog open={!!selectedRecipe} onOpenChange={(isOpen) => !isOpen && handleDialogClose()}>
             {children}
             {selectedRecipe && (
-                <DialogContent className="max-w-md p-0 gap-0">
-                    <DialogHeader className="p-4 border-b flex-row items-center justify-between">
+                <DialogContent className="max-w-md p-0">
+                    <DialogHeader className="p-6 pb-2">
                         <DialogTitle className="text-xl">{getRecipeName(selectedRecipe)}</DialogTitle>
-                         <DialogClose className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-                            <X className="h-4 w-4" />
-                            <span className="sr-only">Close</span>
-                        </DialogClose>
                     </DialogHeader>
-                    <div className="p-4 space-y-4 h-[70vh] overflow-y-auto">
+                    <div className="p-6 pt-0 space-y-4 h-[70vh] overflow-y-auto">
                         {selectedRecipe.imageUrl ? (
                             <div className="relative w-full aspect-video rounded-lg overflow-hidden border shadow-sm bg-muted">
                                 <Image src={selectedRecipe.imageUrl} alt={getRecipeName(selectedRecipe)} fill className="object-cover" data-ai-hint="recipe food" />
