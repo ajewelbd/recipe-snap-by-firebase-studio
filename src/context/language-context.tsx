@@ -21,7 +21,7 @@ interface LanguageProviderProps {
 
 export const content = {
     en: {
-        appName: 'Chefmate',
+        appName: 'ChefMate',
         languageName: 'English',
         auth: {
             login: 'Login',
