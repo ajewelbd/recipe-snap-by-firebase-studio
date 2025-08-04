@@ -1,6 +1,6 @@
 'use server';
 
-import { supabase } from '@/lib/supabase';
+import { createSupabaseServerClient } from '@/lib/supabase';
 import { categorizeRecipe } from '@/ai/flows/categorize-recipe';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
@@ -28,6 +28,7 @@ export type FormState = {
 async function uploadImage(file: File, bucket: string): Promise<string | null> {
     if (!file || file.size === 0) return null;
     
+    const supabase = createSupabaseServerClient();
     const userResponse = await supabase.auth.getUser();
     if (userResponse.error || !userResponse.data.user) {
         throw new Error('User not authenticated.');
@@ -52,6 +53,7 @@ export async function saveRecipe(
   prevState: FormState,
   formData: FormData
 ): Promise<FormState> {
+  const supabase = createSupabaseServerClient();
   const userResponse = await supabase.auth.getUser();
   if (userResponse.error || !userResponse.data.user) {
     return {
