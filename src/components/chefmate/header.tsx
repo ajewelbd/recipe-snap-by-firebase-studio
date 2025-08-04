@@ -113,6 +113,7 @@ export default function Header() {
                     <DropdownMenuRadioItem value="dark">Dark</DropdownMenuRadioItem>
                     <DropdownMenuRadioItem value="system">System</DropdownMenuRadioItem>
                     <DropdownMenuRadioItem value="theme-indigo">Indigo</DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="theme-green-orange">Green/Orange</DropdownMenuRadioItem>
                 </DropdownMenuRadioGroup>
             </DropdownMenuContent>
           </DropdownMenu>
