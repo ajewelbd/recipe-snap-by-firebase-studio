@@ -121,7 +121,14 @@ export default function IngredientEditor({
 
   const handleAddIngredient = () => {
     if (newIngredient.trim() !== '') {
-      setIngredients([...new Set([...ingredients, newIngredient.trim()])]);
+      const newIngredientsList = newIngredient
+        .split(',')
+        .map((ingredient) => ingredient.trim())
+        .filter((ingredient) => ingredient !== '');
+      
+      if (newIngredientsList.length > 0) {
+        setIngredients([...new Set([...ingredients, ...newIngredientsList])]);
+      }
       setNewIngredient('');
     }
   };
