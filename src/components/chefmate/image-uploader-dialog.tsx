@@ -30,6 +30,8 @@ export default function ImageUploaderDialog({ open, onOpenChange, onComplete, de
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [view, setView] = useState<'upload' | 'camera' | 'preview'>('upload');
     const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+    const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
+    const [currentDeviceIndex, setCurrentDeviceIndex] = useState(0);
     
     const { toast } = useToast();
     const { language } = useContext(LanguageContext);
@@ -49,12 +51,24 @@ export default function ImageUploaderDialog({ open, onOpenChange, onComplete, de
     const startCamera = useCallback(async () => {
         try {
             if (streamRef.current) stopCamera();
-
+            
             const stream = await navigator.mediaDevices.getUserMedia({ video: true });
             setHasCameraPermission(true);
-            streamRef.current = stream;
+
+            // Enumerate devices after getting permission
+            const allDevices = await navigator.mediaDevices.enumerateDevices();
+            const videoDevices = allDevices.filter(device => device.kind === 'videoinput');
+            setDevices(videoDevices);
+            
+            // Now start the stream with the selected device
+            const deviceId = videoDevices[currentDeviceIndex]?.deviceId;
+            const newStream = await navigator.mediaDevices.getUserMedia({ 
+                video: { deviceId: deviceId ? { exact: deviceId } : undefined }
+            });
+
+            streamRef.current = newStream;
             if (videoRef.current) {
-                videoRef.current.srcObject = stream;
+                videoRef.current.srcObject = newStream;
             }
         } catch (error) {
             console.error('Error accessing camera:', error);
@@ -66,8 +80,11 @@ export default function ImageUploaderDialog({ open, onOpenChange, onComplete, de
             });
             setView('upload');
         }
-    }, [t.toast.error.camera, t.toast.error.cameraPermission, toast, stopCamera]);
+    }, [t.toast.error.camera, t.toast.error.cameraPermission, toast, stopCamera, currentDeviceIndex]);
 
+    const handleSwitchCamera = () => {
+        setCurrentDeviceIndex(prevIndex => (prevIndex + 1) % devices.length);
+    };
 
     useEffect(() => {
         if (open) {
@@ -76,6 +93,7 @@ export default function ImageUploaderDialog({ open, onOpenChange, onComplete, de
             setIsAnalyzing(false);
             setView(defaultView);
             setHasCameraPermission(null);
+            setCurrentDeviceIndex(0);
         } else {
             // Cleanup camera stream when dialog closes
             stopCamera();
@@ -88,7 +106,7 @@ export default function ImageUploaderDialog({ open, onOpenChange, onComplete, de
       } else {
         stopCamera();
       }
-    }, [view, open, startCamera, stopCamera]);
+    }, [view, open, startCamera, stopCamera, currentDeviceIndex]);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -222,10 +240,17 @@ export default function ImageUploaderDialog({ open, onOpenChange, onComplete, de
                                      </div>
                                 )}
                             </div>
-                            <Button onClick={handleSnap} disabled={!hasCameraPermission} className="w-full">
-                                <Camera className="mr-2" />
-                                {t.camera.snap}
-                            </Button>
+                            <div className="flex items-center gap-2">
+                                <Button onClick={handleSnap} disabled={!hasCameraPermission} className="w-full">
+                                    <Camera className="mr-2" />
+                                    {t.camera.snap}
+                                </Button>
+                                {devices.length > 1 && (
+                                    <Button onClick={handleSwitchCamera} variant="outline" size="icon" aria-label="Switch camera">
+                                        <RefreshCw className="w-5 h-5" />
+                                    </Button>
+                                )}
+                            </div>
                         </div>
                     </TabsContent>
                     
