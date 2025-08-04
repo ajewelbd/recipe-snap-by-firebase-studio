@@ -128,6 +128,6 @@ export async function saveRecipe(
   }
   
   // Revalidate and redirect on success
-  revalidatePath('/my-recipes'); // Assuming you'll have a page to list recipes
-  redirect('/my-recipes/new/success'); // Redirect to a success page
+  revalidatePath('/my-recipes');
+  redirect('/my-recipes/new/success');
 }

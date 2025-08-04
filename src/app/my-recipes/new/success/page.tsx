@@ -22,10 +22,10 @@ export default function SuccessPage() {
                 <p className="text-muted-foreground">Your new recipe has been successfully saved to your collection.</p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Button asChild>
-                        <Link href="/my-recipes/new">Create Another Recipe</Link>
+                        <Link href="/my-recipes">View My Recipes</Link>
                     </Button>
                      <Button variant="outline" asChild>
-                        <Link href="/">Back to Home</Link>
+                        <Link href="/my-recipes/new">Create Another Recipe</Link>
                     </Button>
                 </div>
             </CardContent>
