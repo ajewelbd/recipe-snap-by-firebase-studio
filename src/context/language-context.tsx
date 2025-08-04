@@ -109,6 +109,7 @@ export const content = {
                 cuisine: 'Cuisine',
                 diet: 'Diet',
                 time: 'Time',
+                any: 'Any',
             },
         },
         videos: {
@@ -227,6 +228,7 @@ export const content = {
                 cuisine: 'রন্ধনপ্রণালী',
                 diet: 'পথ্য',
                 time: 'সময়',
+                any: 'যেকোনো',
             },
         },
         videos: {

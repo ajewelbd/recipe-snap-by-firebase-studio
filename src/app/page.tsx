@@ -22,6 +22,13 @@ export type RecipeWithImage = SuggestRecipesOutput['recipes'][0] & {
   imageUrl?: string;
 };
 
+export type FilterType = 'cuisine' | 'diet' | 'time';
+export type FilterValues = {
+  cuisine: string;
+  diet: string;
+  time: string;
+};
+
 const GUEST_SEARCH_LIMIT = 3;
 
 export default function Home() {
@@ -34,6 +41,7 @@ export default function Home() {
   const { user } = useAuth();
   const [remainingSearches, setRemainingSearches] = useState(GUEST_SEARCH_LIMIT);
   const [lastImageUrl, setLastImageUrl] = useState<string | null>(null);
+  const [filters, setFilters] = useState<FilterValues>({ cuisine: '', diet: '', time: '' });
 
   useEffect(() => {
     if (!user) {
@@ -111,7 +119,13 @@ export default function Home() {
     setIsLoadingRecipes(true);
     setRecipes([]); // Clear previous recipes
     try {
-      const result = await suggestRecipes({ ingredients: ingredients, language });
+      const result = await suggestRecipes({ 
+        ingredients: ingredients, 
+        language,
+        cuisine: filters.cuisine || undefined,
+        diet: filters.diet || undefined,
+        time: filters.time || undefined
+      });
       
       const recipesWithImagePlaceholder = result.recipes.map(r => ({...r, imageUrl: undefined}));
       setRecipes(recipesWithImagePlaceholder);
@@ -143,6 +157,10 @@ export default function Home() {
       setLastImageUrl(null); // Reset after search
     }
   };
+
+  const handleFilterChange = (filterType: FilterType, value: string) => {
+    setFilters(prev => ({...prev, [filterType]: value}));
+  }
 
   const getRecipesDisabled = ingredients.length === 0 || isLoadingRecipes || (!user && remainingSearches <= 0);
 
@@ -181,7 +199,7 @@ export default function Home() {
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <h2 className="text-2xl font-bold">{t.recipes.title}</h2>
-              <RecipeFilters />
+              <RecipeFilters onFilterChange={handleFilterChange} filters={filters} />
             </div>
             <RecipeGrid 
               recipes={recipes} 

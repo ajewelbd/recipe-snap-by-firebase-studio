@@ -1,9 +1,9 @@
 'use server';
 
 /**
- * @fileOverview Suggests recipes tailored to a list of ingredients.
+ * @fileOverview Suggests recipes tailored to a list of ingredients and user preferences.
  *
- * - suggestRecipes - A function that suggests recipes based on the provided ingredients.
+ * - suggestRecipes - A function that suggests recipes based on the provided ingredients and filters.
  * - SuggestRecipesInput - The input type for the suggestRecipes function.
  * - SuggestRecipesOutput - The return type for the suggestRecipes function.
  */
@@ -19,6 +19,9 @@ const NutrientSchema = z.object({
 const SuggestRecipesInputSchema = z.object({
   ingredients: z.array(z.string()).describe('A list of ingredients to base the recipe suggestions on.'),
   language: z.string().describe("The user's preferred language for the output. Can be 'en' for English or 'bn' for Bengali."),
+  cuisine: z.string().optional().describe('A preferred cuisine (e.g., "Italian", "Mexican").'),
+  diet: z.string().optional().describe('A dietary restriction (e.g., "Vegan", "Gluten-Free").'),
+  time: z.string().optional().describe('A maximum preparation time constraint (e.g., "Under 30 minutes").'),
 });
 export type SuggestRecipesInput = z.infer<typeof SuggestRecipesInputSchema>;
 
@@ -61,6 +64,21 @@ const prompt = ai.definePrompt({
 - {{this}}
 {{/each}}
 
+Please consider the following user preferences:
+{{#if cuisine}}
+- Cuisine: {{cuisine}}
+{{/if}}
+{{#if diet}}
+- Dietary Restriction: {{diet}}
+{{/if}}
+{{#if time}}
+- Maximum Time: {{time}}
+{{/if}}
+{{#unless cuisine}}{{#unless diet}}{{#unless time}}
+- No specific preferences provided.
+{{/unless}}{{/unless}}{{/unless}}
+
+
 For each recipe, provide the following information:
 1.  **Recipe Name & Instructions**: Generate the recipe name and instructions in BOTH English and Bengali.
     -   The 'name' and 'instructions' fields should be in the user's preferred language ({{language}}).
@@ -70,7 +88,7 @@ For each recipe, provide the following information:
 3.  **Ingredients Used Count**: Count how many of the user-provided ingredients are used in the recipe. For example, if the user provided ["tomato", "onion", "garlic"] and the recipe uses tomatoes and onions, this value should be 2.
 4.  **Nutritional Information**: Provide estimated nutritional info (calories, protein, carbs, fat) for a defined 'servingSize'. This is an AI-generated estimate.
 5.  **YouTube Search Query**: An effective, simple search query in English to find a video for this recipe.
-6.  **Image Generation Prompt**: A detailed, photorealistic image generation prompt in English for the final, plated dish.`,
+6.  **Image Generation Prompt**: A detailed, photorealistic image generation prompt in English for the final, plated dish. This prompt will be used to create an image of the food.`,
 });
 
 const suggestRecipesFlow = ai.defineFlow(
