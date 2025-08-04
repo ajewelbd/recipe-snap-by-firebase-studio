@@ -6,7 +6,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
 import { type RecipeWithImage } from '@/app/page';
@@ -70,7 +69,7 @@ export default function RecipeDetailDialog({ children, recipes, userIngredients 
                             <span className="sr-only">Close</span>
                         </DialogClose>
                     </DialogHeader>
-                    <div className="p-4 space-y-4 max-h-[70vh] overflow-y-auto">
+                    <div className="p-4 space-y-4 h-[70vh] overflow-y-auto">
                         {selectedRecipe.imageUrl ? (
                             <div className="relative w-full aspect-video rounded-lg overflow-hidden border shadow-sm bg-muted">
                                 <Image src={selectedRecipe.imageUrl} alt={getRecipeName(selectedRecipe)} fill className="object-cover" data-ai-hint="recipe food" />
