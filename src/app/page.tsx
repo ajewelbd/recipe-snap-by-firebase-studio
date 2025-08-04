@@ -2,53 +2,31 @@
 'use client';
 
 import { useState, useContext, useEffect } from 'react';
-import type { AnalyzeImageIngredientsOutput } from '@/ai/flows/analyze-image-ingredients';
 import type { SuggestRecipesOutput } from '@/ai/flows/suggest-recipes';
-import { analyzeImageIngredients } from '@/ai/flows/analyze-image-ingredients';
 import { suggestRecipes } from '@/ai/flows/suggest-recipes';
-import { generateRecipeSpeech } from '@/ai/flows/generate-recipe-speech';
 import { generateRecipeImage } from '@/ai/flows/generate-recipe-image';
 
 import Header from '@/components/chefmate/header';
-import ImageUploader from '@/components/chefmate/image-uploader';
 import IngredientEditor from '@/components/chefmate/ingredient-editor';
-import RecipeDisplay from '@/components/chefmate/recipe-display';
-import { Skeleton } from '@/components/ui/skeleton';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Separator } from '@/components/ui/separator';
 import { LanguageContext, content } from '@/context/language-context';
-import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/auth-context';
-import type { User } from '@supabase/supabase-js';
+import RecipeGrid from '@/components/chefmate/recipe-grid';
+import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
+import RecipeFilters from '@/components/chefmate/recipe-filters';
 
 // Define a new type for the recipe that includes the optional imageUrl
 export type RecipeWithImage = SuggestRecipesOutput['recipes'][0] & {
   imageUrl?: string;
 };
 
-// Helper to convert data URI to a Blob
-const dataURIToBlob = (dataURI: string) => {
-  const splitDataURI = dataURI.split(',');
-  const byteString = splitDataURI[0].indexOf('base64') >= 0 ? atob(splitDataURI[1]) : decodeURI(splitDataURI[1]);
-  const mimeString = splitDataURI[0].split(':')[1].split(';')[0];
-  const ia = new Uint8Array(byteString.length);
-  for (let i = 0; i < byteString.length; i++) {
-    ia[i] = byteString.charCodeAt(i);
-  }
-  return new Blob([ia], { type: mimeString });
-}
-
 const GUEST_SEARCH_LIMIT = 3;
 
 export default function Home() {
-  const [image, setImage] = useState<string | null>(null);
-  const [imageSource, setImageSource] = useState<'file' | 'camera' | null>(null);
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [recipes, setRecipes] = useState<RecipeWithImage[]>([]);
-  const [isLoadingIngredients, setIsLoadingIngredients] = useState(false);
   const [isLoadingRecipes, setIsLoadingRecipes] = useState(false);
-  const [analysisPerformed, setAnalysisPerformed] = useState(false);
   const { toast } = useToast();
   const { language } = useContext(LanguageContext);
   const t = content[language];
@@ -71,108 +49,7 @@ export default function Home() {
       }
     }
   }, [user]);
-
-  const handleImageUpload = (file: File) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setImage(reader.result as string);
-      setImageSource('file');
-      setIngredients([]);
-      setRecipes([]);
-      setAnalysisPerformed(false);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  const handleImageCapture = (dataUri: string) => {
-    setImage(dataUri);
-    setImageSource('camera');
-    setIngredients([]);
-    setRecipes([]);
-    setAnalysisPerformed(false);
-  };
-
-  const handleRemoveImage = () => {
-    setImage(null);
-    setImageSource(null);
-    setIngredients([]);
-    setRecipes([]);
-    setAnalysisPerformed(false);
-  }
-
-  const handleAnalyzeImage = async () => {
-    if (!image) return;
-    setIsLoadingIngredients(true);
-    setRecipes([]);
-    setAnalysisPerformed(false); 
-    try {
-      const result = await analyzeImageIngredients({ photoDataUri: image });
-      setIngredients(result.ingredients);
-    } catch (error) {
-      console.error('Error analyzing image:', error);
-      toast({
-        variant: 'destructive',
-        title: t.toast.error.title,
-        description: t.toast.error.analyze,
-      });
-    } finally {
-      setIsLoadingIngredients(false);
-      setAnalysisPerformed(true);
-    }
-  };
-
-  const saveHistoryInBackground = async (
-    currentUser: User, 
-    imageData: string | null, 
-    recipeData: SuggestRecipesOutput,
-    currentIngredients: string[],
-  ) => {
-    try {
-      let imageUrl: string | null = null;
-      if (imageData) {
-        // 1. Upload image to Supabase Storage if it exists
-        const file = dataURIToBlob(imageData);
-        const filePath = `public/${currentUser.id}/${new Date().toISOString()}`;
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('history-images')
-          .upload(filePath, file, {
-            cacheControl: '3600',
-            upsert: false,
-            contentType: file.type,
-          });
-
-        if (uploadError) throw uploadError;
-
-        // 2. Get public URL for the uploaded image
-        const { data: urlData } = supabase.storage
-          .from('history-images')
-          .getPublicUrl(uploadData.path);
-        
-        imageUrl = urlData.publicUrl;
-      }
-
-      // 3. Save history to Supabase database
-      const { error: dbError } = await supabase.from('history').insert({
-        user_id: currentUser.id,
-        image_url: imageUrl,
-        ingredients: currentIngredients,
-        recipes: recipeData.recipes,
-      });
-
-      if (dbError) throw dbError;
-
-    } catch (supabaseError) {
-      console.error("Error saving to Supabase in background:", supabaseError);
-      // Non-blocking error - we don't want to hang the UI
-      // But we can inform the user if something went wrong
-      toast({
-        variant: 'destructive',
-        title: 'Database Error',
-        description: 'Failed to save recipe to your history. Your recipes are still available to view.',
-      });
-    }
-  };
-
+  
   const generateImagesInBackground = (recipes: RecipeWithImage[]) => {
     recipes.forEach((recipe, index) => {
       (async () => {
@@ -207,15 +84,13 @@ export default function Home() {
     }
 
     setIsLoadingRecipes(true);
+    setRecipes([]); // Clear previous recipes
     try {
       const result = await suggestRecipes({ ingredients: ingredients, language });
       setRecipes(result.recipes);
       generateImagesInBackground(result.recipes); // Start generating images
       
-      if (user) {
-        // Don't wait for this to complete. Let it run in the background.
-        saveHistoryInBackground(user, image, result, ingredients);
-      } else {
+      if (!user) {
          // Decrement and save for guest users
          try {
             const newCount = remainingSearches - 1;
@@ -238,83 +113,44 @@ export default function Home() {
     }
   };
 
-  const handleGetSpeech = async (text: string) => {
-    try {
-      const result = await generateRecipeSpeech({ text });
-      return result.audioDataUri;
-    } catch (error) {
-      console.error('Error generating speech:', error);
-      toast({
-        variant: 'destructive',
-        title: t.toast.error.title,
-        description: t.toast.error.speech,
-      });
-      return null;
-    }
-  };
-
+  const getRecipesDisabled = ingredients.length === 0 || isLoadingRecipes || (remainingSearches !== undefined && remainingSearches <= 0);
 
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
-      <main className="flex-grow container mx-auto p-4 md:p-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-          <div className="space-y-8">
-            <ImageUploader
-              onImageUpload={handleImageUpload}
-              onImageCapture={handleImageCapture}
-              onAnalyze={handleAnalyzeImage}
-              onRemove={handleRemoveImage}
-              isLoading={isLoadingIngredients}
-              imagePreview={image}
-              imageSource={imageSource}
-            />
-
-            <IngredientEditor
-              ingredients={ingredients}
-              setIngredients={setIngredients}
-              onGetRecipes={handleGetRecipes}
-              isLoading={isLoadingRecipes}
-              isImageLoading={isLoadingIngredients}
-              analysisPerformed={analysisPerformed}
-              remainingSearches={user ? undefined : remainingSearches}
-            />
-          </div>
-          <div className="lg:mt-0">
+      <main className="flex-grow container mx-auto p-4 md:px-6 md:py-8">
+        <div className="max-w-2xl mx-auto w-full space-y-8">
+          <IngredientEditor
+            ingredients={ingredients}
+            setIngredients={setIngredients}
+            isLoading={isLoadingRecipes}
+          />
+          <Button 
+            onClick={handleGetRecipes} 
+            disabled={getRecipesDisabled} 
+            className="w-full h-12 text-lg rounded-full"
+            size="lg"
+          >
             {isLoadingRecipes ? (
-               <Card>
-                <CardHeader>
-                  <CardTitle>{t.recipes.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Skeleton className="h-8 w-3/4" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-5/6" />
-                  </div>
-                  <Separator />
-                  <div className="space-y-2">
-                    <Skeleton className="h-8 w-4/5" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-5/6" />
-                  </div>
-                </CardContent>
-              </Card>
+              <>
+                <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                {t.ingredients.loading}
+              </>
             ) : (
-              (recipes.length > 0 || isLoadingRecipes) && <RecipeDisplay recipes={recipes} onGetSpeech={handleGetSpeech} />
+              t.ingredients.getButton
             )}
-            
-            {!isLoadingRecipes && recipes.length === 0 && ingredients.length > 0 && (
-                 <Card className="flex flex-col items-center justify-center p-12 text-center border-dashed">
-                    <CardHeader>
-                        <CardTitle>{t.recipes.ready}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="text-muted-foreground">{t.recipes.prompt}</p>
-                    </CardContent>
-                </Card>
-            )}
+          </Button>
+
+          <div className="space-y-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <h2 className="text-2xl font-bold">{t.recipes.title}</h2>
+              <RecipeFilters />
+            </div>
+            <RecipeGrid 
+              recipes={recipes} 
+              isLoading={isLoadingRecipes} 
+              userIngredients={ingredients}
+            />
           </div>
         </div>
       </main>

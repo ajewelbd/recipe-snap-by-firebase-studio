@@ -74,11 +74,12 @@ export const content = {
         ingredients: {
             title: '2. Refine Your Ingredients',
             description: 'Add or remove ingredients to customize your recipes.',
-            addPlaceholder: 'Add an ingredient...',
+            addPlaceholder: 'Enter ingredients...',
             addAriaLabel: 'Add ingredient',
+            addMore: 'Add More',
             voiceAriaLabel: 'Add ingredient by voice',
             loading: 'Finding Recipes...',
-            getButton: 'Get Recipes',
+            getButton: 'Find Recipes',
             notFound: 'No ingredients found. Please try another image or add some manually.',
             searchesLeft: (count: number) => `You have ${count} free ${count === 1 ? 'search' : 'searches'} left.`,
             loginForMore: 'Please log in for unlimited searches.',
@@ -90,7 +91,7 @@ export const content = {
             }
         },
         recipes: {
-            title: '3. Your Personalized Recipes',
+            title: 'Recipes',
             description: 'Here are some recipe ideas based on your ingredients.',
             empty: 'No recipes to show yet. Try generating some!',
             ready: 'Ready to Cook?',
@@ -102,6 +103,12 @@ export const content = {
             carbs: 'Carbs',
             fat: 'Fat',
             servingSize: 'Serving Size',
+            ingredientsUsed: (count: number) => `Uses ${count} of your ingredients`,
+            filters: {
+                cuisine: 'Cuisine',
+                diet: 'Diet',
+                time: 'Time',
+            },
         },
         videos: {
             title: 'Video Tutorials',
@@ -184,11 +191,12 @@ export const content = {
         ingredients: {
             title: '২. আপনার উপাদান পরিমার্জন করুন',
             description: 'আপনার রেসিপি কাস্টমাইজ করতে উপাদান যোগ করুন বা সরান।',
-            addPlaceholder: 'একটি উপাদান যোগ করুন...',
+            addPlaceholder: 'উপাদান লিখুন...',
             addAriaLabel: 'উপাদান যোগ করুন',
+            addMore: 'আরও যোগ করুন',
             voiceAriaLabel: 'ভয়েসের মাধ্যমে উপাদান যোগ করুন',
             loading: 'রেসিপি খোঁজা হচ্ছে...',
-            getButton: 'রেসিপি পান',
+            getButton: 'রেসিপি খুঁজুন',
             notFound: 'কোন উপাদান পাওয়া যায়নি। অনুগ্রহ করে অন্য একটি ছবি চেষ্টা করুন বা ম্যানুয়ালি কিছু যোগ করুন।',
             searchesLeft: (count: number) => `আপনার ${count}টি বিনামূল্যে অনুসন্ধান বাকি আছে।`,
             loginForMore: 'সীমাহীন অনুসন্ধানের জন্য অনুগ্রহ করে লগইন করুন।',
@@ -200,7 +208,7 @@ export const content = {
             }
         },
         recipes: {
-            title: '৩. আপনার ব্যক্তিগতকৃত রেসিপি',
+            title: 'রেসিপি',
             description: 'আপনার উপাদানগুলির উপর ভিত্তি করে এখানে কিছু রেসিপির ধারণা রয়েছে।',
             empty: 'এখনও দেখানোর মতো কোনো রেসিপি নেই। কিছু তৈরি করার চেষ্টা করুন!',
             ready: 'রান্না করতে প্রস্তুত?',
@@ -212,6 +220,12 @@ export const content = {
             carbs: 'কার্বোহাইড্রেট',
             fat: 'চর্বি',
             servingSize: 'পরিবেশনের আকার',
+            ingredientsUsed: (count: number) => `আপনার ${count}টি উপাদান ব্যবহার করে`,
+            filters: {
+                cuisine: 'রন্ধনপ্রণালী',
+                diet: 'পথ্য',
+                time: 'সময়',
+            },
         },
         videos: {
             title: 'ভিডিও টিউটোরিয়াল',

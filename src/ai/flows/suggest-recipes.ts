@@ -33,6 +33,8 @@ const SuggestRecipesOutputSchema = z.object({
       instructions_bn: z.string().describe('The cooking instructions for the recipe, in Bengali.'),
       youtubeSearchQuery: z.string().describe('A simple, effective search query to find a YouTube video for this recipe in English.'),
       imageGenerationPrompt: z.string().describe('A detailed, photorealistic image generation prompt for the final, plated dish. This prompt will be used to create an image of the food.'),
+      ingredientsUsedCount: z.number().describe('The number of ingredients from the user\'s list that are used in this recipe.'),
+      totalTime: z.string().describe('The total time to prepare the recipe (e.g., "30 min").'),
       nutrition: z.object({
         servingSize: z.string().describe('The estimated serving size, including a precise quantity in parentheses. For example: "1 bowl (400g)" or "1 glass (250ml)".'),
         calories: NutrientSchema.describe('Estimated calories per serving.'),
@@ -53,24 +55,22 @@ const prompt = ai.definePrompt({
   name: 'suggestRecipesPrompt',
   input: {schema: SuggestRecipesInputSchema},
   output: {schema: SuggestRecipesOutputSchema},
-  prompt: `Suggest 3 recipes based on the following ingredients:
+  prompt: `You are a helpful recipe assistant. Suggest 4 diverse recipes based on the following ingredients:
 
 {{#each ingredients}}
 - {{this}}
 {{/each}}
 
-VERY IMPORTANT: You must generate the recipe name and instructions in BOTH English and Bengali.
-- The 'name' and 'instructions' fields should be in the user's preferred language ({{language}}).
-- The 'name_en' and 'instructions_en' fields must be in English.
-- The 'name_bn' and 'instructions_bn' fields must be in Bengali (Bangla).
-
-For each recipe, also provide estimated nutritional information (calories, protein, carbs, and fat). This is an AI-generated estimate and should not be used for medical purposes.
-Crucially, you must also define a 'servingSize' for which the nutritional info is calculated. This should include a descriptive name and a precise quantity in parentheses. For example: "1 cup (250g)" or "1 glass (250ml)".
-The youtubeSearchQuery should always be in English.
-
-For each recipe, also generate a detailed, photorealistic image generation prompt for the final, plated dish. This prompt should be in English and will be used to create an image of the food.
-
-Each recipe should include a name, cooking instructions, a simple YouTube search query, an image generation prompt, and nutritional information.`,
+For each recipe, provide the following information:
+1.  **Recipe Name & Instructions**: Generate the recipe name and instructions in BOTH English and Bengali.
+    -   The 'name' and 'instructions' fields should be in the user's preferred language ({{language}}).
+    -   'name_en' and 'instructions_en' must be in English.
+    -   'name_bn' and 'instructions_bn' must be in Bengali (Bangla).
+2.  **Total Time**: A string representing the total time to prepare the recipe (e.g., "30 min", "1 hour").
+3.  **Ingredients Used Count**: Count how many of the user-provided ingredients are used in the recipe. For example, if the user provided ["tomato", "onion", "garlic"] and the recipe uses tomatoes and onions, this value should be 2.
+4.  **Nutritional Information**: Provide estimated nutritional info (calories, protein, carbs, fat) for a defined 'servingSize'. This is an AI-generated estimate.
+5.  **YouTube Search Query**: An effective, simple search query in English to find a video for this recipe.
+6.  **Image Generation Prompt**: A detailed, photorealistic image generation prompt in English for the final, plated dish.`,
 });
 
 const suggestRecipesFlow = ai.defineFlow(
