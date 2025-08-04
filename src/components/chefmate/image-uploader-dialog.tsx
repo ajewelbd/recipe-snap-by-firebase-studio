@@ -14,7 +14,7 @@ import { useToast } from '@/hooks/use-toast';
 import { LanguageContext, content } from '@/context/language-context';
 import { analyzeImageIngredients } from '@/ai/flows/analyze-image-ingredients';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
-import { Loader2, Camera, UploadCloud, X, RefreshCw } from 'lucide-react';
+import { Loader2, Camera, UploadCloud, X, CameraSwitch } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 
@@ -52,6 +52,7 @@ export default function ImageUploaderDialog({ open, onOpenChange, onComplete, de
         try {
             if (streamRef.current) stopCamera();
             
+            // Get permission first to enumerate devices
             const stream = await navigator.mediaDevices.getUserMedia({ video: true });
             setHasCameraPermission(true);
 
@@ -239,17 +240,17 @@ export default function ImageUploaderDialog({ open, onOpenChange, onComplete, de
                                         </Alert>
                                      </div>
                                 )}
+                                {devices.length > 1 && (
+                                    <Button onClick={handleSwitchCamera} variant="ghost" size="icon" aria-label="Switch camera" className="absolute bottom-2 left-2 bg-black/20 hover:bg-black/40 text-white hover:text-white">
+                                        <CameraSwitch className="w-5 h-5" />
+                                    </Button>
+                                )}
                             </div>
                             <div className="flex items-center gap-2">
                                 <Button onClick={handleSnap} disabled={!hasCameraPermission} className="w-full">
                                     <Camera className="mr-2" />
                                     {t.camera.snap}
                                 </Button>
-                                {devices.length > 1 && (
-                                    <Button onClick={handleSwitchCamera} variant="outline" size="icon" aria-label="Switch camera">
-                                        <RefreshCw className="w-5 h-5" />
-                                    </Button>
-                                )}
                             </div>
                         </div>
                     </TabsContent>
@@ -262,7 +263,7 @@ export default function ImageUploaderDialog({ open, onOpenChange, onComplete, de
                                 </div>
                             )}
                              <Button onClick={handleAnalyze} disabled={isAnalyzing} className="w-full">
-                                 {isAnalyzing ? <Loader2 className="mr-2 animate-spin" /> : <RefreshCw className="mr-2" />}
+                                 {isAnalyzing ? <Loader2 className="mr-2 animate-spin" /> : <Camera className="mr-2" />}
                                  {t.uploader.analyzeButton}
                              </Button>
                              <Button onClick={reset} variant="outline" className="w-full">
