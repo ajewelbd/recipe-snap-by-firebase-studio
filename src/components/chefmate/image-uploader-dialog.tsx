@@ -175,8 +175,14 @@ export default function ImageUploaderDialog({ open, onOpenChange, onComplete, de
 
                 <Tabs value={view} onValueChange={(v) => setView(v as 'upload' | 'camera' | 'preview')} className="w-full">
                     <TabsList className="grid w-full grid-cols-2">
-                        <TabsTrigger value="upload" disabled={view === 'preview'}>{t.uploader.drag}</TabsTrigger>
-                        <TabsTrigger value="camera" disabled={view === 'preview'}>{t.uploader.useCamera}</TabsTrigger>
+                        <TabsTrigger value="upload" disabled={view === 'preview'}>
+                            <UploadCloud className="mr-2" />
+                            {t.uploader.uploadButton}
+                        </TabsTrigger>
+                        <TabsTrigger value="camera" disabled={view === 'preview'}>
+                            <Camera className="mr-2" />
+                            {t.uploader.useCamera}
+                        </TabsTrigger>
                     </TabsList>
                     
                     <TabsContent value="upload" className="mt-4">
