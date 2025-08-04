@@ -2,7 +2,7 @@
 'use client';
 import { useContext, useState } from 'react';
 import Link from 'next/link';
-import { Globe, History, LogOut, Moon, Sun, Palette, Menu } from 'lucide-react';
+import { Globe, History, LogOut, Moon, Sun, Palette, Menu, Soup } from 'lucide-react';
 import { useTheme } from "next-themes";
 import {
   DropdownMenu,
@@ -81,12 +81,20 @@ export default function Header() {
   const navLinks = (
     <>
       {user && (
+        <>
+        <Link href="/my-recipes/new" prefetch={true} onClick={() => setIsMobileMenuOpen(false)}>
+            <Button variant="ghost" className="w-full justify-start gap-2 px-2">
+              <Soup className="h-4 w-4" />
+              <span>New Recipe</span>
+            </Button>
+        </Link>
         <Link href="/history" prefetch={true} onClick={() => setIsMobileMenuOpen(false)}>
             <Button variant="ghost" className="w-full justify-start gap-2 px-2">
               <History className="h-4 w-4" />
               <span>{t.history.title}</span>
             </Button>
         </Link>
+        </>
       )}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -129,6 +137,14 @@ export default function Header() {
   const desktopNavLinks = (
      <>
       {user && (
+        <>
+        <Link href="/my-recipes/new" prefetch={true}>
+            <Button variant="outline" size="sm" className="relative md:w-auto w-9 p-0 md:px-3">
+              <Soup className="h-4 w-4" />
+              <span className="hidden md:inline ml-2">New Recipe</span>
+              <span className="sr-only">New Recipe</span>
+            </Button>
+        </Link>
         <Link href="/history" prefetch={true}>
             <Button variant="outline" size="sm" className="relative md:w-auto w-9 p-0 md:px-3">
               <History className="h-4 w-4" />
@@ -136,6 +152,7 @@ export default function Header() {
               <span className="sr-only">{t.history.title}</span>
             </Button>
         </Link>
+        </>
       )}
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
