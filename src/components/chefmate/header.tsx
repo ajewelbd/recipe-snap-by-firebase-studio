@@ -114,10 +114,7 @@ export default function Header() {
             </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-            <DropdownMenuRadioGroup value={theme} onValueChange={(value) => {
-              setTheme(value);
-              setIsMobileMenuOpen(false);
-            }}>
+            <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
                 <DropdownMenuRadioItem value="light">Light</DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="dark">Dark</DropdownMenuRadioItem>
                 <DropdownMenuRadioItem value="system">System</DropdownMenuRadioItem>
@@ -199,7 +196,7 @@ export default function Header() {
           <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
-                <Menu className="h-8 w-8" />
+                <Menu className="h-9 w-9" />
                 <span className="sr-only">Open menu</span>
               </Button>
             </SheetTrigger>
