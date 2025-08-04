@@ -5,6 +5,7 @@ import { useState, useContext, useEffect } from 'react';
 import type { SuggestRecipesOutput } from '@/ai/flows/suggest-recipes';
 import { suggestRecipes } from '@/ai/flows/suggest-recipes';
 import { generateRecipeImage } from '@/ai/flows/generate-recipe-image';
+import { supabase } from '@/lib/supabase';
 
 import Header from '@/components/chefmate/header';
 import IngredientEditor from '@/components/chefmate/ingredient-editor';
@@ -32,6 +33,7 @@ export default function Home() {
   const t = content[language];
   const { user } = useAuth();
   const [remainingSearches, setRemainingSearches] = useState(GUEST_SEARCH_LIMIT);
+  const [lastImageUrl, setLastImageUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -50,15 +52,38 @@ export default function Home() {
     }
   }, [user]);
   
-  const generateImagesInBackground = (recipes: RecipeWithImage[]) => {
-    recipes.forEach((recipe, index) => {
+  const saveSearchToHistory = async (searchIngredients: string[], foundRecipes: RecipeWithImage[], imageUrl?: string | null) => {
+    if (!user) return; // Only save history for logged-in users
+    try {
+        const { error } = await supabase.from('history').insert({
+            user_id: user.id,
+            ingredients: searchIngredients,
+            recipes: foundRecipes,
+            image_url: imageUrl
+        });
+        if (error) throw error;
+    } catch (error) {
+        console.error("Error saving search to history:", error);
+    }
+  }
+
+
+  const generateImagesInBackground = (recipesToUpdate: RecipeWithImage[]) => {
+    recipesToUpdate.forEach((recipe, index) => {
+      // Skip if image already exists
+      if (recipe.imageUrl) return;
+
       (async () => {
         try {
           const imageResult = await generateRecipeImage({ prompt: recipe.imageGenerationPrompt });
           // Update the specific recipe in the state with the new image URL
           setRecipes(currentRecipes => {
             const newRecipes = [...currentRecipes];
-            newRecipes[index] = { ...newRecipes[index], imageUrl: imageResult.imageUrl };
+            // Find the recipe in the current state to update, in case the order has changed
+            const recipeIndex = newRecipes.findIndex(r => r.name === recipe.name);
+            if (recipeIndex !== -1) {
+              newRecipes[recipeIndex] = { ...newRecipes[recipeIndex], imageUrl: imageResult.imageUrl };
+            }
             return newRecipes;
           });
         } catch (error) {
@@ -87,10 +112,15 @@ export default function Home() {
     setRecipes([]); // Clear previous recipes
     try {
       const result = await suggestRecipes({ ingredients: ingredients, language });
-      setRecipes(result.recipes);
-      generateImagesInBackground(result.recipes); // Start generating images
       
-      if (!user) {
+      const recipesWithImagePlaceholder = result.recipes.map(r => ({...r, imageUrl: undefined}));
+      setRecipes(recipesWithImagePlaceholder);
+      
+      generateImagesInBackground(recipesWithImagePlaceholder); // Start generating images
+      
+      if (user) {
+        await saveSearchToHistory(ingredients, result.recipes, lastImageUrl);
+      } else {
          // Decrement and save for guest users
          try {
             const newCount = remainingSearches - 1;
@@ -110,10 +140,11 @@ export default function Home() {
       });
     } finally {
       setIsLoadingRecipes(false);
+      setLastImageUrl(null); // Reset after search
     }
   };
 
-  const getRecipesDisabled = ingredients.length === 0 || isLoadingRecipes || (remainingSearches !== undefined && remainingSearches <= 0);
+  const getRecipesDisabled = ingredients.length === 0 || isLoadingRecipes || (!user && remainingSearches <= 0);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -124,6 +155,7 @@ export default function Home() {
             ingredients={ingredients}
             setIngredients={setIngredients}
             isLoading={isLoadingRecipes}
+            setLastImageUrl={setLastImageUrl}
           />
           <Button 
             onClick={handleGetRecipes} 
@@ -140,6 +172,11 @@ export default function Home() {
               t.ingredients.getButton
             )}
           </Button>
+          {!user && (
+            <p className="text-sm text-center text-muted-foreground">
+              {t.ingredients.searchesLeft(remainingSearches)} <span className="underline">{t.ingredients.loginForMore}</span>
+            </p>
+          )}
 
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
