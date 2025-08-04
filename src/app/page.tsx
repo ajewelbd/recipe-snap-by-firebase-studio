@@ -9,10 +9,10 @@ import { suggestRecipes } from '@/ai/flows/suggest-recipes';
 import { generateRecipeSpeech } from '@/ai/flows/generate-recipe-speech';
 import { generateRecipeImage } from '@/ai/flows/generate-recipe-image';
 
-import Header from '@/components/recipe-snap/header';
-import ImageUploader from '@/components/recipe-snap/image-uploader';
-import IngredientEditor from '@/components/recipe-snap/ingredient-editor';
-import RecipeDisplay from '@/components/recipe-snap/recipe-display';
+import Header from '@/components/chefmate/header';
+import ImageUploader from '@/components/chefmate/image-uploader';
+import IngredientEditor from '@/components/chefmate/ingredient-editor';
+import RecipeDisplay from '@/components/chefmate/recipe-display';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';

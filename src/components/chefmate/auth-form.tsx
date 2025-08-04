@@ -137,7 +137,7 @@ export function AuthForm() {
           {t.login}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent>
         {showSuccessMessage ? (
            <div className="p-4">
              <Alert>

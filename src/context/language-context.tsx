@@ -21,7 +21,7 @@ interface LanguageProviderProps {
 
 export const content = {
     en: {
-        appName: 'Recipe Snap',
+        appName: 'Chefmate',
         languageName: 'English',
         auth: {
             login: 'Login',
@@ -131,7 +131,7 @@ export const content = {
         }
     },
     bn: {
-        appName: 'রেসিপি স্ন্যাপ',
+        appName: 'শেফমেট',
         languageName: 'বাংলা',
         auth: {
             login: 'লগইন',

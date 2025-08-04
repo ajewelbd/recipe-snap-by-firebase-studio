@@ -1,6 +1,6 @@
 'use client';
-import Header from '@/components/recipe-snap/header';
-import HistoryList from '@/components/recipe-snap/history-list';
+import Header from '@/components/chefmate/header';
+import HistoryList from '@/components/chefmate/history-list';
 
 export default function HistoryPage() {
 
