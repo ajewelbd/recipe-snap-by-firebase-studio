@@ -12,7 +12,19 @@ import { format } from 'date-fns';
 import { bn, enUS } from 'date-fns/locale';
 import { LanguageContext, content } from '@/context/language-context';
 import { useAuth } from '@/context/auth-context';
-import { ListPlus } from 'lucide-react';
+import { ListPlus, Trash2 } from 'lucide-react';
+import { Button } from '../ui/button';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useToast } from '@/hooks/use-toast';
 
 interface HistoryItem {
   id: string;
@@ -25,10 +37,12 @@ interface HistoryItem {
 export default function HistoryList() {
   const [history, setHistory] = useState<Record<string, HistoryItem[]>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [itemToDelete, setItemToDelete] = useState<HistoryItem | null>(null);
   const { language } = useContext(LanguageContext);
   const t = content[language];
   const { user, loading: authLoading } = useAuth();
   const dateLocale = language === 'bn' ? bn : enUS;
+  const { toast } = useToast();
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -69,6 +83,46 @@ export default function HistoryList() {
       fetchHistory();
     }
   }, [user, authLoading, dateLocale]);
+  
+  const handleDelete = async () => {
+    if (!itemToDelete) return;
+
+    try {
+      const { error } = await supabase
+        .from('history')
+        .delete()
+        .eq('id', itemToDelete.id);
+
+      if (error) throw error;
+
+      // Optimistically update UI
+      setHistory(currentHistory => {
+        const newHistory = { ...currentHistory };
+        for (const date in newHistory) {
+          const itemIndex = newHistory[date].findIndex(item => item.id === itemToDelete.id);
+          if (itemIndex > -1) {
+            newHistory[date].splice(itemIndex, 1);
+            if (newHistory[date].length === 0) {
+              delete newHistory[date];
+            }
+            break;
+          }
+        }
+        return newHistory;
+      });
+
+    } catch (error) {
+       console.error("Error deleting history item: ", error);
+       toast({
+         variant: 'destructive',
+         title: t.toast.error.title,
+         description: 'Could not delete history item.',
+       });
+    } finally {
+      setItemToDelete(null);
+    }
+  };
+
 
   if (isLoading || authLoading) {
     return (
@@ -106,6 +160,21 @@ export default function HistoryList() {
   }
 
   return (
+    <>
+    <AlertDialog open={!!itemToDelete} onOpenChange={(isOpen) => !isOpen && setItemToDelete(null)}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete this search from your history.
+            </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
     <div className="space-y-8">
       <h1 className="text-3xl font-bold font-headline text-primary">{t.history.title}</h1>
       {Object.keys(history).length === 0 && !isLoading ? (
@@ -116,7 +185,16 @@ export default function HistoryList() {
             <h2 className="text-xl font-semibold font-headline text-foreground/80 mb-4">{date}</h2>
             <div className="space-y-4">
             {items.map((item) => (
-              <Card key={item.id}>
+              <Card key={item.id} className="relative">
+                 <Button
+                    variant="ghost"
+                    size="icon"
+                    className="absolute top-2 right-2 text-muted-foreground hover:text-destructive"
+                    onClick={() => setItemToDelete(item)}
+                    aria-label="Delete history item"
+                >
+                    <Trash2 className="h-4 w-4" />
+                </Button>
                 <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
                   {item.image_url ? (
                     <div className="relative w-full aspect-square rounded-lg overflow-hidden shadow-md">
@@ -165,5 +243,6 @@ export default function HistoryList() {
         ))
       )}
     </div>
+    </>
   );
 }
