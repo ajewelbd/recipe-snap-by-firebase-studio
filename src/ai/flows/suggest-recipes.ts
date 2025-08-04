@@ -98,7 +98,14 @@ const suggestRecipesFlow = ai.defineFlow(
     outputSchema: SuggestRecipesOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    try {
+      const {output} = await prompt(input);
+      // Ensure output is not null, otherwise return a default value
+      return output ?? { recipes: [] };
+    } catch (error) {
+      console.error('Error in suggestRecipesFlow:', error);
+      // Return an empty list of recipes on error
+      return { recipes: [] };
+    }
   }
 );

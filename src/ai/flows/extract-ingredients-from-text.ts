@@ -48,7 +48,12 @@ const extractIngredientsFromTextFlow = ai.defineFlow(
     outputSchema: ExtractIngredientsFromTextOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    try {
+      const {output} = await prompt(input);
+      return output ?? { ingredients: [] };
+    } catch (error) {
+      console.error('Error in extractIngredientsFromTextFlow:', error);
+      return { ingredients: [] };
+    }
   }
 );

@@ -51,7 +51,12 @@ const analyzeImageIngredientsFlow = ai.defineFlow(
     outputSchema: AnalyzeImageIngredientsOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    try {
+      const {output} = await prompt(input);
+      return output ?? { ingredients: [] };
+    } catch(error) {
+      console.error('Error in analyzeImageIngredientsFlow:', error);
+      return { ingredients: [] };
+    }
   }
 );
