@@ -56,7 +56,7 @@ export default function NewRecipeForm() {
           name="details"
           placeholder="List ingredients and step-by-step instructions here..."
           required
-          rows={10}
+          rows={15}
           className="text-base"
         />
         {state.errors?.details && (
