@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useContext } from "react";
@@ -43,30 +44,30 @@ export default function RecipeFilters({ onFilterChange, filters }: RecipeFilters
 
   return (
     <div className="flex items-center gap-2">
-      <Select value={filters.cuisine} onValueChange={(value) => onFilterChange('cuisine', value)}>
+      <Select value={filters.cuisine} onValueChange={(value) => onFilterChange('cuisine', value === 'any' ? '' : value)}>
         <SelectTrigger className="w-[110px] h-9">
           <SelectValue placeholder={t.recipes.filters.cuisine} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">{t.recipes.filters.any}</SelectItem>
+          <SelectItem value="any">{t.recipes.filters.any}</SelectItem>
           {filterOptions.cuisine.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
         </SelectContent>
       </Select>
-      <Select value={filters.diet} onValueChange={(value) => onFilterChange('diet', value)}>
+      <Select value={filters.diet} onValueChange={(value) => onFilterChange('diet', value === 'any' ? '' : value)}>
         <SelectTrigger className="w-[110px] h-9">
           <SelectValue placeholder={t.recipes.filters.diet} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">{t.recipes.filters.any}</SelectItem>
+          <SelectItem value="any">{t.recipes.filters.any}</SelectItem>
           {filterOptions.diet.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
         </SelectContent>
       </Select>
-      <Select value={filters.time} onValueChange={(value) => onFilterChange('time', value)}>
+      <Select value={filters.time} onValueChange={(value) => onFilterChange('time', value === 'any' ? '' : value)}>
         <SelectTrigger className="w-[110px] h-9">
           <SelectValue placeholder={t.recipes.filters.time} />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="">{t.recipes.filters.any}</SelectItem>
+          <SelectItem value="any">{t.recipes.filters.any}</SelectItem>
           {filterOptions.time.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
         </SelectContent>
       </Select>
