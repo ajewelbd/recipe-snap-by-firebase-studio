@@ -8,7 +8,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import Image from 'next/image';
-import { format } from 'date-fns';
+import { format, formatDistanceToNow } from 'date-fns';
 import { bn, enUS } from 'date-fns/locale';
 import { LanguageContext, content } from '@/context/language-context';
 import { useAuth } from '@/context/auth-context';
@@ -185,17 +185,22 @@ export default function HistoryList() {
             <h2 className="text-xl font-semibold font-headline text-foreground/80 mb-4">{date}</h2>
             <div className="space-y-4">
             {items.map((item) => (
-              <Card key={item.id} className="relative">
-                 <Button
-                    variant="ghost"
-                    size="icon"
-                    className="absolute top-2 right-2 text-muted-foreground hover:text-destructive"
-                    onClick={() => setItemToDelete(item)}
-                    aria-label="Delete history item"
-                >
-                    <Trash2 className="h-4 w-4" />
-                </Button>
-                <CardContent className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
+              <Card key={item.id}>
+                <CardHeader className="flex flex-row items-center justify-between p-4 border-b">
+                   <p className="text-sm text-muted-foreground">
+                    Search from {item.created_at ? formatDistanceToNow(new Date(item.created_at), { addSuffix: true, locale: dateLocale }) : ''}
+                   </p>
+                   <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-muted-foreground hover:text-destructive h-8 w-8"
+                      onClick={() => setItemToDelete(item)}
+                      aria-label="Delete history item"
+                  >
+                      <Trash2 className="h-4 w-4" />
+                  </Button>
+                </CardHeader>
+                <CardContent className="p-4 md:p-6 grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
                   {item.image_url ? (
                     <div className="relative w-full aspect-square rounded-lg overflow-hidden shadow-md">
                       <Image src={item.image_url} alt="Ingredients" fill style={{objectFit: 'cover'}} data-ai-hint="food ingredients" />
