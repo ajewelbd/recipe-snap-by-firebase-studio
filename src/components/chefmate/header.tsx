@@ -2,7 +2,7 @@
 'use client';
 import { useContext, useState } from 'react';
 import Link from 'next/link';
-import { Globe, History, LogOut, Moon, Sun, Palette, Menu, Soup } from 'lucide-react';
+import { Globe, History, LogOut, Moon, Sun, Palette, Menu, Soup, BookOpen } from 'lucide-react';
 import { useTheme } from "next-themes";
 import {
   DropdownMenu,
@@ -82,6 +82,12 @@ export default function Header() {
     <>
       {user && (
         <>
+        <Link href="/my-recipes" prefetch={true} onClick={() => setIsMobileMenuOpen(false)}>
+            <Button variant="ghost" className="w-full justify-start gap-2 px-2">
+              <BookOpen className="h-4 w-4" />
+              <span>My Recipes</span>
+            </Button>
+        </Link>
         <Link href="/my-recipes/new" prefetch={true} onClick={() => setIsMobileMenuOpen(false)}>
             <Button variant="ghost" className="w-full justify-start gap-2 px-2">
               <Soup className="h-4 w-4" />
@@ -138,6 +144,13 @@ export default function Header() {
      <>
       {user && (
         <>
+        <Link href="/my-recipes" prefetch={true}>
+            <Button variant="outline" size="sm" className="relative md:w-auto w-9 p-0 md:px-3">
+              <BookOpen className="h-4 w-4" />
+              <span className="hidden md:inline ml-2">My Recipes</span>
+              <span className="sr-only">My Recipes</span>
+            </Button>
+        </Link>
         <Link href="/my-recipes/new" prefetch={true}>
             <Button variant="outline" size="sm" className="relative md:w-auto w-9 p-0 md:px-3">
               <Soup className="h-4 w-4" />
