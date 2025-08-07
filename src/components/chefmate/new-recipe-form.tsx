@@ -13,6 +13,16 @@ import { Loader2 } from 'lucide-react';
 import ImageUploader from './image-uploader';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
 
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" disabled={pending} className="w-full">
+      {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+      Save Recipe
+    </Button>
+  );
+}
+
 export default function NewRecipeForm() {
   const initialState: FormState = { message: '', errors: {} };
   const [state, dispatch] = useActionState(saveRecipe, initialState);
@@ -23,16 +33,6 @@ export default function NewRecipeForm() {
       router.push('/my-recipes/new/success');
     }
   }, [state, router]);
-
-  function SubmitButton() {
-    const { pending } = useFormStatus();
-    return (
-      <Button type="submit" disabled={pending} className="w-full">
-        {pending && <Loader2 className="mr-2 animate-spin" />}
-        Save Recipe
-      </Button>
-    );
-  }
 
   return (
     <form action={dispatch} className="space-y-8">
