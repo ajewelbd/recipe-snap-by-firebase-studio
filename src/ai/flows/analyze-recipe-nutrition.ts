@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -16,13 +17,13 @@ const NutrientSchema = z.object({
     unit: z.string().describe('The unit of measurement (e.g., "g", "mg", "kcal").'),
 });
 
-export const AnalyzeRecipeNutritionInputSchema = z.object({
+const AnalyzeRecipeNutritionInputSchema = z.object({
   title: z.string().describe('The title of the recipe.'),
   details: z.string().describe('The detailed instructions and ingredients of the recipe.'),
 });
-export type AnalyzeRecipeNutritionInput = z.infer<typeof AnalyzeRecipeNutritionInputSchema>;
+type AnalyzeRecipeNutritionInput = z.infer<typeof AnalyzeRecipeNutritionInputSchema>;
 
-export const AnalyzeRecipeNutritionOutputSchema = z.object({
+const AnalyzeRecipeNutritionOutputSchema = z.object({
     servingSize: z.string().describe('The estimated serving size, including a precise quantity in parentheses. For example: "1 bowl (400g)" or "1 glass (250ml)".'),
     calories: NutrientSchema.describe('Estimated calories per serving.'),
     protein: NutrientSchema.describe('Estimated protein per serving.'),

@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -15,13 +16,13 @@ const CategorizeRecipeInputSchema = z.object({
   title: z.string().describe('The title of the recipe.'),
   details: z.string().describe('The detailed instructions and ingredients of the recipe.'),
 });
-export type CategorizeRecipeInput = z.infer<typeof CategorizeRecipeInputSchema>;
+type CategorizeRecipeInput = z.infer<typeof CategorizeRecipeInputSchema>;
 
 const CategorizeRecipeOutputSchema = z.object({
   tags: z.array(z.string()).describe('A list of 3-5 relevant tags for the recipe (e.g., "quick", "dessert", "chicken", "spicy").'),
   category: z.string().describe('A single, broad category for the recipe (e.g., "Dinner", "Dessert", "Appetizer", "Beverage").'),
 });
-export type CategorizeRecipeOutput = z.infer<typeof CategorizeRecipeOutputSchema>;
+type CategorizeRecipeOutput = z.infer<typeof CategorizeRecipeOutputSchema>;
 
 export async function categorizeRecipe(
   input: CategorizeRecipeInput
