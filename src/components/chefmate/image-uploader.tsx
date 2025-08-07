@@ -1,5 +1,5 @@
 'use client';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Button } from '../ui/button';
 import { UploadCloud, X, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
@@ -13,56 +13,86 @@ interface FileWithPreview extends File {
   preview: string;
 }
 
+// DataTransferItemList item type guard
+function isFile(item: DataTransferItem): item is FileSystemFileEntry {
+    return item.kind === 'file';
+}
+
 export default function ImageUploader({ name, multiple = false }: ImageUploaderProps) {
   const [files, setFiles] = useState<FileWithPreview[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files) {
-      const newFiles = Array.from(event.target.files).map(file =>
+  const handleFiles = (newFiles: File[]) => {
+    const processedFiles = newFiles
+        .filter(file => file.type.startsWith('image/'))
+        .map(file =>
         Object.assign(file, {
           preview: URL.createObjectURL(file),
         })
       );
       
       if (multiple) {
-        setFiles(prev => [...prev, ...newFiles]);
+        setFiles(prev => [...prev, ...processedFiles]);
       } else {
         // Revoke previous object URLs to prevent memory leaks
         files.forEach(file => URL.revokeObjectURL(file.preview));
-        setFiles(newFiles);
+        setFiles(processedFiles);
       }
+  }
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files) {
+      handleFiles(Array.from(event.target.files));
+      // Reset file input to allow selecting the same file again
+      event.target.value = '';
     }
   };
 
   const removeFile = (index: number) => {
-    const newFiles = [...files];
-    const removedFile = newFiles.splice(index, 1)[0];
-    URL.revokeObjectURL(removedFile.preview);
-    setFiles(newFiles);
+    setFiles(prevFiles => {
+      const newFiles = [...prevFiles];
+      const removedFile = newFiles.splice(index, 1)[0];
+      URL.revokeObjectURL(removedFile.preview);
+      return newFiles;
+    });
   };
   
   const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
       event.preventDefault();
       event.stopPropagation();
       if (event.dataTransfer.files) {
-         const newFiles = Array.from(event.dataTransfer.files).map(file =>
-            Object.assign(file, {
-              preview: URL.createObjectURL(file),
-            })
-          );
-          if (multiple) {
-            setFiles(prev => [...prev, ...newFiles]);
-          } else {
-            files.forEach(file => URL.revokeObjectURL(file.preview));
-            setFiles(newFiles);
-          }
+         handleFiles(Array.from(event.dataTransfer.files));
       }
   };
+  
+  // Cleanup object URLs on unmount
+  useEffect(() => {
+    return () => {
+        files.forEach(file => URL.revokeObjectURL(file.preview));
+    }
+  }, [files]);
 
 
   return (
     <div>
+        {/* Hidden file inputs to hold the actual file data for the form */}
+        {files.map((file, index) => (
+            <input 
+                key={index}
+                type="file"
+                name={name}
+                className="hidden"
+                ref={input => {
+                    if (input) {
+                        const dataTransfer = new DataTransfer();
+                        dataTransfer.items.add(file);
+                        input.files = dataTransfer.files;
+                    }
+                }}
+                onChange={() => {}} // Dummy onChange to satisfy React
+            />
+        ))}
+
         <div
             className="flex flex-col items-center justify-center w-full min-h-[10rem] p-4 border-2 border-dashed rounded-lg cursor-pointer bg-muted hover:bg-muted/80"
             onClick={() => fileInputRef.current?.click()}
@@ -79,12 +109,10 @@ export default function ImageUploader({ name, multiple = false }: ImageUploaderP
             <input
                 ref={fileInputRef}
                 type="file"
-                name={name}
                 accept="image/png, image/jpeg, image/webp"
                 className="hidden"
                 multiple={multiple}
                 onChange={handleFileChange}
-                // By leaving the value uncontrolled, we can add more files in multiple mode
             />
         </div>
 
