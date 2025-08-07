@@ -2,6 +2,7 @@
 
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { categorizeRecipe } from '@/ai/flows/categorize-recipe';
+import { analyzeRecipeNutrition } from '@/ai/flows/analyze-recipe-nutrition';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
@@ -87,8 +88,11 @@ export async function saveRecipe(
   const { title, details, is_public, time_to_cook, featured_image, result_images } = validatedFields.data;
 
   try {
-    // 1. Categorize Recipe
-    const categorization = await categorizeRecipe({ title, details });
+    // 1. Categorize Recipe & Analyze Nutrition in parallel
+    const [categorization, nutrition] = await Promise.all([
+        categorizeRecipe({ title, details }),
+        analyzeRecipeNutrition({ title, details })
+    ]);
 
     // 2. Upload images
     let featuredImageUrl: string | null = null;
@@ -118,6 +122,7 @@ export async function saveRecipe(
       result_image_urls: resultImageUrls.length > 0 ? resultImageUrls : null,
       tags: categorization.tags,
       category: categorization.category,
+      nutrition,
     });
 
     if (dbError) {
