@@ -27,15 +27,10 @@ export type FormState = {
   recipeId?: string;
 };
 
-async function uploadImage(file: File, bucket: string): Promise<string | null> {
+async function uploadImage(file: File, bucket: string, userId: string): Promise<string | null> {
     if (!file || file.size === 0) return null;
     
     const supabase = createSupabaseServerClient();
-    const userResponse = await supabase.auth.getUser();
-    if (userResponse.error || !userResponse.data.user) {
-        throw new Error('User not authenticated.');
-    }
-    const userId = userResponse.data.user.id;
     
     const filePath = `${userId}/${Date.now()}-${file.name}`;
     const { error: uploadError } = await supabase.storage
@@ -83,11 +78,11 @@ export async function saveRecipe(
   }
 
   const { title, details, is_public, time_to_cook } = validatedFields.data;
-  const featured_image = formData.get('featured_image');
-  const result_images = formData.getAll('result_images');
-
-
+  
   try {
+    const featured_image = formData.get('featured_image');
+    const result_images = formData.getAll('result_images');
+    
     // 1. Categorize Recipe
     const categorization = await categorizeRecipe({ title, details });
     
@@ -97,14 +92,14 @@ export async function saveRecipe(
     // 3. Upload images
     let featuredImageUrl: string | null = null;
     if (featured_image instanceof File && featured_image.size > 0) {
-        featuredImageUrl = await uploadImage(featured_image, 'recipe-images');
+        featuredImageUrl = await uploadImage(featured_image, 'recipe-images', userId);
     }
 
     let resultImageUrls: string[] = [];
      if (Array.isArray(result_images)) {
         for (const file of result_images) {
             if (file instanceof File && file.size > 0) {
-                const url = await uploadImage(file, 'recipe-images');
+                const url = await uploadImage(file, 'recipe-images', userId);
                 if (url) resultImageUrls.push(url);
             }
         }
