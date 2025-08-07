@@ -111,7 +111,7 @@ export async function saveRecipe(
       result_image_urls: resultImageUrls.length > 0 ? resultImageUrls : null,
       tags: categorization.tags,
       category: categorization.category,
-      nutrition: nutrition, // Supabase client handles JSON stringification
+      nutrition: nutrition,
     }).select('id').single();
 
     if (dbError) {
