@@ -189,7 +189,7 @@ export default function IngredientEditor({
       <div className="flex flex-wrap gap-2 min-h-[2rem]">
         {ingredients.map((ingredient, index) => (
             <Badge key={index} variant="default" className="text-base py-1.5 px-3 flex items-center gap-2 rounded-full">
-            {ingredient}
+            {t.ingredients.list[ingredient.toLowerCase() as keyof typeof t.ingredients.list] || ingredient}
             <button
                 onClick={() => handleRemoveIngredient(index)}
                 disabled={isLoading}
