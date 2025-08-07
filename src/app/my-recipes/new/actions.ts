@@ -12,9 +12,6 @@ const FormSchema = z.object({
   details: z.string().min(1, 'Recipe details are required.'),
   time_to_cook: z.string().optional(),
   is_public: z.boolean(),
-  // Refine schema to expect File objects. `any()` is used for `getAll` compatibility.
-  featured_image: z.any().optional(),
-  result_images: z.any().optional(),
 });
 
 export type FormState = {
@@ -76,8 +73,6 @@ export async function saveRecipe(
     details: formData.get('details'),
     time_to_cook: formData.get('time_to_cook'),
     is_public: formData.get('is_public') === 'on',
-    featured_image: formData.get('featured_image'),
-    result_images: formData.getAll('result_images'),
   });
 
   if (!validatedFields.success) {
