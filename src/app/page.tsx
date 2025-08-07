@@ -198,18 +198,20 @@ export default function Home() {
             </p>
           )}
 
-          <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <h2 className="text-2xl font-bold">{t.recipes.title}</h2>
-              <RecipeFilters onFilterChange={handleFilterChange} filters={filters} />
+          {(isLoadingRecipes || recipes.length > 0) && (
+            <div className="space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <h2 className="text-2xl font-bold">{t.recipes.title}</h2>
+                <RecipeFilters onFilterChange={handleFilterChange} filters={filters} />
+              </div>
+              <RecipeGrid 
+                recipes={recipes} 
+                isLoading={isLoadingRecipes} 
+                userIngredients={ingredients}
+                hasSearched={hasSearched}
+              />
             </div>
-            <RecipeGrid 
-              recipes={recipes} 
-              isLoading={isLoadingRecipes} 
-              userIngredients={ingredients}
-              hasSearched={hasSearched}
-            />
-          </div>
+          )}
         </div>
       </main>
     </div>

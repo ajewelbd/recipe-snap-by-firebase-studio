@@ -39,17 +39,10 @@ export default function RecipeGrid({ recipes, isLoading, userIngredients, hasSea
         );
     }
 
-    if (recipes.length === 0) {
-        if (hasSearched) {
-            return (
-                <div className="text-center py-16">
-                    <p className="text-muted-foreground">{t.recipes.empty}</p>
-                </div>
-            );
-        }
+    if (hasSearched && recipes.length === 0) {
         return (
             <div className="text-center py-16">
-                 <p className="text-muted-foreground">{t.recipes.prompt}</p>
+                <p className="text-muted-foreground">{t.recipes.empty}</p>
             </div>
         );
     }
