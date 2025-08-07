@@ -12,8 +12,9 @@ const FormSchema = z.object({
   details: z.string().min(1, 'Recipe details are required.'),
   time_to_cook: z.string().optional(),
   is_public: z.boolean(),
-  featured_image: z.any().optional(),
-  result_images: z.any().optional(),
+  // Refine schema to expect File objects
+  featured_image: z.instanceof(File).optional(),
+  result_images: z.array(z.instanceof(File)).optional(),
 });
 
 export type FormState = {
