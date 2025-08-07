@@ -5,7 +5,6 @@ import { categorizeRecipe } from '@/ai/flows/categorize-recipe';
 import { analyzeRecipeNutrition } from '@/ai/flows/analyze-recipe-nutrition';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 
 const FormSchema = z.object({
   title: z.string().min(1, 'Title is required.'),
@@ -26,6 +25,7 @@ export type FormState = {
     result_images?: string[];
     database?: string[];
   };
+  recipeId?: string;
 };
 
 async function uploadImage(file: File, bucket: string): Promise<string | null> {
@@ -112,7 +112,7 @@ export async function saveRecipe(
 
 
     // 3. Save to database
-    const { error: dbError } = await supabase.from('my_recipies').insert({
+    const { data: newRecipe, error: dbError } = await supabase.from('my_recipies').insert({
       user_id: userId,
       title,
       details,
@@ -123,7 +123,7 @@ export async function saveRecipe(
       tags: categorization.tags,
       category: categorization.category,
       nutrition,
-    });
+    }).select('id').single();
 
     if (dbError) {
       console.error('Database Error:', dbError);
@@ -132,6 +132,13 @@ export async function saveRecipe(
           errors: { database: ['Failed to save recipe to the database.'] } 
       };
     }
+
+    revalidatePath('/my-recipes');
+    return {
+        message: 'Success',
+        recipeId: newRecipe.id
+    };
+
   } catch (error) {
     console.error('An unexpected error occurred:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
@@ -140,8 +147,4 @@ export async function saveRecipe(
         errors: { database: [errorMessage] }
     };
   }
-  
-  // Revalidate and redirect on success
-  revalidatePath('/my-recipes');
-  redirect('/my-recipes/new/success');
 }

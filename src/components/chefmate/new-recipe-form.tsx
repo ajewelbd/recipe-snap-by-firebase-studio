@@ -1,5 +1,6 @@
 'use client';
-import { useActionState } from 'react';
+import { useActionState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { useFormStatus } from 'react-dom';
 import { saveRecipe, type FormState } from '@/app/my-recipes/new/actions';
 import { Label } from '@/components/ui/label';
@@ -24,6 +25,13 @@ function SubmitButton() {
 export default function NewRecipeForm() {
   const initialState: FormState = { message: '', errors: {} };
   const [state, dispatch] = useActionState(saveRecipe, initialState);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (state.message === 'Success' && state.recipeId) {
+      router.push('/my-recipes/new/success');
+    }
+  }, [state, router]);
 
   return (
     <form action={dispatch} className="space-y-8">
@@ -97,13 +105,6 @@ export default function NewRecipeForm() {
           <Alert variant="destructive">
             <AlertTitle>Error</AlertTitle>
             <AlertDescription>{state.errors.database[0]}</AlertDescription>
-          </Alert>
-        )}
-
-       {state.message === 'Success' && (
-          <Alert>
-            <AlertTitle>Success!</AlertTitle>
-            <AlertDescription>Your recipe has been saved.</AlertDescription>
           </Alert>
         )}
 
