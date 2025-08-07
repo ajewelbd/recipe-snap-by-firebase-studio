@@ -50,6 +50,21 @@ export default function NewRecipeForm() {
         )}
       </div>
 
+       <div className="space-y-2">
+        <Label htmlFor="ingredients" className="text-lg">Ingredients</Label>
+        <Textarea
+          id="ingredients"
+          name="ingredients"
+          placeholder="e.g., 2 cups flour, 1 cup sugar, and 3 eggs"
+          required
+          rows={5}
+          className="text-base"
+        />
+        {state.errors?.ingredients && (
+          <p className="text-sm text-destructive">{state.errors.ingredients[0]}</p>
+        )}
+      </div>
+
       <div className="space-y-2">
         <Label htmlFor="time_to_cook" className="text-lg">Time to Cook</Label>
         <Input

@@ -7,7 +7,7 @@ import { useAuth } from '@/context/auth-context';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
-import { BookOpen, Camera, Clock, Calendar, Soup } from 'lucide-react';
+import { BookOpen, Camera, Clock, Calendar, Soup, CheckSquare } from 'lucide-react';
 import { format } from 'date-fns';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '../ui/carousel';
 import type { AnalyzeRecipeNutritionOutput } from '@/ai/flows/analyze-recipe-nutrition';
@@ -16,6 +16,7 @@ interface Recipe {
   id: string;
   title: string;
   details: string;
+  ingredients: string[] | null;
   time_to_cook: string | null;
   featured_image_url: string | null;
   result_image_urls: string[] | null;
@@ -109,8 +110,20 @@ export default function RecipeDetail({ recipeId }: RecipeDetailProps) {
             </div>
         )}
 
+        {recipe.ingredients && recipe.ingredients.length > 0 && (
+            <div className="prose prose-lg dark:prose-invert max-w-none">
+                <h2 className="font-headline flex items-center gap-2"><CheckSquare /> Ingredients</h2>
+                <ul className="not-prose list-disc pl-5 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+                    {recipe.ingredients.map((item, index) => (
+                        <li key={index} className="text-base">{item}</li>
+                    ))}
+                </ul>
+            </div>
+        )}
+
+
         <div className="prose prose-lg dark:prose-invert max-w-none">
-            <h2 className="font-headline flex items-center gap-2"><BookOpen /> Details</h2>
+            <h2 className="font-headline flex items-center gap-2"><BookOpen /> Instructions</h2>
             <p className="whitespace-pre-wrap">{recipe.details}</p>
         </div>
         

@@ -10,6 +10,7 @@ import { revalidatePath } from 'next/cache';
 
 const FormSchema = z.object({
   title: z.string().min(1, 'Title is required.'),
+  ingredients: z.string().min(1, 'Ingredients are required.'),
   details: z.string().min(1, 'Recipe details are required.'),
   time_to_cook: z.string().optional(),
   is_public: z.boolean(),
@@ -19,6 +20,7 @@ export type FormState = {
   message: string;
   errors?: {
     title?: string[];
+    ingredients?: string[];
     details?: string[];
     time_to_cook?: string[];
     featured_image?: string[];
@@ -64,6 +66,7 @@ export async function saveRecipe(
 
   const validatedFields = FormSchema.safeParse({
     title: formData.get('title'),
+    ingredients: formData.get('ingredients'),
     details: formData.get('details'),
     time_to_cook: formData.get('time_to_cook'),
     is_public: formData.get('is_public') === 'on',
@@ -76,8 +79,14 @@ export async function saveRecipe(
     };
   }
 
-  const { title, details, is_public, time_to_cook } = validatedFields.data;
+  const { title, details, ingredients, is_public, time_to_cook } = validatedFields.data;
   
+  // Parse ingredients string into an array
+  const ingredientsArray = ingredients
+    .split(/,|\band\b/i)
+    .map(ing => ing.trim())
+    .filter(Boolean);
+
   let categorization: { tags: string[], category: string };
   let nutrition: AnalyzeRecipeNutritionOutput | null;
 
@@ -118,6 +127,7 @@ export async function saveRecipe(
       user_id: userId,
       title,
       details,
+      ingredients: ingredientsArray,
       is_public,
       time_to_cook,
       featured_image_url: featuredImageUrl,

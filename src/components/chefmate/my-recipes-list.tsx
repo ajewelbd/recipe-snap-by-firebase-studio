@@ -36,7 +36,7 @@ export default function MyRecipesList() {
       try {
         const { data, error } = await supabase
           .from('my_recipies')
-          .select('id, title, featured_image_url, tags, category, created_at')
+          .select('id, title, featured_image_url, tags, category, created_at, ingredients')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false });
 
