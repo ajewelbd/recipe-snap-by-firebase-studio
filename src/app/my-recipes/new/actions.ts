@@ -4,6 +4,7 @@
 import { createSupabaseServerClient } from '@/lib/supabase/server';
 import { categorizeRecipe } from '@/ai/flows/categorize-recipe';
 import { analyzeRecipeNutrition } from '@/ai/flows/analyze-recipe-nutrition';
+import type { AnalyzeRecipeNutritionOutput } from '@/ai/flows/analyze-recipe-nutrition';
 import { z } from 'zod';
 import { revalidatePath } from 'next/cache';
 
@@ -77,13 +78,25 @@ export async function saveRecipe(
 
   const { title, details, is_public, time_to_cook } = validatedFields.data;
   
+  let categorization: { tags: string[], category: string };
+  let nutrition: AnalyzeRecipeNutritionOutput | null;
+
   try {
     // 1. AI Categorization & Nutrition Analysis
-    const [categorization, nutrition] = await Promise.all([
+    const [catResult, nutResult] = await Promise.all([
         categorizeRecipe({ title, details }),
         analyzeRecipeNutrition({ title, details })
     ]);
-    
+    categorization = catResult;
+    nutrition = nutResult;
+  } catch (aiError) {
+    console.error('AI processing error:', aiError);
+    // Continue with default values if AI fails
+    categorization = { tags: [], category: 'Uncategorized' };
+    nutrition = null;
+  }
+  
+  try {
     // 2. Upload images
     const featured_image = formData.get('featured_image');
     let featuredImageUrl: string | null = null;
