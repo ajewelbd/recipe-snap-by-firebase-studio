@@ -9,6 +9,7 @@ import { redirect } from 'next/navigation';
 const FormSchema = z.object({
   title: z.string().min(1, 'Title is required.'),
   details: z.string().min(1, 'Recipe details are required.'),
+  time_to_cook: z.string().optional(),
   is_public: z.boolean(),
   featured_image: z.any().optional(),
   result_images: z.any().optional(),
@@ -19,6 +20,7 @@ export type FormState = {
   errors?: {
     title?: string[];
     details?: string[];
+    time_to_cook?: string[];
     featured_image?: string[];
     result_images?: string[];
     database?: string[];
@@ -69,6 +71,7 @@ export async function saveRecipe(
   const validatedFields = FormSchema.safeParse({
     title: formData.get('title'),
     details: formData.get('details'),
+    time_to_cook: formData.get('time_to_cook'),
     is_public: formData.get('is_public') === 'on',
     featured_image: formData.get('featured_image'),
     result_images: formData.getAll('result_images'),
@@ -81,7 +84,7 @@ export async function saveRecipe(
     };
   }
 
-  const { title, details, is_public, featured_image, result_images } = validatedFields.data;
+  const { title, details, is_public, time_to_cook, featured_image, result_images } = validatedFields.data;
 
   try {
     // 1. Categorize Recipe
@@ -110,6 +113,7 @@ export async function saveRecipe(
       title,
       details,
       is_public,
+      time_to_cook,
       featured_image_url: featuredImageUrl,
       result_image_urls: resultImageUrls.length > 0 ? resultImageUrls : null,
       tags: categorization.tags,

@@ -7,7 +7,7 @@ import { useAuth } from '@/context/auth-context';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
-import { BookOpen, Camera, Clock } from 'lucide-react';
+import { BookOpen, Camera, Clock, Calendar } from 'lucide-react';
 import { format } from 'date-fns';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '../ui/carousel';
 
@@ -15,6 +15,7 @@ interface Recipe {
   id: string;
   title: string;
   details: string;
+  time_to_cook: string | null;
   featured_image_url: string | null;
   result_image_urls: string[] | null;
   tags: string[] | null;
@@ -82,13 +83,19 @@ export default function RecipeDetail({ recipeId }: RecipeDetailProps) {
   return (
     <div className="max-w-4xl mx-auto">
         <div className="mb-4">
-            <Badge variant="secondary">{recipe.category}</Badge>
+            {recipe.category && <Badge variant="secondary">{recipe.category}</Badge>}
             <h1 className="text-4xl font-bold font-headline mt-2">{recipe.title}</h1>
-            <div className="flex items-center gap-4 text-sm text-muted-foreground mt-2">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground mt-2">
                 <div className="flex items-center gap-1.5">
-                    <Clock className="w-4 h-4" />
+                    <Calendar className="w-4 h-4" />
                     <span>Created on {format(new Date(recipe.created_at), 'MMMM d, yyyy')}</span>
                 </div>
+                {recipe.time_to_cook && (
+                    <div className="flex items-center gap-1.5">
+                        <Clock className="w-4 h-4" />
+                        <span>{recipe.time_to_cook}</span>
+                    </div>
+                )}
             </div>
         </div>
         
@@ -157,4 +164,3 @@ function RecipeDetailSkeleton() {
         </div>
     )
 }
-

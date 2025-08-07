@@ -42,6 +42,19 @@ export default function NewRecipeForm() {
       </div>
 
       <div className="space-y-2">
+        <Label htmlFor="time_to_cook" className="text-lg">Time to Cook</Label>
+        <Input
+          id="time_to_cook"
+          name="time_to_cook"
+          placeholder="e.g., 30 minutes"
+          className="text-base"
+        />
+        {state.errors?.time_to_cook && (
+          <p className="text-sm text-destructive">{state.errors.time_to_cook[0]}</p>
+        )}
+      </div>
+
+      <div className="space-y-2">
         <Label htmlFor="featured_image" className="text-lg">Featured Image</Label>
         <ImageUploader name="featured_image" multiple={false} />
          {state.errors?.featured_image && (
