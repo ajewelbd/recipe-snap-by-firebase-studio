@@ -1,3 +1,4 @@
+
 'use server';
 
 import { createSupabaseServerClient } from '@/lib/supabase/server';
@@ -88,13 +89,13 @@ export async function saveRecipe(
   const { title, details, is_public, time_to_cook, featured_image, result_images } = validatedFields.data;
 
   try {
-    // 1. Categorize Recipe & Analyze Nutrition in parallel
-    const [categorization, nutrition] = await Promise.all([
-        categorizeRecipe({ title, details }),
-        analyzeRecipeNutrition({ title, details })
-    ]);
+    // 1. Categorize Recipe
+    const categorization = await categorizeRecipe({ title, details });
+    
+    // 2. Analyze Nutrition
+    const nutrition = await analyzeRecipeNutrition({ title, details });
 
-    // 2. Upload images
+    // 3. Upload images
     let featuredImageUrl: string | null = null;
     if (featured_image instanceof File && featured_image.size > 0) {
         featuredImageUrl = await uploadImage(featured_image, 'recipe-images');
@@ -111,7 +112,7 @@ export async function saveRecipe(
     }
 
 
-    // 3. Save to database
+    // 4. Save to database
     const { data: newRecipe, error: dbError } = await supabase.from('my_recipies').insert({
       user_id: userId,
       title,
