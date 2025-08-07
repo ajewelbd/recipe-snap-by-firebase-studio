@@ -54,14 +54,17 @@ export async function saveRecipe(
   formData: FormData
 ): Promise<FormState> {
   const supabase = createSupabaseServerClient();
-  const userResponse = await supabase.auth.getUser();
-  if (userResponse.error || !userResponse.data.user) {
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
     return {
         message: 'Error',
         errors: { database: ['User not authenticated. Please log in.'] },
     };
   }
-  const userId = userResponse.data.user.id;
+  const userId = user.id;
 
   const validatedFields = FormSchema.safeParse({
     title: formData.get('title'),
