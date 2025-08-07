@@ -27,10 +27,8 @@ export type FormState = {
   recipeId?: string;
 };
 
-async function uploadImage(file: File, bucket: string, userId: string): Promise<string | null> {
+async function uploadImage(supabase: ReturnType<typeof createSupabaseServerClient>, file: File, bucket: string, userId: string): Promise<string | null> {
     if (!file || file.size === 0) return null;
-    
-    const supabase = createSupabaseServerClient();
     
     const filePath = `${userId}/${Date.now()}-${file.name}`;
     const { error: uploadError } = await supabase.storage
@@ -80,33 +78,29 @@ export async function saveRecipe(
   const { title, details, is_public, time_to_cook } = validatedFields.data;
   
   try {
+    // 1. AI Categorization & Nutrition Analysis
+    const [categorization, nutrition] = await Promise.all([
+        categorizeRecipe({ title, details }),
+        analyzeRecipeNutrition({ title, details })
+    ]);
+    
+    // 2. Upload images
     const featured_image = formData.get('featured_image');
-    const result_images = formData.getAll('result_images');
-    
-    // 1. Categorize Recipe
-    const categorization = await categorizeRecipe({ title, details });
-    
-    // 2. Analyze Nutrition
-    const nutrition = await analyzeRecipeNutrition({ title, details });
-
-    // 3. Upload images
     let featuredImageUrl: string | null = null;
     if (featured_image instanceof File && featured_image.size > 0) {
-        featuredImageUrl = await uploadImage(featured_image, 'recipe-images', userId);
+        featuredImageUrl = await uploadImage(supabase, featured_image, 'recipe-images', userId);
     }
 
+    const result_images = formData.getAll('result_images');
     let resultImageUrls: string[] = [];
-     if (Array.isArray(result_images)) {
-        for (const file of result_images) {
-            if (file instanceof File && file.size > 0) {
-                const url = await uploadImage(file, 'recipe-images', userId);
-                if (url) resultImageUrls.push(url);
-            }
+    for (const file of result_images) {
+        if (file instanceof File && file.size > 0) {
+            const url = await uploadImage(supabase, file, 'recipe-images', userId);
+            if (url) resultImageUrls.push(url);
         }
     }
 
-
-    // 4. Save to database
+    // 3. Save to database
     const { data: newRecipe, error: dbError } = await supabase.from('my_recipies').insert({
       user_id: userId,
       title,
@@ -117,14 +111,14 @@ export async function saveRecipe(
       result_image_urls: resultImageUrls.length > 0 ? resultImageUrls : null,
       tags: categorization.tags,
       category: categorization.category,
-      nutrition,
+      nutrition: nutrition, // Supabase client handles JSON stringification
     }).select('id').single();
 
     if (dbError) {
       console.error('Database Error:', dbError);
       return { 
           message: 'Error',
-          errors: { database: ['Failed to save recipe to the database.'] } 
+          errors: { database: [`Failed to save recipe to the database. Details: ${dbError.message}`] } 
       };
     }
 
@@ -135,7 +129,7 @@ export async function saveRecipe(
     };
 
   } catch (error) {
-    console.error('An unexpected error occurred:', error);
+    console.error('An unexpected error occurred in saveRecipe:', error);
     const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred.';
     return { 
         message: 'Error',
