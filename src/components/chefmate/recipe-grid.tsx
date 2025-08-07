@@ -13,9 +13,10 @@ interface RecipeGridProps {
   recipes: RecipeWithImage[];
   isLoading: boolean;
   userIngredients: string[];
+  hasSearched: boolean;
 }
 
-export default function RecipeGrid({ recipes, isLoading, userIngredients }: RecipeGridProps) {
+export default function RecipeGrid({ recipes, isLoading, userIngredients, hasSearched }: RecipeGridProps) {
     const { language } = useContext(LanguageContext);
     const t = content[language];
 
@@ -39,9 +40,16 @@ export default function RecipeGrid({ recipes, isLoading, userIngredients }: Reci
     }
 
     if (recipes.length === 0) {
+        if (hasSearched) {
+            return (
+                <div className="text-center py-16">
+                    <p className="text-muted-foreground">{t.recipes.empty}</p>
+                </div>
+            );
+        }
         return (
             <div className="text-center py-16">
-                <p className="text-muted-foreground">{t.recipes.prompt}</p>
+                 <p className="text-muted-foreground">{t.recipes.prompt}</p>
             </div>
         );
     }

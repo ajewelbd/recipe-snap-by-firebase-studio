@@ -35,6 +35,7 @@ export default function Home() {
   const [ingredients, setIngredients] = useState<string[]>([]);
   const [recipes, setRecipes] = useState<RecipeWithImage[]>([]);
   const [isLoadingRecipes, setIsLoadingRecipes] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const { toast } = useToast();
   const { language } = useContext(LanguageContext);
   const t = content[language];
@@ -117,6 +118,7 @@ export default function Home() {
     }
 
     setIsLoadingRecipes(true);
+    setHasSearched(true);
     setRecipes([]); // Clear previous recipes
     try {
       const result = await suggestRecipes({ 
@@ -205,6 +207,7 @@ export default function Home() {
               recipes={recipes} 
               isLoading={isLoadingRecipes} 
               userIngredients={ingredients}
+              hasSearched={hasSearched}
             />
           </div>
         </div>
