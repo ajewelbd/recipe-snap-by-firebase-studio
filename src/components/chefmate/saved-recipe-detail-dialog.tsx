@@ -43,8 +43,8 @@ export function SavedRecipeDetailDialogProvider({ children }: SavedRecipeDetailD
             <Dialog open={!!selectedRecipe} onOpenChange={(isOpen) => !isOpen && handleDialogClose()}>
                 {children}
                 {selectedRecipe && (
-                    <DialogContent className="max-w-4xl p-0">
-                         <DialogHeader>
+                    <DialogContent className="max-w-4xl p-0 h-[80vh] flex flex-col">
+                         <DialogHeader className="p-6 pb-0 flex-shrink-0">
                             {/* This title is for accessibility. It is visually hidden but available to screen readers. */}
                             <DialogTitle className="sr-only">{selectedRecipe.title}</DialogTitle>
                         </DialogHeader>
@@ -52,7 +52,7 @@ export function SavedRecipeDetailDialogProvider({ children }: SavedRecipeDetailD
                             <X className="h-5 w-5" />
                             <span className="sr-only">Close</span>
                         </DialogClose>
-                        <div className="p-6 md:p-8 h-[80vh] overflow-y-auto">
+                        <div className="px-6 md:px-8 pb-6 flex-grow overflow-y-auto">
                             <RecipeDetail recipeId={selectedRecipe.id} />
                         </div>
                     </DialogContent>
