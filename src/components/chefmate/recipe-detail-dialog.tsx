@@ -14,10 +14,12 @@ import Image from "next/image";
 import { Skeleton } from "../ui/skeleton";
 import { LanguageContext, content } from "@/context/language-context";
 import { Badge } from "../ui/badge";
-import { Volume2, Loader2, X } from "lucide-react";
+import { Volume2, Loader2, X, Soup } from "lucide-react";
 import { Button } from "../ui/button";
 import { generateRecipeSpeech } from "@/ai/flows/generate-recipe-speech";
 import { useToast } from "@/hooks/use-toast";
+import VideoSuggestions from "./video-suggestions";
+import { Separator } from "../ui/separator";
 
 
 interface RecipeDetailDialogContextType {
@@ -138,6 +140,38 @@ export function RecipeDetailDialogProvider({ children, userIngredients }: Recipe
                                 dangerouslySetInnerHTML={{ __html: highlightIngredients(getRecipeInstructions(selectedRecipe)) }}
                             />
                         </div>
+
+                        <Separator />
+
+                        <div className="space-y-4">
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                               <h4 className="font-semibold font-headline flex items-center gap-2">
+                                 <Soup />
+                                 {t.recipes.nutrition}
+                               </h4>
+                               <Badge variant="outline">{t.recipes.servingSize}: {selectedRecipe.nutrition.servingSize}</Badge>
+                             </div>
+                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
+                               <div className="bg-muted p-3 rounded-lg text-center">
+                                   <p className="font-semibold">{selectedRecipe.nutrition.calories.value} {selectedRecipe.nutrition.calories.unit}</p>
+                                   <p className="text-muted-foreground">{t.recipes.calories}</p>
+                               </div>
+                               <div className="bg-muted p-3 rounded-lg text-center">
+                                   <p className="font-semibold">{selectedRecipe.nutrition.protein.value}{selectedRecipe.nutrition.protein.unit}</p>
+                                   <p className="text-muted-foreground">{t.recipes.protein}</p>
+                               </div>
+                               <div className="bg-muted p-3 rounded-lg text-center">
+                                   <p className="font-semibold">{selectedRecipe.nutrition.carbs.value}{selectedRecipe.nutrition.carbs.unit}</p>
+                                   <p className="text-muted-foreground">{t.recipes.carbs}</p>
+                               </div>
+                               <div className="bg-muted p-3 rounded-lg text-center">
+                                   <p className="font-semibold">{selectedRecipe.nutrition.fat.value}{selectedRecipe.nutrition.fat.unit}</p>
+                                   <p className="text-muted-foreground">{t.recipes.fat}</p>
+                               </div>
+                             </div>
+                        </div>
+
+                        <VideoSuggestions searchQuery={selectedRecipe.youtubeSearchQuery} />
                     </div>
                 </DialogContent>
             )}
