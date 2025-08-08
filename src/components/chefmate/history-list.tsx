@@ -164,14 +164,14 @@ export default function HistoryList() {
     <AlertDialog open={!!itemToDelete} onOpenChange={(isOpen) => !isOpen && setItemToDelete(null)}>
         <AlertDialogContent>
             <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>{t.history.deleteDialog.title}</AlertDialogTitle>
             <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete this search from your history.
+                {t.history.deleteDialog.description}
             </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+            <AlertDialogCancel>{t.history.deleteDialog.cancel}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete}>{t.history.deleteDialog.delete}</AlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>
     </AlertDialog>

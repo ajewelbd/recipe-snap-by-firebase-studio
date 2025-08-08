@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/context/auth-context';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -22,6 +22,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { LanguageContext, content } from '@/context/language-context';
 
 
 export interface MyRecipe {
@@ -43,6 +44,9 @@ export default function MyRecipesList() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [recipeToDelete, setRecipeToDelete] = useState<MyRecipe | null>(null);
+  const { language } = useContext(LanguageContext);
+  const t = content[language];
+
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -104,14 +108,14 @@ export default function MyRecipesList() {
     <AlertDialog open={!!recipeToDelete} onOpenChange={(isOpen) => !isOpen && setRecipeToDelete(null)}>
         <AlertDialogContent>
             <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>{t.myRecipes.deleteDialog.title}</AlertDialogTitle>
             <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete "{recipeToDelete?.title}" and all its associated data.
+                {t.myRecipes.deleteDialog.description(recipeToDelete?.title || '')}
             </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
+            <AlertDialogCancel>{t.myRecipes.deleteDialog.cancel}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive hover:bg-destructive/90">{t.myRecipes.deleteDialog.delete}</AlertDialogAction>
             </AlertDialogFooter>
         </AlertDialogContent>
     </AlertDialog>
@@ -120,20 +124,20 @@ export default function MyRecipesList() {
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold font-headline text-primary flex items-center gap-3">
                     <BookOpen />
-                    My Recipes
+                    {t.myRecipes.title}
                 </h1>
                 <Button asChild>
                     <Link href="/my-recipes/new">
                         <PlusCircle className="mr-2" />
-                        Create New
+                        {t.myRecipes.create}
                     </Link>
                 </Button>
             </div>
 
             {recipes.length === 0 ? (
                 <div className="text-center py-16 border-2 border-dashed rounded-lg">
-                    <p className="text-lg font-semibold text-muted-foreground">You haven't saved any recipes yet.</p>
-                    <p className="text-muted-foreground mt-2">Why not create your first one?</p>
+                    <p className="text-lg font-semibold text-muted-foreground">{t.myRecipes.emptyPrompt}</p>
+                    <p className="text-muted-foreground mt-2">{t.myRecipes.emptySuggestion}</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

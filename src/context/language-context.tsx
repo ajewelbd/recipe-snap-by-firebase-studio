@@ -68,6 +68,12 @@ export const content = {
             ingredientsUsed: 'Ingredients Used',
             suggestedRecipes: 'Suggested Recipes',
             manualEntry: 'Manual Entry',
+            deleteDialog: {
+              title: 'Are you sure?',
+              description: 'This action cannot be undone. This will permanently delete this search from your history.',
+              cancel: 'Cancel',
+              delete: 'Delete',
+            }
         },
         uploader: {
             title: 'Upload a Photo',
@@ -157,6 +163,20 @@ export const content = {
             addCommentPlaceholder: 'Add a comment...',
             loading: 'Loading...'
         },
+        myRecipes: {
+            title: 'My Recipes',
+            create: 'Create New',
+            emptyPrompt: "You haven't saved any recipes yet.",
+            emptySuggestion: "Why not create your first one?",
+            edit: 'Edit',
+            delete: 'Delete',
+            deleteDialog: {
+              title: 'Are you sure?',
+              description: (recipeTitle: string) => `This action cannot be undone. This will permanently delete "${recipeTitle}" and all its associated data.`,
+              cancel: 'Cancel',
+              delete: 'Delete',
+            }
+        },
         newRecipe: {
             createTitle: 'Create New Recipe',
             editTitle: 'Edit Recipe',
@@ -243,6 +263,12 @@ export const content = {
             ingredientsUsed: 'ব্যবহৃত উপাদান',
             suggestedRecipes: 'প্রস্তাবিত রেসিপি',
             manualEntry: 'ম্যানুয়াল এন্ট্রি',
+            deleteDialog: {
+              title: 'আপনি কি নিশ্চিত?',
+              description: 'এই কাজটি বাতিল করা যাবে না। এটি আপনার ইতিহাস থেকে এই অনুসন্ধানটি স্থায়ীভাবে মুছে ফেলবে।',
+              cancel: 'বাতিল',
+              delete: 'মুছে ফেলুন',
+            }
         },
         uploader: {
             title: 'ছবি আপলোড করুন',
@@ -331,6 +357,20 @@ export const content = {
             loginToComment: 'একটি মন্তব্য যোগ করতে লগইন করুন.',
             addCommentPlaceholder: 'একটি মন্তব্য যোগ করুন...',
             loading: 'লোড হচ্ছে...'
+        },
+         myRecipes: {
+            title: 'আমার রেসিপি',
+            create: 'নতুন তৈরি করুন',
+            emptyPrompt: 'আপনি এখনও কোনো রেসিপি সংরক্ষণ করেননি।',
+            emptySuggestion: 'আপনার প্রথমটি তৈরি করবেন না কেন?',
+            edit: 'সম্পাদনা করুন',
+            delete: 'মুছে ফেলুন',
+            deleteDialog: {
+              title: 'আপনি কি নিশ্চিত?',
+              description: (recipeTitle: string) => `এই কাজটি বাতিল করা যাবে না। এটি "${recipeTitle}" এবং এর সাথে সম্পর্কিত সমস্ত ডেটা স্থায়ীভাবে মুছে ফেলবে।`,
+              cancel: 'বাতিল করুন',
+              delete: 'মুছে ফেলুন',
+            }
         },
         newRecipe: {
             createTitle: 'নতুন রেসিপি তৈরি করুন',

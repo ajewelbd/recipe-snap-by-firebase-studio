@@ -15,6 +15,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from '../ui/button';
 import Link from 'next/link';
+import { useContext } from 'react';
+import { LanguageContext, content } from '@/context/language-context';
 
 interface SavedRecipeCardProps {
     recipe: MyRecipe;
@@ -24,6 +26,8 @@ interface SavedRecipeCardProps {
 
 export default function SavedRecipeCard({ recipe, isOwner, onDelete }: SavedRecipeCardProps) {
     const { setSelectedRecipe } = useSavedRecipeDetailDialog();
+    const { language } = useContext(LanguageContext);
+    const t = content[language];
 
     const handleCardClick = (e: React.MouseEvent) => {
         // Prevent dialog from opening if the click was on any interactive element inside the card
@@ -65,12 +69,12 @@ export default function SavedRecipeCard({ recipe, isOwner, onDelete }: SavedReci
                                 <DropdownMenuItem asChild>
                                     <Link href={`/my-recipes/${recipe.id}/edit`}>
                                         <Pencil className="mr-2 h-4 w-4" />
-                                        <span>Edit</span>
+                                        <span>{t.myRecipes.edit}</span>
                                     </Link>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem onClick={onDelete} className="text-destructive focus:text-destructive focus:bg-destructive/10">
                                     <Trash2 className="mr-2 h-4 w-4" />
-                                    <span>Delete</span>
+                                    <span>{t.myRecipes.delete}</span>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
