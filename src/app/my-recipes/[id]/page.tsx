@@ -3,13 +3,14 @@
 import Header from '@/components/chefmate/header';
 import RecipeDetail from '@/components/chefmate/recipe-detail';
 import { useAuth } from '@/context/auth-context';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { useEffect } from 'react';
 
-export default function RecipeDetailPage({ params }: { params: { id: string } }) {
+export default function RecipeDetailPage() {
     const { user, loading } = useAuth();
     const router = useRouter();
-    const { id } = params;
+    const params = useParams();
+    const id = params.id as string;
 
     useEffect(() => {
         if (!loading && !user) {
