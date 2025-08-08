@@ -11,6 +11,9 @@ import { BookOpen, Camera, Clock, Calendar, Soup, CheckSquare } from 'lucide-rea
 import { format } from 'date-fns';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '../ui/carousel';
 import type { AnalyzeRecipeNutritionOutput } from '@/ai/flows/analyze-recipe-nutrition';
+import RecipeInteractions from './recipe-interactions';
+import { Separator } from '../ui/separator';
+
 
 interface Recipe {
   id: string;
@@ -38,19 +41,30 @@ export default function RecipeDetail({ recipeId }: RecipeDetailProps) {
 
   useEffect(() => {
     const fetchRecipe = async () => {
-      if (!user || !recipeId) {
+      if (!recipeId) {
         setIsLoading(false);
         return;
       }
       setIsLoading(true);
       try {
-        const { data, error } = await supabase
+        // Anyone can view a public recipe, but only the owner can view a private one.
+        // We will fetch public recipes regardless of the user.
+        // If there's a user, we'll try to fetch their own private recipes too.
+        let query = supabase
           .from('my_recipies')
           .select('*')
           .eq('id', recipeId)
-          .eq('user_id', user.id)
-          .single();
 
+        if (user) {
+            // If user is logged in, they can see public recipes OR their own private ones.
+            query = query.or(`is_public.eq.true,and(is_public.eq.false,user_id.eq.${user.id})`)
+        } else {
+            // If user is not logged in, they can only see public recipes.
+            query = query.eq('is_public', true);
+        }
+
+        const { data, error } = await query.single();
+          
         if (error) {
             if (error.code === 'PGRST116') { // "Not a single row was returned"
                 console.warn('Recipe not found or access denied.');
@@ -132,6 +146,10 @@ export default function RecipeDetail({ recipeId }: RecipeDetailProps) {
                 <Badge key={i} variant="outline" className="text-sm">{tag}</Badge>
             ))}
         </div>
+        
+        <Separator />
+        <RecipeInteractions recipeId={recipe.id} />
+        <Separator />
 
         {nutrition && (
             <div className="space-y-4 pt-4">
