@@ -5,7 +5,8 @@ import { useAuth } from '@/context/auth-context';
 import { Button } from '../ui/button';
 import { Heart, Loader2 } from 'lucide-react';
 import { toggleLike } from '@/app/actions';
-import { useTransition } from 'react';
+import { useContext, useTransition } from 'react';
+import { LanguageContext, content } from '@/context/language-context';
 
 interface LikeButtonProps {
     likeCount: number;
@@ -16,6 +17,8 @@ interface LikeButtonProps {
 export default function LikeButton({ likeCount, hasLiked, recipeId }: LikeButtonProps) {
     const { user, loading: authLoading } = useAuth();
     const [isPending, startTransition] = useTransition();
+    const { language } = useContext(LanguageContext);
+    const t = content[language];
 
     const handleLike = () => {
         if (!user) return; // Or prompt to login
@@ -28,7 +31,7 @@ export default function LikeButton({ likeCount, hasLiked, recipeId }: LikeButton
         return (
             <Button variant="outline" disabled>
                 <Loader2 className="mr-2 animate-spin" />
-                Loading...
+                {t.recipeDetail.loading}
             </Button>
         );
     }
@@ -44,7 +47,7 @@ export default function LikeButton({ likeCount, hasLiked, recipeId }: LikeButton
             ) : (
                 <Heart className={`mr-2 ${hasLiked ? 'text-red-500 fill-current' : ''}`} />
             )}
-            {likeCount} {likeCount === 1 ? 'Like' : 'Likes'}
+            {likeCount} {likeCount === 1 ? t.recipeDetail.like : t.recipeDetail.likes}
         </Button>
     )
 }

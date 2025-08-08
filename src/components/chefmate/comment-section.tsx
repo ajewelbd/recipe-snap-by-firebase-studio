@@ -6,11 +6,13 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
 import { addComment, deleteComment } from '@/app/actions';
-import { useRef } from 'react';
+import { useContext, useRef } from 'react';
 import { useFormStatus } from 'react-dom';
 import { Loader2, Send, Trash2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { bn, enUS } from 'date-fns/locale';
 import type { CommentWithProfile } from './recipe-interactions';
+import { LanguageContext, content } from '@/context/language-context';
 
 
 interface CommentSectionProps {
@@ -47,12 +49,15 @@ function DeleteButton({ comment, recipeId }: { comment: CommentWithProfile, reci
 export default function CommentSection({ comments, recipeId }: CommentSectionProps) {
     const { user, loading } = useAuth();
     const formRef = useRef<HTMLFormElement>(null);
+    const { language } = useContext(LanguageContext);
+    const t = content[language];
+    const dateLocale = language === 'bn' ? bn : enUS;
     
     if (loading) return null;
     
     return (
         <div className="space-y-6">
-            <h3 className="text-xl font-bold font-headline">{comments.length} Comments</h3>
+            <h3 className="text-xl font-bold font-headline">{comments.length} {comments.length === 1 ? t.recipeDetail.comment : t.recipeDetail.comments}</h3>
             {user ? (
                 <form 
                     ref={formRef}
@@ -69,7 +74,7 @@ export default function CommentSection({ comments, recipeId }: CommentSectionPro
                     <div className="flex-grow flex items-center gap-2">
                         <Textarea
                             name="content"
-                            placeholder="Add a comment..."
+                            placeholder={t.recipeDetail.addCommentPlaceholder}
                             className="text-base"
                             rows={1}
                             required
@@ -79,7 +84,7 @@ export default function CommentSection({ comments, recipeId }: CommentSectionPro
                     </div>
                 </form>
             ) : (
-                <p className="text-muted-foreground">Please log in to add a comment.</p>
+                <p className="text-muted-foreground">{t.recipeDetail.loginToComment}</p>
             )}
 
             <div className="space-y-4">
@@ -93,7 +98,7 @@ export default function CommentSection({ comments, recipeId }: CommentSectionPro
                             <div className="flex items-center justify-between">
                                <div className="flex items-center gap-2">
                                   <span className="font-semibold">{comment.user_full_name || 'Anonymous'}</span>
-                                  <span className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}</span>
+                                  <span className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(comment.created_at), { addSuffix: true, locale: dateLocale })}</span>
                                </div>
                                 {user?.id === comment.user_id && (
                                     <form action={() => deleteComment(comment.id, recipeId)}>

@@ -137,6 +137,26 @@ export const content = {
             cancel: 'Cancel',
             snap: 'Snap Photo',
         },
+        recipeDetail: {
+            createdOn: 'Created on',
+            ingredients: 'Ingredients',
+            instructions: 'Instructions',
+            nutrition: 'Nutritional Information',
+            servingSize: 'Serving Size',
+            calories: 'Calories',
+            protein: 'Protein',
+            carbs: 'Carbs',
+            fat: 'Fat',
+            disclaimer: 'Disclaimer: Nutritional information is an AI-generated estimate and should not be used for medical purposes.',
+            finalResults: 'Final Results',
+            like: 'Like',
+            likes: 'Likes',
+            comment: 'Comment',
+            comments: 'Comments',
+            loginToComment: 'Please log in to add a comment.',
+            addCommentPlaceholder: 'Add a comment...',
+            loading: 'Loading...'
+        },
         toast: {
             error: {
                 title: 'Uh oh! Something went wrong.',
@@ -268,6 +288,26 @@ export const content = {
             allowAccess: 'এই বৈশিষ্ট্যটি ব্যবহার করতে অনুগ্রহ করে ক্যামেরা অ্যাক্সেসের অনুমতি দিন। আপনাকে আপনার ব্রাউজার সেটিংসে অনুমতি পরিবর্তন করতে হতে পারে।',
             cancel: 'বাতিল করুন',
             snap: 'ছবি তুলুন',
+        },
+        recipeDetail: {
+            createdOn: 'তৈরির তারিখ',
+            ingredients: 'উপাদান',
+            instructions: 'নির্দেশাবলী',
+            nutrition: 'পুষ্টি সম্পর্কিত তথ্য',
+            servingSize: 'পরিবেশনের আকার',
+            calories: 'ক্যালোরি',
+            protein: 'প্রোটিন',
+            carbs: 'কার্বোহাইড্রেট',
+            fat: 'চর্বি',
+            disclaimer: 'দাবিত্যাগ: পুষ্টি সম্পর্কিত তথ্য একটি এআই-উত্পন্ন অনুমান এবং চিকিৎসা উদ্দেশ্যে ব্যবহার করা উচিত নয়।',
+            finalResults: 'চূড়ান্ত ফলাফল',
+            like: 'লাইক',
+            likes: 'লাইক',
+            comment: 'মন্তব্য',
+            comments: 'মন্তব্য',
+            loginToComment: 'একটি মন্তব্য যোগ করতে লগইন করুন.',
+            addCommentPlaceholder: 'একটি মন্তব্য যোগ করুন...',
+            loading: 'লোড হচ্ছে...'
         },
         toast: {
             error: {

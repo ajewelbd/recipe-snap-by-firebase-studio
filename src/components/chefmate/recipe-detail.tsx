@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { supabase } from '@/lib/supabase/client';
 import { useAuth } from '@/context/auth-context';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -9,10 +9,12 @@ import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { BookOpen, Camera, Clock, Calendar, Soup, CheckSquare } from 'lucide-react';
 import { format } from 'date-fns';
+import { bn, enUS } from 'date-fns/locale';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '../ui/carousel';
 import type { AnalyzeRecipeNutritionOutput } from '@/ai/flows/analyze-recipe-nutrition';
 import RecipeInteractions from './recipe-interactions';
 import { Separator } from '../ui/separator';
+import { LanguageContext, content } from '@/context/language-context';
 
 
 interface Recipe {
@@ -38,6 +40,9 @@ export default function RecipeDetail({ recipeId }: RecipeDetailProps) {
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
+  const { language } = useContext(LanguageContext);
+  const t = content[language];
+  const dateLocale = language === 'bn' ? bn : enUS;
 
   useEffect(() => {
     const fetchRecipe = async () => {
@@ -107,7 +112,7 @@ export default function RecipeDetail({ recipeId }: RecipeDetailProps) {
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground mt-2">
                 <div className="flex items-center gap-1.5">
                     <Calendar className="w-4 h-4" />
-                    <span>Created on {format(new Date(recipe.created_at), 'MMMM d, yyyy')}</span>
+                    <span>{t.recipeDetail.createdOn} {format(new Date(recipe.created_at), 'MMMM d, yyyy', { locale: dateLocale })}</span>
                 </div>
                 {recipe.time_to_cook && (
                     <div className="flex items-center gap-1.5">
@@ -126,7 +131,7 @@ export default function RecipeDetail({ recipeId }: RecipeDetailProps) {
 
         {recipe.ingredients && recipe.ingredients.length > 0 && (
             <div className="prose prose-lg dark:prose-invert max-w-none">
-                <h2 className="font-headline flex items-center gap-2"><CheckSquare /> Ingredients</h2>
+                <h2 className="font-headline flex items-center gap-2"><CheckSquare /> {t.recipeDetail.ingredients}</h2>
                 <ul className="not-prose list-disc pl-5 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
                     {recipe.ingredients.map((item, index) => (
                         <li key={index} className="text-base">{item}</li>
@@ -137,7 +142,7 @@ export default function RecipeDetail({ recipeId }: RecipeDetailProps) {
 
 
         <div className="prose prose-lg dark:prose-invert max-w-none">
-            <h2 className="font-headline flex items-center gap-2"><BookOpen /> Instructions</h2>
+            <h2 className="font-headline flex items-center gap-2"><BookOpen /> {t.recipeDetail.instructions}</h2>
             <p className="whitespace-pre-wrap">{recipe.details}</p>
         </div>
         
@@ -154,56 +159,58 @@ export default function RecipeDetail({ recipeId }: RecipeDetailProps) {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <h2 className="text-2xl font-bold font-headline flex items-center gap-2">
                     <Soup />
-                    Nutritional Information
+                    {t.recipeDetail.nutrition}
                 </h2>
-                <Badge variant="outline">Serving Size: {nutrition.servingSize}</Badge>
+                <Badge variant="outline">{t.recipeDetail.servingSize}: {nutrition.servingSize}</Badge>
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
                     <div className="bg-muted p-3 rounded-lg text-center">
                         <p className="font-semibold text-lg">{nutrition.calories.value} {nutrition.calories.unit}</p>
-                        <p className="text-muted-foreground">Calories</p>
+                        <p className="text-muted-foreground">{t.recipeDetail.calories}</p>
                     </div>
                     <div className="bg-muted p-3 rounded-lg text-center">
                         <p className="font-semibold text-lg">{nutrition.protein.value}{nutrition.protein.unit}</p>
-                        <p className="text-muted-foreground">Protein</p>
+                        <p className="text-muted-foreground">{t.recipeDetail.protein}</p>
                     </div>
                     <div className="bg-muted p-3 rounded-lg text-center">
                         <p className="font-semibold text-lg">{nutrition.carbs.value}{nutrition.carbs.unit}</p>
-                        <p className="text-muted-foreground">Carbs</p>
+                        <p className="text-muted-foreground">{t.recipeDetail.carbs}</p>
                     </div>
                     <div className="bg-muted p-3 rounded-lg text-center">
                         <p className="font-semibold text-lg">{nutrition.fat.value}{nutrition.fat.unit}</p>
-                        <p className="text-muted-foreground">Fat</p>
+                        <p className="text-muted-foreground">{t.recipeDetail.fat}</p>
                     </div>
                 </div>
-                <p className="text-xs text-muted-foreground text-center">Disclaimer: Nutritional information is an AI-generated estimate and should not be used for medical purposes.</p>
+                <p className="text-xs text-muted-foreground text-center">{t.recipeDetail.disclaimer}</p>
             </div>
            </>
         )}
-
-        {recipe.result_image_urls && recipe.result_image_urls.length > 0 && (
-            <div>
-                 <h2 className="text-2xl font-bold font-headline mb-4 flex items-center gap-2"><Camera /> Final Results</h2>
-                 <Carousel className="w-full" opts={{ align: "start", loop: true }}>
-                    <CarouselContent>
-                        {recipe.result_image_urls.map((url, index) => (
-                        <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
-                            <div className="p-1">
-                                <div className="relative aspect-square w-full rounded-lg overflow-hidden">
-                                     <Image src={url} alt={`Result photo ${index + 1}`} fill className="object-cover" data-ai-hint="recipe food" />
-                                </div>
-                            </div>
-                        </CarouselItem>
-                        ))}
-                    </CarouselContent>
-                    <CarouselPrevious />
-                    <CarouselNext />
-                </Carousel>
-            </div>
-        )}
         
-        <Separator />
-        <RecipeInteractions recipeId={recipe.id} />
+        <div className="space-y-6">
+            {recipe.result_image_urls && recipe.result_image_urls.length > 0 && (
+                <div>
+                     <h2 className="text-2xl font-bold font-headline mb-4 flex items-center gap-2"><Camera /> {t.recipeDetail.finalResults}</h2>
+                     <Carousel className="w-full" opts={{ align: "start", loop: true }}>
+                        <CarouselContent>
+                            {recipe.result_image_urls.map((url, index) => (
+                            <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3">
+                                <div className="p-1">
+                                    <div className="relative aspect-square w-full rounded-lg overflow-hidden">
+                                         <Image src={url} alt={`Result photo ${index + 1}`} fill className="object-cover" data-ai-hint="recipe food" />
+                                    </div>
+                                </div>
+                            </CarouselItem>
+                            ))}
+                        </CarouselContent>
+                        <CarouselPrevious />
+                        <CarouselNext />
+                    </Carousel>
+                </div>
+            )}
+            
+            <Separator />
+            <RecipeInteractions recipeId={recipe.id} />
+        </div>
     </div>
   );
 }
