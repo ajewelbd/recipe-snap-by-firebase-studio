@@ -63,10 +63,15 @@ export default function PublicRecipesList() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {recipes.map(recipe => (
-                <SavedRecipeCard key={recipe.id} recipe={recipe} />
+                <SavedRecipeCard 
+                    key={recipe.id} 
+                    recipe={recipe} 
+                    isOwner={user?.id === recipe.user_id}
+                />
             ))}
             </div>
         </div>
     </SavedRecipeDetailDialogProvider>
   );
 }
+

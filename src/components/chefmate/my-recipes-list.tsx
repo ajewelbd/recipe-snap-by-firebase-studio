@@ -10,6 +10,19 @@ import { Button } from '../ui/button';
 import Link from 'next/link';
 import SavedRecipeCard from './saved-recipe-card';
 import { SavedRecipeDetailDialogProvider } from './saved-recipe-detail-dialog';
+import { deleteRecipe } from '@/app/actions';
+import { useToast } from '@/hooks/use-toast';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+
 
 export interface MyRecipe {
   id: string;
@@ -28,6 +41,8 @@ export default function MyRecipesList() {
   const [recipes, setRecipes] = useState<MyRecipe[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
+  const { toast } = useToast();
+  const [recipeToDelete, setRecipeToDelete] = useState<MyRecipe | null>(null);
 
   useEffect(() => {
     const fetchRecipes = async () => {
@@ -55,6 +70,25 @@ export default function MyRecipesList() {
     }
   }, [user]);
 
+  const handleDeleteConfirm = async () => {
+    if (!recipeToDelete) return;
+    const { error } = await deleteRecipe(recipeToDelete.id);
+    if (error) {
+        toast({
+            variant: 'destructive',
+            title: 'Error',
+            description: error,
+        });
+    } else {
+        toast({
+            title: 'Success',
+            description: `"${recipeToDelete.title}" has been deleted.`,
+        });
+        setRecipes(recipes.filter(r => r.id !== recipeToDelete.id));
+    }
+    setRecipeToDelete(null);
+  }
+
   if (isLoading) {
     return (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -66,6 +100,21 @@ export default function MyRecipesList() {
   }
 
   return (
+    <>
+    <AlertDialog open={!!recipeToDelete} onOpenChange={(isOpen) => !isOpen && setRecipeToDelete(null)}>
+        <AlertDialogContent>
+            <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+                This action cannot be undone. This will permanently delete "{recipeToDelete?.title}" and all its associated data.
+            </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
     <SavedRecipeDetailDialogProvider>
         <div>
             <div className="flex justify-between items-center mb-6">
@@ -89,11 +138,18 @@ export default function MyRecipesList() {
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {recipes.map(recipe => (
-                    <SavedRecipeCard key={recipe.id} recipe={recipe} />
+                    <SavedRecipeCard 
+                        key={recipe.id} 
+                        recipe={recipe} 
+                        isOwner={recipe.user_id === user?.id}
+                        onDelete={() => setRecipeToDelete(recipe)}
+                    />
                 ))}
                 </div>
             )}
         </div>
     </SavedRecipeDetailDialogProvider>
+    </>
   );
 }
+
