@@ -6,6 +6,7 @@ import type { SuggestRecipesOutput } from '@/ai/flows/suggest-recipes';
 import { suggestRecipes } from '@/ai/flows/suggest-recipes';
 import { generateRecipeImage } from '@/ai/flows/generate-recipe-image';
 import { supabase } from '@/lib/supabase/client';
+import { findMatchingRecipes, type FindMatchingRecipesOutput } from '@/ai/flows/find-matching-recipes';
 
 import Header from '@/components/chefmate/header';
 import IngredientEditor from '@/components/chefmate/ingredient-editor';
@@ -19,10 +20,21 @@ import RecipeFilters from '@/components/chefmate/recipe-filters';
 import PublicRecipesList from '@/components/chefmate/public-recipes-list';
 import { Separator } from '@/components/ui/separator';
 
+type AiRecipe = SuggestRecipesOutput['recipes'][0];
+type UserRecipe = FindMatchingRecipesOutput['recipes'][0];
+
+
 // Define a new type for the recipe that includes the optional imageUrl
-export type RecipeWithImage = SuggestRecipesOutput['recipes'][0] & {
+export type CombinedRecipe = (AiRecipe | UserRecipe) & {
   imageUrl?: string;
+  source: 'ai' | 'user';
+  // ensure properties from both types are optional or present
+  name?: string;
+  youtubeSearchQuery?: string;
+  ingredientsUsedCount?: number;
+  id: string;
 };
+
 
 export type FilterType = 'cuisine' | 'diet' | 'time';
 export type FilterValues = {
@@ -35,7 +47,7 @@ const GUEST_SEARCH_LIMIT = 3;
 
 export default function Home() {
   const [ingredients, setIngredients] = useState<string[]>([]);
-  const [recipes, setRecipes] = useState<RecipeWithImage[]>([]);
+  const [recipes, setRecipes] = useState<CombinedRecipe[]>([]);
   const [isLoadingRecipes, setIsLoadingRecipes] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const { toast } = useToast();
@@ -63,11 +75,13 @@ export default function Home() {
     }
   }, [user]);
   
-  const saveSearchToHistory = async (searchIngredients: string[], foundRecipes: RecipeWithImage[], imageUrl?: string | null) => {
+  const saveSearchToHistory = async (searchIngredients: string[], foundRecipes: CombinedRecipe[], imageUrl?: string | null) => {
     if (!user) return; // Only save history for logged-in users
     try {
         // Create a "clean" version of the recipes without the client-side `imageUrl` and complex `nutrition` properties
-        const recipesForDb = foundRecipes.map(({ imageUrl, nutrition, ...rest }) => rest);
+        const recipesForDb = foundRecipes
+            .filter(r => r.source === 'ai')
+            .map(({ imageUrl, nutrition, ...rest }) => rest);
 
         const { error } = await supabase.from('history').insert({
             user_id: user.id,
@@ -82,10 +96,10 @@ export default function Home() {
   }
 
 
-  const generateImagesInBackground = (recipesToUpdate: RecipeWithImage[]) => {
+  const generateImagesInBackground = (recipesToUpdate: CombinedRecipe[]) => {
     recipesToUpdate.forEach((recipe, index) => {
-      // Skip if image already exists
-      if (recipe.imageUrl) return;
+      // Skip if image already exists or if it's not an AI recipe
+      if (recipe.imageUrl || recipe.source !== 'ai' || !recipe.imageGenerationPrompt) return;
 
       (async () => {
         try {
@@ -93,8 +107,8 @@ export default function Home() {
           // Update the specific recipe in the state with the new image URL
           setRecipes(currentRecipes => {
             const newRecipes = [...currentRecipes];
-            // Find the recipe in the current state to update, in case the order has changed
-            const recipeIndex = newRecipes.findIndex(r => r.name === recipe.name);
+            // Find the recipe in the current state to update
+            const recipeIndex = newRecipes.findIndex(r => r.id === recipe.id);
             if (recipeIndex !== -1) {
               newRecipes[recipeIndex] = { ...newRecipes[recipeIndex], imageUrl: imageResult.imageUrl };
             }
@@ -126,22 +140,41 @@ export default function Home() {
     setHasSearched(true);
     setRecipes([]); // Clear previous recipes
     try {
-      const result = await suggestRecipes({ 
-        ingredients: ingredients, 
-        language,
-        cuisine: filters.cuisine && filters.cuisine !== 'any' ? filters.cuisine : undefined,
-        diet: filters.diet && filters.diet !== 'any' ? filters.diet : undefined,
-        time: filters.time && filters.time !== 'any' ? filters.time : undefined
-      });
+      const [aiResult, userResult] = await Promise.all([
+          suggestRecipes({ 
+            ingredients: ingredients, 
+            language,
+            cuisine: filters.cuisine && filters.cuisine !== 'any' ? filters.cuisine : undefined,
+            diet: filters.diet && filters.diet !== 'any' ? filters.diet : undefined,
+            time: filters.time && filters.time !== 'any' ? filters.time : undefined
+          }),
+          findMatchingRecipes({ ingredients })
+      ]);
       
-      const recipesWithImagePlaceholder = result.recipes.map(r => ({...r, imageUrl: undefined}));
-      setRecipes(recipesWithImagePlaceholder);
+      const aiRecipes: CombinedRecipe[] = aiResult.recipes.map((r, i) => ({
+          ...r, 
+          id: `ai-${i}-${Date.now()}`, // Create a stable unique ID
+          imageUrl: undefined,
+          source: 'ai'
+      }));
+
+      const userRecipes: CombinedRecipe[] = userResult.recipes.map(r => ({
+          ...r,
+          imageUrl: r.featured_image_url || 'https://placehold.co/512x512.png',
+          source: 'user',
+          name: r.title,
+          totalTime: r.time_to_cook || 'N/A'
+      }));
+
+      const combined = [...userRecipes, ...aiRecipes];
+
+      setRecipes(combined);
       
-      generateImagesInBackground(recipesWithImagePlaceholder); // Start generating images
+      generateImagesInBackground(combined); // Start generating images for AI recipes
       
       if (user) {
         // Pass the original result.recipes to saveSearchToHistory, it will be cleaned inside
-        await saveSearchToHistory(ingredients, recipesWithImagePlaceholder, lastImageUrl);
+        await saveSearchToHistory(ingredients, combined, lastImageUrl);
       } else {
          // Decrement and save for guest users
          try {

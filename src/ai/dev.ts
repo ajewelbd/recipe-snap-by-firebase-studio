@@ -10,3 +10,4 @@ import '@/ai/flows/extract-ingredients-from-text.ts';
 import '@/ai/flows/generate-recipe-image.ts';
 import '@/ai/flows/categorize-recipe.ts';
 import '@/ai/flows/analyze-recipe-nutrition.ts';
+import '@/ai/flows/find-matching-recipes.ts';
