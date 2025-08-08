@@ -86,13 +86,13 @@ export default function CommentSection({ comments, recipeId }: CommentSectionPro
                 {comments.map(comment => (
                     <div key={comment.id} className="flex items-start gap-4">
                         <Avatar className="h-10 w-10 border">
-                            <AvatarImage src={comment.profiles?.avatar_url || ''} alt={comment.profiles?.full_name || 'User'} />
-                            <AvatarFallback>{comment.profiles?.full_name?.charAt(0)?.toUpperCase() || 'U'}</AvatarFallback>
+                            <AvatarImage src={comment.user_avatar_url || ''} alt={comment.user_full_name || 'User'} />
+                            <AvatarFallback>{comment.user_full_name?.charAt(0)?.toUpperCase() || 'U'}</AvatarFallback>
                         </Avatar>
                         <div className="flex-grow">
                             <div className="flex items-center justify-between">
                                <div className="flex items-center gap-2">
-                                  <span className="font-semibold">{comment.profiles?.full_name || 'Anonymous'}</span>
+                                  <span className="font-semibold">{comment.user_full_name || 'Anonymous'}</span>
                                   <span className="text-xs text-muted-foreground">{formatDistanceToNow(new Date(comment.created_at), { addSuffix: true })}</span>
                                </div>
                                 {user?.id === comment.user_id && (

@@ -16,16 +16,14 @@ interface Like {
     user_id: string;
 }
 
-// Update the comment type to match the new data structure
+// Update the comment type to match the new denormalized data structure
 export interface CommentWithProfile {
     id: string;
     content: string;
     created_at: string;
     user_id: string;
-    profiles: {
-        full_name: string | null;
-        avatar_url: string | null;
-    } | null;
+    user_full_name: string | null;
+    user_avatar_url: string | null;
 }
 
 export default function RecipeInteractions({ recipeId }: RecipeInteractionsProps) {
@@ -34,63 +32,38 @@ export default function RecipeInteractions({ recipeId }: RecipeInteractionsProps
     const [comments, setComments] = useState<CommentWithProfile[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
+    const fetchData = async () => {
+        setIsLoading(true);
+        
+        const likesPromise = supabase
+            .from('likes')
+            .select('user_id')
+            .eq('recipe_id', recipeId);
+        
+        const commentsPromise = supabase
+            .from('comments')
+            .select('*')
+            .eq('recipe_id', recipeId)
+            .order('created_at', { ascending: false }); // Fetch newest first
+
+        const [likesRes, commentsRes] = await Promise.all([likesPromise, commentsPromise]);
+        
+        if (likesRes.error) {
+            console.error('Error fetching likes:', likesRes.error.message);
+        } else {
+            setLikes(likesRes.data || []);
+        }
+
+        if (commentsRes.error) {
+            console.error('Error fetching comments:', commentsRes.error.message);
+        } else {
+            setComments(commentsRes.data || []);
+        }
+
+        setIsLoading(false);
+    };
+
     useEffect(() => {
-        const fetchData = async () => {
-            setIsLoading(true);
-            
-            // --- Fetch Likes ---
-            const likesPromise = supabase
-                .from('likes')
-                .select('user_id')
-                .eq('recipe_id', recipeId);
-            
-            // --- Fetch Comments and Profiles separately ---
-            const commentsPromise = supabase
-                .from('comments')
-                .select('*')
-                .eq('recipe_id', recipeId)
-                .order('created_at', { ascending: true });
-
-
-            const [likesRes, commentsRes] = await Promise.all([likesPromise, commentsPromise]);
-            
-            if (likesRes.error) {
-                console.error('Error fetching likes:', likesRes.error.message);
-            } else {
-                setLikes(likesRes.data || []);
-            }
-
-            if (commentsRes.error) {
-                console.error('Error fetching comments:', commentsRes.error.message);
-            } else {
-                const fetchedComments = commentsRes.data || [];
-                const userIds = [...new Set(fetchedComments.map(c => c.user_id))];
-
-                if (userIds.length > 0) {
-                    const { data: profilesData, error: profilesError } = await supabase
-                        .from('profiles')
-                        .select('id, full_name, avatar_url')
-                        .in('id', userIds);
-
-                    if (profilesError) {
-                        console.error('Error fetching profiles:', profilesError.message);
-                        // Set comments without profile data
-                        setComments(fetchedComments.map(c => ({...c, profiles: null})));
-                    } else {
-                        const profilesMap = new Map(profilesData.map(p => [p.id, p]));
-                        const commentsWithProfiles = fetchedComments.map(comment => ({
-                            ...comment,
-                            profiles: profilesMap.get(comment.user_id) || null
-                        })).reverse(); // reverse here to show newest first
-                        setComments(commentsWithProfiles);
-                    }
-                } else {
-                    setComments([]); // No comments, so no profiles to fetch
-                }
-            }
-
-            setIsLoading(false);
-        };
 
         if (recipeId) {
             fetchData();

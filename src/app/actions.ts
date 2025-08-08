@@ -47,6 +47,8 @@ export async function addComment(formData: FormData) {
         content,
         recipe_id: recipeId,
         user_id: user.id,
+        user_full_name: user.user_metadata.full_name,
+        user_avatar_url: user.user_metadata.avatar_url,
     });
     
     revalidatePath(`/my-recipes/${recipeId}`);
