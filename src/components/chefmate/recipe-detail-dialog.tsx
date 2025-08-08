@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { type RecipeWithImage } from '@/app/page';
+import { type CombinedRecipe } from '@/app/page';
 import { useState, useContext, createContext } from 'react';
 import Image from "next/image";
 import { Skeleton } from "../ui/skeleton";
@@ -23,7 +23,7 @@ import { Separator } from "../ui/separator";
 
 
 interface RecipeDetailDialogContextType {
-    setSelectedRecipe: (recipe: RecipeWithImage | null) => void;
+    setSelectedRecipe: (recipe: CombinedRecipe | null) => void;
 }
 
 const RecipeDetailDialogContext = createContext<RecipeDetailDialogContextType | null>(null);
@@ -42,19 +42,25 @@ interface RecipeDetailDialogProviderProps {
 }
 
 export function RecipeDetailDialogProvider({ children, userIngredients }: RecipeDetailDialogProviderProps) {
-  const [selectedRecipe, setSelectedRecipe] = useState<RecipeWithImage | null>(null);
+  const [selectedRecipe, setSelectedRecipe] = useState<CombinedRecipe | null>(null);
   const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
   const { language } = useContext(LanguageContext);
   const t = content[language];
   const { toast } = useToast();
   
-  const getRecipeName = (recipe: RecipeWithImage) => {
-    return language === 'bn' ? recipe.name_bn : recipe.name_en;
+  const getRecipeName = (recipe: CombinedRecipe) => {
+    if (recipe.source === 'ai') {
+        return language === 'bn' ? recipe.name_bn : recipe.name_en;
+    }
+    return recipe.title || "Untitled Recipe";
   };
 
-  const getRecipeInstructions = (recipe: RecipeWithImage) => {
-    return language === 'bn' ? recipe.instructions_bn : recipe.instructions_en;
+  const getRecipeInstructions = (recipe: CombinedRecipe) => {
+     if (recipe.source === 'ai') {
+        return language === 'bn' ? recipe.instructions_bn : recipe.instructions_en;
+     }
+     return "Instructions not available for user recipes in this view.";
   };
 
   const highlightIngredients = (instructions: string) => {
@@ -92,8 +98,8 @@ export function RecipeDetailDialogProvider({ children, userIngredients }: Recipe
     <RecipeDetailDialogContext.Provider value={{ setSelectedRecipe }}>
         <Dialog open={!!selectedRecipe} onOpenChange={(isOpen) => !isOpen && handleDialogClose()}>
             {children}
-            {selectedRecipe && (
-                <DialogContent className="max-w-md sm:rounded-lg">
+            {selectedRecipe && selectedRecipe.source === 'ai' && (
+                <DialogContent className="max-w-md p-0">
                     <DialogHeader className="p-4 border-b flex-row items-center justify-between">
                         <DialogTitle className="text-xl truncate">{getRecipeName(selectedRecipe)}</DialogTitle>
                          <DialogClose className="rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
@@ -112,7 +118,9 @@ export function RecipeDetailDialogProvider({ children, userIngredients }: Recipe
 
                         <div className="flex gap-2">
                             <Badge variant="outline">{selectedRecipe.totalTime}</Badge>
-                            <Badge variant="outline">{t.recipes.ingredientsUsed(selectedRecipe.ingredientsUsedCount)}</Badge>
+                            {selectedRecipe.ingredientsUsedCount && 
+                                <Badge variant="outline">{t.recipes.ingredientsUsed(selectedRecipe.ingredientsUsedCount)}</Badge>
+                            }
                         </div>
                         
                         <div>
@@ -143,6 +151,7 @@ export function RecipeDetailDialogProvider({ children, userIngredients }: Recipe
 
                         <Separator />
 
+                        {selectedRecipe.nutrition && (
                         <div className="space-y-4">
                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                                <h4 className="font-semibold font-headline flex items-center gap-2">
@@ -170,8 +179,11 @@ export function RecipeDetailDialogProvider({ children, userIngredients }: Recipe
                                </div>
                              </div>
                         </div>
+                        )}
 
-                        <VideoSuggestions searchQuery={selectedRecipe.youtubeSearchQuery} />
+                        {selectedRecipe.youtubeSearchQuery &&
+                           <VideoSuggestions searchQuery={selectedRecipe.youtubeSearchQuery} />
+                        }
                     </div>
                 </DialogContent>
             )}
@@ -181,7 +193,7 @@ export function RecipeDetailDialogProvider({ children, userIngredients }: Recipe
 }
 
 
-const RecipeDetailDialogTrigger = ({ children, recipe }: { children: React.ReactNode, recipe: RecipeWithImage }) => {
+const RecipeDetailDialogTrigger = ({ children, recipe }: { children: React.ReactNode, recipe: CombinedRecipe }) => {
     const { setSelectedRecipe } = useRecipeDetailDialog();
     return (
         <div onClick={() => setSelectedRecipe(recipe)} className="cursor-pointer">

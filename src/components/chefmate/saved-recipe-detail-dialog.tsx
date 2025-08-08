@@ -48,7 +48,7 @@ export function SavedRecipeDetailDialogProvider({ children }: SavedRecipeDetailD
                             {/* This title is for accessibility. It is visually hidden but available to screen readers. */}
                             <DialogTitle className="sr-only">{selectedRecipe.title}</DialogTitle>
                         </DialogHeader>
-                        <DialogClose className="absolute right-4 top-4 z-10 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+                        <DialogClose className="absolute right-4 top-4 z-10 rounded-full p-1 opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground bg-background/60 backdrop-blur-sm">
                             <X className="h-5 w-5" />
                             <span className="sr-only">Close</span>
                         </DialogClose>
