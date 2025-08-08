@@ -16,6 +16,8 @@ import RecipeGrid from '@/components/chefmate/recipe-grid';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import RecipeFilters from '@/components/chefmate/recipe-filters';
+import PublicRecipesList from '@/components/chefmate/public-recipes-list';
+import { Separator } from '@/components/ui/separator';
 
 // Define a new type for the recipe that includes the optional imageUrl
 export type RecipeWithImage = SuggestRecipesOutput['recipes'][0] & {
@@ -64,8 +66,8 @@ export default function Home() {
   const saveSearchToHistory = async (searchIngredients: string[], foundRecipes: RecipeWithImage[], imageUrl?: string | null) => {
     if (!user) return; // Only save history for logged-in users
     try {
-        // Create a "clean" version of the recipes without the client-side `imageUrl` property
-        const recipesForDb = foundRecipes.map(({ imageUrl, ...rest }) => rest);
+        // Create a "clean" version of the recipes without the client-side `imageUrl` and complex `nutrition` properties
+        const recipesForDb = foundRecipes.map(({ imageUrl, nutrition, ...rest }) => rest);
 
         const { error } = await supabase.from('history').insert({
             user_id: user.id,
@@ -174,7 +176,7 @@ export default function Home() {
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-grow container mx-auto p-4 md:px-6 md:py-8">
-        <div className="max-w-2xl mx-auto w-full space-y-8">
+        <div className="max-w-4xl mx-auto w-full space-y-8">
           <IngredientEditor
             ingredients={ingredients}
             setIngredients={setIngredients}
@@ -216,6 +218,11 @@ export default function Home() {
               />
             </div>
           )}
+          
+          <div className="pt-8">
+             <PublicRecipesList />
+          </div>
+
         </div>
       </main>
     </div>
