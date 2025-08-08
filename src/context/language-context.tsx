@@ -23,6 +23,7 @@ export const content = {
     en: {
         appName: 'ChefMate',
         languageName: 'English',
+        publicRecipes: 'Recent Community Recipes',
         auth: {
             login: 'Login',
             logout: 'Log out',
@@ -154,6 +155,7 @@ export const content = {
     bn: {
         appName: 'শেফমেট',
         languageName: 'বাংলা',
+        publicRecipes: 'সাম্প্রতিক কমিউনিটি রেসিপি',
         auth: {
             login: 'লগইন',
             logout: 'লগ আউট',
