@@ -18,7 +18,7 @@ export default function SavedRecipeCard({ recipe }: SavedRecipeCardProps) {
 
     return (
         <Card 
-            onClick={() => setSelectedRecipe(recipe.id)}
+            onClick={() => setSelectedRecipe(recipe)}
             className="flex flex-col h-full hover:shadow-lg transition-shadow duration-300 cursor-pointer"
         >
             <CardHeader className="p-0">
