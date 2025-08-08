@@ -17,6 +17,7 @@ import { Button } from '../ui/button';
 import Link from 'next/link';
 import { useContext } from 'react';
 import { LanguageContext, content } from '@/context/language-context';
+import { useAuth } from '@/context/auth-context';
 
 interface SavedRecipeCardProps {
     recipe: MyRecipe;
@@ -28,6 +29,7 @@ export default function SavedRecipeCard({ recipe, isOwner, onDelete }: SavedReci
     const { setSelectedRecipe } = useSavedRecipeDetailDialog();
     const { language } = useContext(LanguageContext);
     const t = content[language];
+    const { user } = useAuth();
 
     const handleCardClick = (e: React.MouseEvent) => {
         // Prevent dialog from opening if the click was on any interactive element inside the card
@@ -82,7 +84,10 @@ export default function SavedRecipeCard({ recipe, isOwner, onDelete }: SavedReci
                 )}
             </CardHeader>
             <CardContent className="p-4 flex-grow">
-                <CardTitle className="text-xl mb-2 line-clamp-2">{recipe.title}</CardTitle>
+                <CardTitle className="text-xl mb-1 line-clamp-2">{recipe.title}</CardTitle>
+                {!isOwner && recipe.owner_full_name && (
+                    <p className="text-xs text-muted-foreground mb-2">by {recipe.owner_full_name}</p>
+                )}
                 {recipe.category && <Badge variant="secondary">{recipe.category}</Badge>}
             </CardContent>
             <CardFooter className="p-4 pt-0 flex justify-between items-center text-sm text-muted-foreground">

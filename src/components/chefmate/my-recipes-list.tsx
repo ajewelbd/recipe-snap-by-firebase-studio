@@ -36,6 +36,8 @@ export interface MyRecipe {
   has_liked: boolean;
   user_id: string;
   is_public: boolean;
+  owner_full_name: string | null;
+  owner_avatar_url: string | null;
 }
 
 export default function MyRecipesList() {
@@ -156,4 +158,3 @@ export default function MyRecipesList() {
     </>
   );
 }
-
