@@ -10,20 +10,11 @@ import { useRef } from 'react';
 import { useFormStatus } from 'react-dom';
 import { Loader2, Send, Trash2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import type { CommentWithProfile } from './recipe-interactions';
 
-interface Comment {
-    id: string;
-    content: string;
-    created_at: string;
-    profiles: {
-        full_name: string | null;
-        avatar_url: string | null;
-    } | null;
-    user_id: string;
-}
 
 interface CommentSectionProps {
-    comments: Comment[];
+    comments: CommentWithProfile[];
     recipeId: string;
 }
 
@@ -36,7 +27,7 @@ function SubmitButton() {
     )
 }
 
-function DeleteButton({ comment, recipeId }: { comment: Comment, recipeId: string }) {
+function DeleteButton({ comment, recipeId }: { comment: CommentWithProfile, recipeId: string }) {
     const { pending } = useFormStatus();
     return (
          <Button

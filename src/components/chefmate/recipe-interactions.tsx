@@ -16,7 +16,8 @@ interface Like {
     user_id: string;
 }
 
-interface Comment {
+// Update the comment type to match the new data structure
+export interface CommentWithProfile {
     id: string;
     content: string;
     created_at: string;
@@ -30,35 +31,26 @@ interface Comment {
 export default function RecipeInteractions({ recipeId }: RecipeInteractionsProps) {
     const { user } = useAuth();
     const [likes, setLikes] = useState<Like[]>([]);
-    const [comments, setComments] = useState<Comment[]>([]);
+    const [comments, setComments] = useState<CommentWithProfile[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true);
             
+            // --- Fetch Likes ---
             const likesPromise = supabase
                 .from('likes')
                 .select('user_id')
                 .eq('recipe_id', recipeId);
-
-            // Fetch comments and join with profiles table
-            // The syntax `profiles:user_id(*)` tells Supabase to join on the `user_id` foreign key
-            // and return all columns from the `profiles` table.
+            
+            // --- Fetch Comments and Profiles separately ---
             const commentsPromise = supabase
                 .from('comments')
-                .select(`
-                    id,
-                    content,
-                    created_at,
-                    user_id,
-                    profiles:profiles (
-                        full_name,
-                        avatar_url
-                    )
-                `)
+                .select('*')
                 .eq('recipe_id', recipeId)
-                .order('created_at', { ascending: false });
+                .order('created_at', { ascending: true });
+
 
             const [likesRes, commentsRes] = await Promise.all([likesPromise, commentsPromise]);
             
@@ -71,7 +63,30 @@ export default function RecipeInteractions({ recipeId }: RecipeInteractionsProps
             if (commentsRes.error) {
                 console.error('Error fetching comments:', commentsRes.error.message);
             } else {
-                setComments(commentsRes.data as Comment[] || []);
+                const fetchedComments = commentsRes.data || [];
+                const userIds = [...new Set(fetchedComments.map(c => c.user_id))];
+
+                if (userIds.length > 0) {
+                    const { data: profilesData, error: profilesError } = await supabase
+                        .from('profiles')
+                        .select('id, full_name, avatar_url')
+                        .in('id', userIds);
+
+                    if (profilesError) {
+                        console.error('Error fetching profiles:', profilesError.message);
+                        // Set comments without profile data
+                        setComments(fetchedComments.map(c => ({...c, profiles: null})));
+                    } else {
+                        const profilesMap = new Map(profilesData.map(p => [p.id, p]));
+                        const commentsWithProfiles = fetchedComments.map(comment => ({
+                            ...comment,
+                            profiles: profilesMap.get(comment.user_id) || null
+                        })).reverse(); // reverse here to show newest first
+                        setComments(commentsWithProfiles);
+                    }
+                } else {
+                    setComments([]); // No comments, so no profiles to fetch
+                }
             }
 
             setIsLoading(false);
@@ -87,7 +102,6 @@ export default function RecipeInteractions({ recipeId }: RecipeInteractionsProps
             'postgres_changes',
             { event: '*', schema: 'public', table: 'likes', filter: `recipe_id=eq.${recipeId}` },
             (payload) => {
-              // Refetch likes on any change
               fetchData();
             }
           )
@@ -95,7 +109,6 @@ export default function RecipeInteractions({ recipeId }: RecipeInteractionsProps
             'postgres_changes',
             { event: '*', schema: 'public', table: 'comments', filter: `recipe_id=eq.${recipeId}` },
             (payload) => {
-              // Refetch comments on any change
               fetchData();
             }
           )
