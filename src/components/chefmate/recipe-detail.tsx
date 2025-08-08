@@ -147,11 +147,9 @@ export default function RecipeDetail({ recipeId }: RecipeDetailProps) {
             ))}
         </div>
         
-        <Separator />
-        <RecipeInteractions recipeId={recipe.id} />
-        <Separator />
-
         {nutrition && (
+          <>
+            <Separator />
             <div className="space-y-4 pt-4">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <h2 className="text-2xl font-bold font-headline flex items-center gap-2">
@@ -180,6 +178,7 @@ export default function RecipeDetail({ recipeId }: RecipeDetailProps) {
                 </div>
                 <p className="text-xs text-muted-foreground text-center">Disclaimer: Nutritional information is an AI-generated estimate and should not be used for medical purposes.</p>
             </div>
+           </>
         )}
 
         {recipe.result_image_urls && recipe.result_image_urls.length > 0 && (
@@ -202,6 +201,9 @@ export default function RecipeDetail({ recipeId }: RecipeDetailProps) {
                 </Carousel>
             </div>
         )}
+        
+        <Separator />
+        <RecipeInteractions recipeId={recipe.id} />
     </div>
   );
 }
