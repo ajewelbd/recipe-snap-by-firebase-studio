@@ -26,7 +26,7 @@ export default function PublicRecipesList() {
          const { data, error } = await supabase
           .rpc('get_recipes_with_interactions', { 
               request_user_id: user?.id || null,
-              only_public: true 
+              p_only_public: true 
             })
           .order('created_at', { ascending: false })
           .limit(6);
@@ -45,7 +45,10 @@ export default function PublicRecipesList() {
   if (isLoading) {
     return (
         <div className="space-y-6">
-            <Skeleton className="h-8 w-64" />
+            <h2 className="text-3xl font-bold font-headline text-primary flex items-center gap-3">
+                <Sparkles />
+                {t.publicRecipes}
+            </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[...Array(3)].map((_, i) => (
                    <Skeleton key={i} className="h-96 w-full" />
@@ -80,4 +83,3 @@ export default function PublicRecipesList() {
     </SavedRecipeDetailDialogProvider>
   );
 }
-
