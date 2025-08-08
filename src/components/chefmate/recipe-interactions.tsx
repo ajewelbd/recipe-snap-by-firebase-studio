@@ -59,11 +59,17 @@ export default function RecipeInteractions({ recipeId }: RecipeInteractionsProps
 
             const [likesRes, commentsRes] = await Promise.all([likesPromise, commentsPromise]);
             
-            if (likesRes.error) console.error('Error fetching likes:', likesRes.error);
-            else setLikes(likesRes.data || []);
+            if (likesRes.error) {
+                console.error('Error fetching likes:', likesRes.error.message);
+            } else {
+                setLikes(likesRes.data || []);
+            }
 
-            if (commentsRes.error) console.error('Error fetching comments:', commentsRes.error);
-            else setComments(commentsRes.data as Comment[] || []);
+            if (commentsRes.error) {
+                console.error('Error fetching comments:', commentsRes.error.message);
+            } else {
+                setComments(commentsRes.data as Comment[] || []);
+            }
 
             setIsLoading(false);
         };
