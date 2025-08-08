@@ -85,13 +85,13 @@ export default function Header() {
         <Link href="/my-recipes" prefetch={true} onClick={() => setIsMobileMenuOpen(false)}>
             <Button variant="ghost" className="w-full justify-start gap-2 px-2">
               <BookOpen className="h-4 w-4" />
-              <span>My Recipes</span>
+              <span>{t.header.myRecipes}</span>
             </Button>
         </Link>
         <Link href="/my-recipes/new" prefetch={true} onClick={() => setIsMobileMenuOpen(false)}>
             <Button variant="ghost" className="w-full justify-start gap-2 px-2">
               <Soup className="h-4 w-4" />
-              <span>New Recipe</span>
+              <span>{t.header.newRecipe}</span>
             </Button>
         </Link>
         <Link href="/history" prefetch={true} onClick={() => setIsMobileMenuOpen(false)}>
@@ -124,16 +124,16 @@ export default function Header() {
             <Button variant="ghost" className="w-full justify-start gap-2 px-2">
               <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
               <Moon className="absolute left-2 h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              <span>Toggle theme</span>
+              <span>{t.header.toggleTheme}</span>
             </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
             <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
-                <DropdownMenuRadioItem value="light">Light</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="dark">Dark</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="system">System</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="theme-indigo">Indigo</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="theme-green-orange">Green/Orange</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="light">{t.header.light}</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="dark">{t.header.dark}</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="system">{t.header.system}</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="theme-indigo">{t.header.indigo}</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="theme-green-orange">{t.header.greenOrange}</DropdownMenuRadioItem>
             </DropdownMenuRadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -147,15 +147,15 @@ export default function Header() {
         <Link href="/my-recipes" prefetch={true}>
             <Button variant="outline" size="sm" className="relative md:w-auto w-9 p-0 md:px-3">
               <BookOpen className="h-4 w-4" />
-              <span className="hidden md:inline ml-2">My Recipes</span>
-              <span className="sr-only">My Recipes</span>
+              <span className="hidden md:inline ml-2">{t.header.myRecipes}</span>
+              <span className="sr-only">{t.header.myRecipes}</span>
             </Button>
         </Link>
         <Link href="/my-recipes/new" prefetch={true}>
             <Button variant="outline" size="sm" className="relative md:w-auto w-9 p-0 md:px-3">
               <Soup className="h-4 w-4" />
-              <span className="hidden md:inline ml-2">New Recipe</span>
-              <span className="sr-only">New Recipe</span>
+              <span className="hidden md:inline ml-2">{t.header.newRecipe}</span>
+              <span className="sr-only">{t.header.newRecipe}</span>
             </Button>
         </Link>
         <Link href="/history" prefetch={true}>
@@ -188,16 +188,16 @@ export default function Header() {
               <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
               <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
               <Palette className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100 theme-indigo:rotate-0 theme-indigo:scale-100 theme-green-orange:rotate-0 theme-green-orange:scale-100" />
-              <span className="sr-only">Toggle theme</span>
+              <span className="sr-only">{t.header.toggleTheme}</span>
             </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
             <DropdownMenuRadioGroup value={theme} onValueChange={setTheme}>
-                <DropdownMenuRadioItem value="light">Light</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="dark">Dark</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="system">System</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="theme-indigo">Indigo</DropdownMenuRadioItem>
-                <DropdownMenuRadioItem value="theme-green-orange">Green/Orange</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="light">{t.header.light}</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="dark">{t.header.dark}</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="system">{t.header.system}</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="theme-indigo">{t.header.indigo}</DropdownMenuRadioItem>
+                <DropdownMenuRadioItem value="theme-green-orange">{t.header.greenOrange}</DropdownMenuRadioItem>
             </DropdownMenuRadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -227,12 +227,12 @@ export default function Header() {
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon">
                 <Menu className="h-9 w-9" />
-                <span className="sr-only">Open menu</span>
+                <span className="sr-only">{t.header.openMenu}</span>
               </Button>
             </SheetTrigger>
             <SheetContent side="right" className="w-3/4">
               <SheetHeader>
-                <SheetTitle>Menu</SheetTitle>
+                <SheetTitle>{t.header.menu}</SheetTitle>
               </SheetHeader>
               <div className="flex flex-col space-y-2 pt-6">
                 <div className="mb-4"><UserMenu isMobile={true} /></div>

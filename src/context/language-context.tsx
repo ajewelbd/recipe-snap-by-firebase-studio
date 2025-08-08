@@ -45,6 +45,18 @@ export const content = {
                 unknown: 'An unknown error occurred. Please try again.',
             }
         },
+        header: {
+            myRecipes: 'My Recipes',
+            newRecipe: 'New Recipe',
+            toggleTheme: 'Toggle theme',
+            menu: 'Menu',
+            openMenu: 'Open menu',
+            light: 'Light',
+            dark: 'Dark',
+            system: 'System',
+            indigo: 'Indigo',
+            greenOrange: 'Green/Orange',
+        },
         history: {
             title: 'History',
             loginPrompt: {
@@ -163,6 +175,18 @@ export const content = {
                 weakPassword: 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।',
                 unknown: 'একটি অজানা ত্রুটি ঘটেছে। অনুগ্রহ করে আবার চেষ্টা করুন।',
             }
+        },
+        header: {
+            myRecipes: 'আমার রেসিপি',
+            newRecipe: 'নতুন রেসিপি',
+            toggleTheme: 'থিম পরিবর্তন করুন',
+            menu: 'মেনু',
+            openMenu: 'মেনু খুলুন',
+            light: 'হালকা',
+            dark: 'অন্ধকার',
+            system: 'সিস্টেম',
+            indigo: 'নীল',
+            greenOrange: 'সবুজ/কমলা',
         },
         history: {
             title: 'ইতিহাস',
