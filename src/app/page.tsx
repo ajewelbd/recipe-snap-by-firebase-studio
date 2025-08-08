@@ -64,8 +64,8 @@ export default function Home() {
   const saveSearchToHistory = async (searchIngredients: string[], foundRecipes: RecipeWithImage[], imageUrl?: string | null) => {
     if (!user) return; // Only save history for logged-in users
     try {
-        // Create a "clean" version of the recipes without the client-side `imageUrl` and complex `nutrition` property
-        const recipesForDb = foundRecipes.map(({ imageUrl, nutrition, ...rest }) => rest);
+        // Create a "clean" version of the recipes without the client-side `imageUrl` property
+        const recipesForDb = foundRecipes.map(({ imageUrl, ...rest }) => rest);
 
         const { error } = await supabase.from('history').insert({
             user_id: user.id,
