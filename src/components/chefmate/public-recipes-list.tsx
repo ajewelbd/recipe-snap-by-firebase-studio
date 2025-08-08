@@ -25,7 +25,7 @@ export default function PublicRecipesList() {
       try {
          const { data, error } = await supabase
           .rpc('get_public_recipes_with_interactions', { 
-              request_user_id: user?.id || null,
+              request_user_id: user?.id ?? null
             })
           .order('created_at', { ascending: false })
           .limit(6);
