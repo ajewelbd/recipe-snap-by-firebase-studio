@@ -6,11 +6,18 @@ import Header from '@/components/chefmate/header';
 import NewRecipeForm from '@/components/chefmate/new-recipe-form';
 import { notFound } from 'next/navigation';
 import { updateRecipe } from './actions';
+import { content } from '@/context/language-context'; // This is a bit of a hack for server components
+import { cookies } from 'next/headers';
 
 
 export default async function EditRecipePage({ params }: { params: { id: string } }) {
   const supabase = createSupabaseServerClient();
   const { id } = params;
+
+  // A bit of a hack to get language on the server for initial render
+  const cookieStore = cookies();
+  const language = cookieStore.get('language')?.value || 'en';
+  const t = content[language as keyof typeof content].newRecipe;
 
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -35,15 +42,14 @@ export default async function EditRecipePage({ params }: { params: { id: string 
       <Header />
       <main className="flex-grow container mx-auto p-4 md:p-8">
         <div className="max-w-2xl mx-auto">
-            <h1 className="text-3xl font-bold font-headline text-primary mb-6">Edit Recipe</h1>
+            <h1 className="text-3xl font-bold font-headline text-primary mb-6">{t.editTitle}</h1>
             <NewRecipeForm 
                 action={updateRecipe}
                 initialData={recipeForForm}
-                submitText="Update Recipe"
+                submitText={t.updateButton}
             />
         </div>
       </main>
     </div>
   );
 }
-

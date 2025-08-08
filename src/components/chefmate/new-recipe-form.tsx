@@ -1,6 +1,6 @@
 
 'use client';
-import { useActionState, useEffect, useMemo } from 'react';
+import { useActionState, useEffect, useMemo, useContext } from 'react';
 import { useRouter } from 'next/navigation';
 import { useFormStatus } from 'react-dom';
 import { saveRecipe, type FormState as SaveFormState } from '@/app/my-recipes/new/actions';
@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import ImageUploader from './image-uploader';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import { LanguageContext, content } from '@/context/language-context';
 
 interface NewRecipeFormProps {
     action?: (prevState: UpdateFormState, formData: FormData) => Promise<UpdateFormState>;
@@ -40,10 +41,14 @@ function SubmitButton({ text }: { text: string }) {
 export default function NewRecipeForm({
     action = saveRecipe,
     initialData,
-    submitText = 'Save Recipe'
+    submitText
 }: NewRecipeFormProps) {
   const isEditing = !!initialData;
   const router = useRouter();
+  const { language } = useContext(LanguageContext);
+  const t = content[language].newRecipe;
+
+  const finalSubmitText = submitText || (isEditing ? t.updateButton : t.saveButton);
 
   const initialState: SaveFormState | UpdateFormState = useMemo(() => ({
     message: '',
@@ -62,11 +67,11 @@ export default function NewRecipeForm({
     <form action={dispatch} className="space-y-8">
       {isEditing && initialData && <input type="hidden" name="id" value={initialData.id} />}
       <div className="space-y-2">
-        <Label htmlFor="title" className="text-lg">Title</Label>
+        <Label htmlFor="title" className="text-lg">{t.titleLabel}</Label>
         <Input
           id="title"
           name="title"
-          placeholder="e.g., Grandma's Apple Pie"
+          placeholder={t.titlePlaceholder}
           required
           className="text-base"
           defaultValue={initialData?.title}
@@ -77,11 +82,11 @@ export default function NewRecipeForm({
       </div>
 
        <div className="space-y-2">
-        <Label htmlFor="ingredients" className="text-lg">Ingredients</Label>
+        <Label htmlFor="ingredients" className="text-lg">{t.ingredientsLabel}</Label>
         <Textarea
           id="ingredients"
           name="ingredients"
-          placeholder="e.g., 2 cups flour, 1 cup sugar, and 3 eggs"
+          placeholder={t.ingredientsPlaceholder}
           required
           rows={5}
           className="text-base"
@@ -93,11 +98,11 @@ export default function NewRecipeForm({
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="time_to_cook" className="text-lg">Time to Cook</Label>
+        <Label htmlFor="time_to_cook" className="text-lg">{t.timeLabel}</Label>
         <Input
           id="time_to_cook"
           name="time_to_cook"
-          placeholder="e.g., 30 minutes"
+          placeholder={t.timePlaceholder}
           className="text-base"
           defaultValue={initialData?.time_to_cook || ''}
         />
@@ -109,7 +114,7 @@ export default function NewRecipeForm({
       {!isEditing && (
         <>
             <div className="space-y-2">
-                <Label htmlFor="featured_image" className="text-lg">Featured Image</Label>
+                <Label htmlFor="featured_image" className="text-lg">{t.featuredImageLabel}</Label>
                 <ImageUploader name="featured_image" multiple={false} />
                 {state.errors?.featured_image && (
                 <p className="text-sm text-destructive">{state.errors.featured_image[0]}</p>
@@ -117,11 +122,11 @@ export default function NewRecipeForm({
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor="details" className="text-lg">Recipe Details</Label>
+                <Label htmlFor="details" className="text-lg">{t.detailsLabel}</Label>
                 <Textarea
                 id="details"
                 name="details"
-                placeholder="List ingredients and step-by-step instructions here..."
+                placeholder={t.detailsPlaceholder}
                 required
                 rows={15}
                 className="text-base"
@@ -133,7 +138,7 @@ export default function NewRecipeForm({
             </div>
 
             <div className="space-y-2">
-                <Label htmlFor="result_images" className="text-lg">Final Result Photos</Label>
+                <Label htmlFor="result_images" className="text-lg">{t.resultPhotosLabel}</Label>
                 <ImageUploader name="result_images" multiple={true} />
                 {state.errors?.result_images && (
                 <p className="text-sm text-destructive">{state.errors.result_images[0]}</p>
@@ -144,11 +149,11 @@ export default function NewRecipeForm({
 
        {isEditing && (
          <div className="space-y-2">
-            <Label htmlFor="details" className="text-lg">Recipe Details</Label>
+            <Label htmlFor="details" className="text-lg">{t.detailsLabel}</Label>
             <Textarea
             id="details"
             name="details"
-            placeholder="List ingredients and step-by-step instructions here..."
+            placeholder={t.detailsPlaceholder}
             required
             rows={15}
             className="text-base"
@@ -164,8 +169,8 @@ export default function NewRecipeForm({
       <div className="flex items-center space-x-4 rounded-lg border p-4">
         <Switch id="is_public" name="is_public" defaultChecked={initialData?.is_public ?? true}/>
         <div className="flex flex-col">
-            <Label htmlFor="is_public" className="text-base">Make Recipe Public</Label>
-            <p className="text-sm text-muted-foreground">Allow other users to see this recipe.</p>
+            <Label htmlFor="is_public" className="text-base">{t.publicLabel}</Label>
+            <p className="text-sm text-muted-foreground">{t.publicDescription}</p>
         </div>
       </div>
       
@@ -176,7 +181,7 @@ export default function NewRecipeForm({
           </Alert>
         )}
 
-      <SubmitButton text={submitText} />
+      <SubmitButton text={finalSubmitText} />
     </form>
   );
 }

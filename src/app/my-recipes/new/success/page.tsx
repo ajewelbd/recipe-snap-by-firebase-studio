@@ -4,9 +4,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle } from 'lucide-react';
 import Link from 'next/link';
-import React from 'react';
+import React, { useContext } from 'react';
+import { LanguageContext, content } from '@/context/language-context';
 
 export default function SuccessPage() {
+  const { language } = useContext(LanguageContext);
+  const t = content[language].newRecipe;
+
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
@@ -16,16 +20,16 @@ export default function SuccessPage() {
                 <div className="mx-auto bg-primary/20 text-primary rounded-full h-16 w-16 flex items-center justify-center">
                     <CheckCircle className="h-10 w-10" />
                 </div>
-                <CardTitle className="mt-4">Recipe Saved!</CardTitle>
+                <CardTitle className="mt-4">{t.successTitle}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
-                <p className="text-muted-foreground">Your new recipe has been successfully saved to your collection.</p>
+                <p className="text-muted-foreground">{t.successDescription}</p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Button asChild>
-                        <Link href="/my-recipes">View My Recipes</Link>
+                        <Link href="/my-recipes">{t.viewMyRecipes}</Link>
                     </Button>
                      <Button variant="outline" asChild>
-                        <Link href="/my-recipes/new">Create Another Recipe</Link>
+                        <Link href="/my-recipes/new">{t.createAnother}</Link>
                     </Button>
                 </div>
             </CardContent>

@@ -4,11 +4,14 @@ import Header from '@/components/chefmate/header';
 import NewRecipeForm from '@/components/chefmate/new-recipe-form';
 import { useAuth } from '@/context/auth-context';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useContext } from 'react';
+import { LanguageContext, content } from '@/context/language-context';
 
 export default function NewRecipePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const { language } = useContext(LanguageContext);
+  const t = content[language].newRecipe;
 
   useEffect(() => {
     // Only redirect if loading is finished and there's no user.
@@ -23,7 +26,7 @@ export default function NewRecipePage() {
         <div className="flex flex-col min-h-screen">
             <Header />
             <main className="flex-grow container mx-auto p-4 md:p-8 flex items-center justify-center">
-                <p>Loading...</p>
+                <p>{t.loading}</p>
             </main>
       </div>
     );
@@ -41,7 +44,7 @@ export default function NewRecipePage() {
       <Header />
       <main className="flex-grow container mx-auto p-4 md:p-8">
         <div className="max-w-2xl mx-auto">
-            <h1 className="text-3xl font-bold font-headline text-primary mb-6">Create New Recipe</h1>
+            <h1 className="text-3xl font-bold font-headline text-primary mb-6">{t.createTitle}</h1>
             <NewRecipeForm />
         </div>
       </main>
