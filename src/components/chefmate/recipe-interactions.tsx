@@ -42,6 +42,9 @@ export default function RecipeInteractions({ recipeId }: RecipeInteractionsProps
                 .select('user_id')
                 .eq('recipe_id', recipeId);
 
+            // Fetch comments and join with profiles table
+            // The syntax `profiles:user_id(*)` tells Supabase to join on the `user_id` foreign key
+            // and return all columns from the `profiles` table.
             const commentsPromise = supabase
                 .from('comments')
                 .select(`
@@ -49,7 +52,7 @@ export default function RecipeInteractions({ recipeId }: RecipeInteractionsProps
                     content,
                     created_at,
                     user_id,
-                    profiles (
+                    profiles:profiles (
                         full_name,
                         avatar_url
                     )
