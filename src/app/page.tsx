@@ -64,10 +64,13 @@ export default function Home() {
   const saveSearchToHistory = async (searchIngredients: string[], foundRecipes: RecipeWithImage[], imageUrl?: string | null) => {
     if (!user) return; // Only save history for logged-in users
     try {
+        // Create a "clean" version of the recipes without the client-side `imageUrl` property
+        const recipesForDb = foundRecipes.map(({ imageUrl, ...rest }) => rest);
+
         const { error } = await supabase.from('history').insert({
             user_id: user.id,
             ingredients: searchIngredients,
-            recipes: foundRecipes,
+            recipes: recipesForDb,
             image_url: imageUrl
         });
         if (error) throw error;
@@ -135,7 +138,8 @@ export default function Home() {
       generateImagesInBackground(recipesWithImagePlaceholder); // Start generating images
       
       if (user) {
-        await saveSearchToHistory(ingredients, result.recipes, lastImageUrl);
+        // Pass the original result.recipes to saveSearchToHistory, it will be cleaned inside
+        await saveSearchToHistory(ingredients, recipesWithImagePlaceholder, lastImageUrl);
       } else {
          // Decrement and save for guest users
          try {
@@ -198,7 +202,7 @@ export default function Home() {
             </p>
           )}
 
-          {(isLoadingRecipes || recipes.length > 0) && (
+          {(isLoadingRecipes || (hasSearched && recipes.length > 0)) && (
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <h2 className="text-2xl font-bold">{t.recipes.title}</h2>
