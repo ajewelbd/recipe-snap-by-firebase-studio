@@ -4,7 +4,7 @@
 import { useAuth } from '@/context/auth-context';
 import { Button } from '../ui/button';
 import { Heart, Loader2 } from 'lucide-react';
-import { toggleLike } from '@/app/my-recipes/[id]/actions';
+import { toggleLike } from '@/app/actions';
 import { useTransition } from 'react';
 
 interface LikeButtonProps {

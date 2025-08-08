@@ -5,7 +5,7 @@ import { useAuth } from '@/context/auth-context';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
-import { addComment, deleteComment } from '@/app/my-recipes/[id]/actions';
+import { addComment, deleteComment } from '@/app/actions';
 import { useRef } from 'react';
 import { useFormStatus } from 'react-dom';
 import { Loader2, Send, Trash2 } from 'lucide-react';
