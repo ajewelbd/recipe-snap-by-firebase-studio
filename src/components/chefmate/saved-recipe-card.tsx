@@ -26,14 +26,8 @@ export default function SavedRecipeCard({ recipe, isOwner, onDelete }: SavedReci
     const { setSelectedRecipe } = useSavedRecipeDetailDialog();
 
     const handleCardClick = (e: React.MouseEvent) => {
-        // Prevent dialog from opening if the click was on the dropdown menu
-        if ((e.target as HTMLElement).closest('[data-radix-dropdown-menu-content]')) {
-            return;
-        }
-        if ((e.target as HTMLElement).closest('a')) {
-            return;
-        }
-        if ((e.target as HTMLElement).closest('button')) {
+        // Prevent dialog from opening if the click was on any interactive element inside the card
+        if ((e.target as HTMLElement).closest('a, button, [role="menuitem"]')) {
             return;
         }
         setSelectedRecipe(recipe);
@@ -58,7 +52,12 @@ export default function SavedRecipeCard({ recipe, isOwner, onDelete }: SavedReci
                      <div className="absolute top-2 right-2">
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
-                                <Button variant="secondary" size="icon" className="h-8 w-8 rounded-full bg-black/50 text-white hover:bg-black/70">
+                                <Button 
+                                    variant="secondary" 
+                                    size="icon" 
+                                    className="h-8 w-8 rounded-full bg-black/50 text-white hover:bg-black/70"
+                                    onClick={(e) => e.stopPropagation()}
+                                >
                                     <MoreVertical className="h-4 w-4" />
                                 </Button>
                             </DropdownMenuTrigger>
@@ -97,4 +96,3 @@ export default function SavedRecipeCard({ recipe, isOwner, onDelete }: SavedReci
         </Card>
     );
 }
-
