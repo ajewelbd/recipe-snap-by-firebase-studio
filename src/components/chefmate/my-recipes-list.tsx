@@ -59,8 +59,10 @@ export default function MyRecipesList() {
       setIsLoading(true);
       try {
         const { data, error } = await supabase
-          .rpc('get_recipes_with_interactions', { request_user_id: user.id })
-          .eq('user_id', user.id)
+          .rpc('get_recipes_with_interactions', { 
+              request_user_id: user.id,
+              owner_id: user.id
+           })
           .order('created_at', { ascending: false });
 
         if (error) throw error;
